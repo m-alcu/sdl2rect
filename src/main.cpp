@@ -17,6 +17,7 @@ int main(int argv, char** args)
 
 	bool isRunning = true;
 	SDL_Event event;
+	Uint32 color;
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -63,9 +64,10 @@ int main(int argv, char** args)
 				y_start = y_start - y_end;
 			}
 
+			color = SDL_MapRGBA( mappingFormat, colr, colg, colb, 0x00 );
 			for (int hy=y_start;hy<y_end;hy++) {
 				for(int hx=x_start;hx<x_end;hx++) {
-					pixels[hy * 800 + hx] = SDL_MapRGBA( mappingFormat, colr, colg, colb, 0x00 );
+					pixels[hy * 800 + hx] = color;
 				}
 			}
 		}
