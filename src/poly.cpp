@@ -11,11 +11,11 @@ void Rectangle::draw(uint32_t *pixels, Screen screen, int y_start, int y_end, in
 
 void Rectangle::randomDraw(uint32_t *pixels, Screen screen) {
 
-    RGBValue v;
-    v.rgba.red = rand() % 255;
-    v.rgba.green = rand() % 255;
-    v.rgba.blue = rand() % 255;
-    v.rgba.alpha = 0x00;
+    RGBValue color;
+    color.rgba.red = rand() % 255;
+    color.rgba.green = rand() % 255;
+    color.rgba.blue = rand() % 255;
+    color.rgba.alpha = 0x00;
 
     int x_start = rand() % screen.width;
     int x_end = rand() % screen.width;
@@ -32,5 +32,9 @@ void Rectangle::randomDraw(uint32_t *pixels, Screen screen) {
         y_start = y_start - y_end;
     };
 
-    draw(pixels, screen, y_start, y_end, x_start, x_end, v.long_value);
+    draw(pixels, screen, y_start, y_end, x_start, x_end, color.long_value);
 };
+
+void Triangle::draw(uint32_t *pixels, Screen screen, Vertex p1, Vertex p2, Vertex p3, uint32_t color) {
+
+}
