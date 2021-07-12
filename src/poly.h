@@ -31,9 +31,10 @@ class Rectangle {
     public:
         Vertex start;
         Vertex end;
+        uint32_t color;
 
     public:
-        void draw(uint32_t *pixels, Screen screen, int y_start, int y_end, int x_start, int x_end, uint32_t color);
+        void draw(uint32_t *pixels, Screen screen);
 
     public:
         void randomDraw(uint32_t *pixels, Screen screen);
@@ -46,7 +47,8 @@ class Triangle {
         Vertex p1;
         Vertex p2;
         Vertex p3;
+        uint32_t color;
 
     public:
-        void draw(uint32_t *pixels, Screen screen, Vertex p1, Vertex p2, Vertex p3, uint32_t color);
+        void draw(uint32_t *pixels, Screen screen);
 };

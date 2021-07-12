@@ -1,10 +1,10 @@
 #include <iostream>
 #include "poly.h"
 
-void Rectangle::draw(uint32_t *pixels, Screen screen, int y_start, int y_end, int x_start, int x_end, uint32_t color) {
-    for (int hy=y_start;hy<y_end;hy++) {
-        for(int hx=x_start;hx<x_end;hx++) {
-            pixels[hy * screen.width + hx] = color;
+void Rectangle::draw(uint32_t *pixels, Screen screen) {
+    for (int hy=Rectangle::start.y;hy<Rectangle::end.y;hy++) {
+        for(int hx=Rectangle::start.x;hx<Rectangle::end.x;hx++) {
+            pixels[hy * screen.width + hx] = Rectangle::color;
         }
     }
 }
@@ -32,9 +32,15 @@ void Rectangle::randomDraw(uint32_t *pixels, Screen screen) {
         y_start = y_start - y_end;
     };
 
-    draw(pixels, screen, y_start, y_end, x_start, x_end, color.long_value);
+    Rectangle::start.x = x_start;
+    Rectangle::start.y = y_start;
+    Rectangle::end.x = x_end;
+    Rectangle::end.y = y_end;
+    Rectangle::color = color.long_value;
+
+    draw(pixels, screen);
 };
 
-void Triangle::draw(uint32_t *pixels, Screen screen, Vertex p1, Vertex p2, Vertex p3, uint32_t color) {
+void Triangle::draw(uint32_t *pixels, Screen screen) {
 
 }
