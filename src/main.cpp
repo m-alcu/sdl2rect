@@ -24,6 +24,7 @@ int main(int argv, char** args)
 	SDL_Event event;
 	Uint32 color;
 	Rectangle rectangle;
+	
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -31,8 +32,6 @@ int main(int argv, char** args)
 
 	while (isRunning)
 	{
-
-		
 
 		while (SDL_PollEvent(&event))
 		{
@@ -51,27 +50,7 @@ int main(int argv, char** args)
 		}
 		
 		for(int i=0;i<100;i++) {
-			int colr = rand() % 255;
-			int colg = rand() % 255;
-			int colb = rand() % 255;
-
-			int x_start = rand() % screen.width;
-			int x_end = rand() % screen.width;
-			int y_start = rand() % screen.high;
-			int y_end = rand() % screen.high;
-			if (x_start > x_end) {
-				x_start = x_start + x_end;
-				x_end = x_start - x_end;
-				x_start = x_start - x_end;
-			}
-			if (y_start > y_end) {
-				y_start = y_start + y_end;
-				y_end = y_start - y_end;
-				y_start = y_start - y_end;
-			}
-
-			color = SDL_MapRGBA( mappingFormat, colr, colg, colb, 0x00 );
-			rectangle.draw(pixels, screen, y_start, y_end, x_start, x_end, color);
+			rectangle.randomDraw(pixels, screen);
 		}
 
 		SDL_SetWindowTitle(window, "pongo el titulo");
