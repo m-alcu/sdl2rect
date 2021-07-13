@@ -68,13 +68,13 @@ void Triangle::randomDraw(uint32_t *pixels, Screen screen) {
 
     Triangle::color = color.long_value;
 
-    if (p1.y > p2.y) swapVertex(&p1,&p2);
-    if (p2.y > p3.y) swapVertex(&p2,&p3);
-    if (p1.y > p2.y) swapVertex(&p1,&p2);
+    draw(pixels, screen);
+};
 
-    Triangle::edge12 = getEdge(p1,p2);
-    Triangle::edge23 = getEdge(p2,p3);
-    Triangle::edge13 = getEdge(p1,p3);
+void Triangle::draw(uint32_t *pixels, Screen screen) {
+
+    orderVertices(&p1, &p2, &p3);
+    calculateEdges(p1,p2,p3);
 
     int32_t leftSide = ( p1.x << 16 ) + 0x8000;
     int32_t rightSide = leftSide;
@@ -87,7 +87,18 @@ void Triangle::randomDraw(uint32_t *pixels, Screen screen) {
         leftSide = (p2.x << 16) + 0x8000;
         drawSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge23, Triangle::edge13);
     }
+};
 
+void Triangle::orderVertices(Vertex *p1, Vertex *p2, Vertex *p3) {
+    if (p1->y > p2->y) swapVertex(p1,p2);
+    if (p2->y > p3->y) swapVertex(p2,p3);
+    if (p1->y > p2->y) swapVertex(p1,p2);
+}
+
+void Triangle::calculateEdges(Vertex p1, Vertex p2, Vertex p3) {
+    Triangle::edge12 = calculateEdge(p1,p2);
+    Triangle::edge23 = calculateEdge(p2,p3);
+    Triangle::edge13 = calculateEdge(p1,p3);
 }
 
 void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
@@ -98,9 +109,9 @@ void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int3
         *leftSide += leftEdge;
         *rightSide += rightEdge;
     }
-}
+};
 
-int32_t Triangle::getEdge(Vertex p1, Vertex p2) {
+int32_t Triangle::calculateEdge(Vertex p1, Vertex p2) {
     int32_t long_y = (int32_t) (p2.y - p1.y);
     if (long_y > 0) {
         int32_t long_x = ((int32_t) (p2.x - p1.x)) << 16;
@@ -108,4 +119,4 @@ int32_t Triangle::getEdge(Vertex p1, Vertex p2) {
     } else {
         return 0;    
     }
-}
+};
