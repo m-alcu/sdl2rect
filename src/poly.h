@@ -57,4 +57,7 @@ class Triangle {
 
     public:
         int32_t getEdge(Vertex p1, Vertex p2);
+
+    public:
+        void drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
 };

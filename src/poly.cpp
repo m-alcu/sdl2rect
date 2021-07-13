@@ -79,57 +79,35 @@ void Triangle::draw(uint32_t *pixels, Screen screen) {
     int32_t leftSide = ( p1.x << 16 ) + 0x8000;
     int32_t rightSide = leftSide;
     if(Triangle::edge13 < Triangle::edge12) {
-        for(uint16_t hy=p1.y;hy<p2.y; hy++) {
-            int16_t left16 = leftSide >> 16;
-            int16_t right16 = rightSide >> 16;
-            for(int hx=left16;hx<right16;hx++) {
-                pixels[hy * screen.width + hx] = Triangle::color;
-            }
-            leftSide = leftSide + Triangle::edge13;
-            rightSide = rightSide + Triangle::edge12;
-        }
-        int16_t rightSide = (p2.x << 16) + 0x8000;
-        for(uint16_t hy=p2.y;hy<p3.y; hy++) {
-            int16_t left16 = leftSide >> 16;
-            int16_t right16 = rightSide >> 16;
-            for(int hx=left16;hx<right16;hx++) {
-                pixels[hy * screen.width + hx] = Triangle::color;
-            }
-            leftSide = leftSide + Triangle::edge13;
-            rightSide = rightSide + Triangle::edge23;
-        }        
+        drawSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge12);
+        rightSide = (p2.x << 16) + 0x8000;
+        drawSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge23);
     } else {
-        for(uint16_t hy=p1.y;hy<p2.y; hy++) {
-            int16_t left16 = leftSide >> 16;
-            int16_t right16 = rightSide >> 16;
-            for(int hx=left16;hx<right16;hx++) {
-                pixels[hy * screen.width + hx] = Triangle::color;
-            }
-            leftSide = leftSide + Triangle::edge12;
-            rightSide = rightSide + Triangle::edge13;
-        }
-        int32_t leftSide = (p2.x << 16) + 0x8000;
-        for(uint16_t hy=p2.y;hy<p3.y; hy++) {
-            int16_t left16 = leftSide >> 16;
-            int16_t right16 = rightSide >> 16;
-            for(int hx=left16;hx<right16;hx++) {
-                pixels[hy * screen.width + hx] = Triangle::color;
-            }
-            leftSide = leftSide + Triangle::edge23;
-            rightSide = rightSide + Triangle::edge13;
-        } 
+        drawSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge12, Triangle::edge13);
+        leftSide = (p2.x << 16) + 0x8000;
+        drawSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge23, Triangle::edge13);
     }
 
 }
 
-int32_t Triangle::getEdge(Vertex p1, Vertex p2) {
+void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
+    for(uint16_t hy=top;hy<bottom; hy++) {
+        int16_t left16 = *leftSide >> 16;
+        int16_t right16 = *rightSide >> 16;
+        for(int hx=left16;hx<right16;hx++) {
+            pixels[hy * screen.width + hx] = Triangle::color;
+        }
+        *leftSide = *leftSide + leftEdge;
+        *rightSide = *rightSide + rightEdge;
+    }
+}
 
+int32_t Triangle::getEdge(Vertex p1, Vertex p2) {
     int32_t long_y = (int32_t) (p2.y - p1.y);
     if (long_y > 0) {
         int32_t long_x = (int32_t) (p2.x - p1.x);
         long_x = long_x << 16;
-        int32_t edge = long_x / long_y;
-        return edge;
+        return long_x / long_y;
     } else {
         return 0;    
     }
