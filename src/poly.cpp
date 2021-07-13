@@ -92,9 +92,7 @@ void Triangle::draw(uint32_t *pixels, Screen screen) {
 
 void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
     for(uint16_t hy=top;hy<bottom; hy++) {
-        int16_t left16 = *leftSide >> 16;
-        int16_t right16 = *rightSide >> 16;
-        for(int hx=left16;hx<right16;hx++) {
+        for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
             pixels[hy * screen.width + hx] = Triangle::color;
         }
         *leftSide = *leftSide + leftEdge;
