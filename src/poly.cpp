@@ -15,8 +15,8 @@ void swapVertex(Vertex *p1, Vertex *p2) {
 
 
 void Rectangle::draw(uint32_t *pixels, Screen screen) {
-    for (int hy=Rectangle::start.y;hy<Rectangle::end.y;hy++) {
-        for(int hx=Rectangle::start.x;hx<Rectangle::end.x;hx++) {
+    for (int hy=Rectangle::start.y; hy<Rectangle::end.y; hy++) {
+        for(int hx=Rectangle::start.x; hx<Rectangle::end.x; hx++) {
             pixels[hy * screen.width + hx] = Rectangle::color;
         }
     }
@@ -50,7 +50,7 @@ void Rectangle::randomDraw(uint32_t *pixels, Screen screen) {
     draw(pixels, screen);
 };
 
-void Triangle::draw(uint32_t *pixels, Screen screen) {
+void Triangle::randomDraw(uint32_t *pixels, Screen screen) {
 
     RGBValue color;
     color.rgba.red = rand() % 255;
@@ -91,20 +91,19 @@ void Triangle::draw(uint32_t *pixels, Screen screen) {
 }
 
 void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
-    for(uint16_t hy=top;hy<bottom; hy++) {
+    for(uint16_t hy=top; hy<bottom; hy++) {
         for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
             pixels[hy * screen.width + hx] = Triangle::color;
         }
-        *leftSide = *leftSide + leftEdge;
-        *rightSide = *rightSide + rightEdge;
+        *leftSide += leftEdge;
+        *rightSide += rightEdge;
     }
 }
 
 int32_t Triangle::getEdge(Vertex p1, Vertex p2) {
     int32_t long_y = (int32_t) (p2.y - p1.y);
     if (long_y > 0) {
-        int32_t long_x = (int32_t) (p2.x - p1.x);
-        long_x = long_x << 16;
+        int32_t long_x = ((int32_t) (p2.x - p1.x)) << 16;
         return long_x / long_y;
     } else {
         return 0;    

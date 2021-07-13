@@ -53,11 +53,11 @@ class Triangle {
         uint32_t edge13; // 16.16
 
     public:
-        void draw(uint32_t *pixels, Screen screen);
+        void randomDraw(uint32_t *pixels, Screen screen);
 
-    public:
+    private:
         int32_t getEdge(Vertex p1, Vertex p2);
 
-    public:
+    private:
         void drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
 };

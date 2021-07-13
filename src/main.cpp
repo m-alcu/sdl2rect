@@ -52,7 +52,7 @@ int main(int argv, char** args)
 		
 		for(int i=0;i<100;i++) {
 			//rectangle.randomDraw(pixels, screen);
-			triangle.draw(pixels, screen);
+			triangle.randomDraw(pixels, screen);
 		}
 
 		SDL_SetWindowTitle(window, "pongo el titulo");
