@@ -48,7 +48,13 @@ class Triangle {
         Vertex p2;
         Vertex p3;
         uint32_t color;
+        uint32_t edge12; // 16.16
+        uint32_t edge23; // 16.16
+        uint32_t edge13; // 16.16
 
     public:
         void draw(uint32_t *pixels, Screen screen);
+
+    public:
+        int32_t getEdge(Vertex p1, Vertex p2);
 };

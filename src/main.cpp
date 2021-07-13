@@ -24,6 +24,7 @@ int main(int argv, char** args)
 	SDL_Event event;
 	Uint32 color;
 	Rectangle rectangle;
+	Triangle triangle;
 	
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -50,7 +51,8 @@ int main(int argv, char** args)
 		}
 		
 		for(int i=0;i<100;i++) {
-			rectangle.randomDraw(pixels, screen);
+			//rectangle.randomDraw(pixels, screen);
+			triangle.draw(pixels, screen);
 		}
 
 		SDL_SetWindowTitle(window, "pongo el titulo");
