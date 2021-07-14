@@ -6,11 +6,11 @@ typedef struct Screen
     uint16_t width;
 } Screen;
 
-typedef struct Vertex
+typedef struct Pixel
 {
     uint16_t x;
     uint16_t y;
-} Vertex;
+} Pixel;
 
 typedef union
 {
@@ -29,8 +29,8 @@ typedef union
 class Rectangle {
 
     public:
-        Vertex start;
-        Vertex end;
+        Pixel start;
+        Pixel end;
         uint32_t color;
 
     public:
@@ -44,10 +44,10 @@ class Rectangle {
 class Triangle {
 
     public:
-        Vertex p1;
-        Vertex p2;
-        Vertex p3;
-        uint32_t color;
+        Pixel p1;
+        Pixel p2;
+        Pixel p3;
+        uint32_t color;  // RGBA
         uint32_t edge12; // 16.16
         uint32_t edge23; // 16.16
         uint32_t edge13; // 16.16
@@ -62,13 +62,13 @@ class Triangle {
         void drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
 
     private:
-        void orderVertices(Vertex *p1, Vertex *p2, Vertex *p3);
+        void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
     
     private:
-        int32_t calculateEdge(Vertex p1, Vertex p2);
+        int32_t calculateEdge(Pixel p1, Pixel p2);
 
     private:
-        void calculateEdges(Vertex p1, Vertex p2, Vertex p3);
+        void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
 
 
 
