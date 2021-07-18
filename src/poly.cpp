@@ -79,13 +79,13 @@ void Triangle::draw(uint32_t *pixels, Screen screen) {
     int32_t leftSide = ( p1.x << 16 ) + 0x8000;
     int32_t rightSide = leftSide;
     if(Triangle::edge13 < Triangle::edge12) {
-        drawSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge12);
+        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge12);
         rightSide = (p2.x << 16) + 0x8000;
-        drawSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge23);
+        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge13, Triangle::edge23);
     } else {
-        drawSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge12, Triangle::edge13);
+        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, pixels, screen, Triangle::edge12, Triangle::edge13);
         leftSide = (p2.x << 16) + 0x8000;
-        drawSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge23, Triangle::edge13);
+        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, pixels, screen, Triangle::edge23, Triangle::edge13);
     }
 };
 
@@ -101,7 +101,7 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
     Triangle::edge13 = calculateEdge(p1,p3);
 }
 
-void Triangle::drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
+void Triangle::drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
     for(uint16_t hy=top; hy<bottom; hy++) {
         for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
             pixels[hy * screen.width + hx] = Triangle::color;

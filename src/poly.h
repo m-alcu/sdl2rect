@@ -26,6 +26,25 @@ typedef union
 } RGBValue;
 
 
+const uint8_t desertBase[20] = { 
+    15,16,17,21,26,31,31,39,45,60,
+    55,47,44,39,34,29,21,16,16,15
+};
+
+class Desert {
+
+    public:
+        uint16_t seed1;
+        uint16_t seed2;
+
+    public:
+        void calcPalette(uint32_t *palette);
+
+    public:
+        void draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *greys);
+
+};
+
 class Rectangle {
 
     public:
@@ -59,7 +78,7 @@ class Triangle {
         void randomDraw(uint32_t *pixels, Screen screen);
 
     private:
-        void drawSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
+        void drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
 
     private:
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);

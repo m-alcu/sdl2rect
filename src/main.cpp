@@ -13,8 +13,8 @@ int main(int argv, char** args)
     }
 
 	Screen screen;
-	screen.width = 800;
-	screen.high = 600;
+	screen.width = 320;
+	screen.high = 200;
 
 	SDL_Window *window = SDL_CreateWindow("Poly3d", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen.width, screen.high, 0);
 	//SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
@@ -34,6 +34,7 @@ int main(int argv, char** args)
 	Uint32 color;
 	Rectangle rectangle;
 	Triangle triangle;
+	Desert desert;
 
 	Uint32 ant;
 	Uint32 dif;
@@ -42,6 +43,11 @@ int main(int argv, char** args)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
+
+	Uint32 * desertPalette = new Uint32[64];
+
+	desert.calcPalette(desertPalette);
+	Uint8 * greys = new Uint8[screen.width * screen.high];
 
 	while (isRunning)
 	{
@@ -64,7 +70,8 @@ int main(int argv, char** args)
 		
 		for(int i=0;i<1;i++) {
 			//rectangle.randomDraw(pixels, screen);
-			triangle.randomDraw(pixels, screen);
+			//triangle.randomDraw(pixels, screen);
+			desert.draw(pixels,screen,desertPalette,greys);
 		}
 
 		dif = SDL_GetTicks() - ant;
