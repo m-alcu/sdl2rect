@@ -13,8 +13,8 @@ int main(int argv, char** args)
     }
 
 	Screen screen;
-	screen.width = 320;
-	screen.high = 200;
+	screen.width = 800;
+	screen.high = 600;
 
 	SDL_Window *window = SDL_CreateWindow("Poly3d", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen.width, screen.high, 0);
 	//SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
