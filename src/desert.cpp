@@ -32,27 +32,19 @@ void Desert::draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *g
     seed2 = 0x2293;
 
     for(int point=0; point<screen.width; point++) {
-        uint8_t out = desertBase[point % sizeof(desertBase)];
-        greys[point] = out;
-        pixels[point] = palette[out];
+        uint8_t grey = desertBase[point % sizeof(desertBase)];
+        greys[point] = grey;
+        pixels[point] = palette[grey];
     }
 
     for (int point=screen.width; point<(screen.width*screen.high - screen.width); point++) {
         uint8_t h_point = greys[point - screen.width + 1];
         uint8_t l_point = greys[point - screen.width];
-
-        h_point = h_point >> 1;
-        uint8_t grey = h_point;
-        h_point = h_point >> 1;
-        grey += h_point;
-        h_point = h_point >> 1;
-        grey += h_point;
-        l_point = l_point >> 3;
-        grey += l_point;
+        uint8_t grey = (h_point >> 1) + (h_point >> 2) + (h_point >> 3) + (l_point >> 3);
 
         if (seed1 >= 0x8000) {
             seed1 += seed1;
-            seed1 = seed1 ^ seed2;
+            seed1 ^= seed2;
         } else {
             seed1 += seed1;
         }
