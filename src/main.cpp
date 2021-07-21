@@ -24,6 +24,7 @@ int main(int argv, char** args)
 	SDL_Texture * texture = SDL_CreateTexture(renderer,
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screen.width, screen.high);
 	Uint32 * pixels = new Uint32[screen.width * screen.high];
+	Uint32 * background = new Uint32[screen.width * screen.high];
 	Uint32 format = SDL_GetWindowPixelFormat( window );
 	SDL_PixelFormat* mappingFormat = SDL_AllocFormat( format );
 
@@ -35,6 +36,7 @@ int main(int argv, char** args)
 	Rectangle rectangle;
 	Triangle triangle;
 	Desert desert;
+	Loader objectLoader;
 
 	Uint32 ant;
 	Uint32 dif;
@@ -48,6 +50,19 @@ int main(int argv, char** args)
 
 	desert.calcPalette(desertPalette);
 	Uint8 * greys = new Uint8[screen.width * screen.high];
+	desert.draw(background,screen,desertPalette,greys);
+
+
+	Vertex * vertices = new Vertex[14];
+	Vertex * rotatedVertices = new Vertex[14];
+	Pixel * projectedPoints = new Pixel[14];
+	Face * faces = new Face[24];
+	Vertex * faceNormals = new Vertex[24];
+
+	objectLoader.loadVertices(vertices);
+	objectLoader.loadNormals(faceNormals);
+	objectLoader.loadFaces(faces);
+
 
 	while (isRunning)
 	{
@@ -70,8 +85,8 @@ int main(int argv, char** args)
 		
 		for(int i=0;i<1;i++) {
 			//rectangle.randomDraw(pixels, screen);
-			//triangle.randomDraw(pixels, screen);
-			desert.draw(pixels,screen,desertPalette,greys);
+			memcpy(pixels, background, screen.width * screen.high * sizeof(Uint32));
+			triangle.randomDraw(pixels, screen);
 		}
 
 		dif = SDL_GetTicks() - ant;

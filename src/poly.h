@@ -25,6 +25,21 @@ typedef union
     uint32_t long_value;
 } RGBValue;
 
+typedef struct Vertex
+{
+    double x;
+    double y;
+    double z;
+} Vertex;
+
+typedef struct Face
+{
+    int16_t vertex1;
+    int16_t vertex2;
+    int16_t vertex3;
+    int32_t color;
+} Face;
+
 
 const uint8_t desertBase[40] = { 
     15,15,16,16,17,19,21,23,26,29,31,31,31,35,39,42,45,43,60,57,
@@ -90,5 +105,50 @@ class Triangle {
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
 
 
+
+};
+
+
+class Loader {
+
+    public:
+        void loadVertices(Vertex *vertices);
+
+    public:
+        void loadNormals(Vertex *normals);
+
+    public:
+        void loadFaces(Face *faces);
+
+};
+
+
+class Matrix {
+
+    public:
+        double r00;
+        double r01;
+        double r02;
+
+        double r10;
+        double r11;
+        double r12;
+
+        double r20;
+        double r21;
+        double r22;
+
+    public:
+        void init(int16_t xAngle, int16_t yAngle, int16_t zAngle);
+
+    public:
+        Vertex rotate(Vertex vertex);
+
+};
+
+class Project {
+
+    public:
+        Pixel proj3to2D(Vertex vertex, Screen screen);
 
 };
