@@ -82,9 +82,9 @@ class Triangle {
         Pixel p2;
         Pixel p3;
         uint32_t color;  // RGBA
-        uint32_t edge12; // 16.16
-        uint32_t edge23; // 16.16
-        uint32_t edge13; // 16.16
+        int32_t edge12; // 16.16
+        int32_t edge23; // 16.16
+        int32_t edge13; // 16.16
 
     public:
         void draw(uint32_t *pixels, Screen screen);
@@ -104,7 +104,8 @@ class Triangle {
     private:
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
 
-
+    public:
+        bool visible();
 
 };
 
@@ -139,16 +140,31 @@ class Matrix {
         double r22;
 
     public:
-        void init(int16_t xAngle, int16_t yAngle, int16_t zAngle);
+        void init(double xAngle, double yAngle, double zAngle);
 
     public:
         Vertex rotate(Vertex vertex);
 
 };
 
-class Project {
+class Render {
 
     public:
         Pixel proj3to2D(Vertex vertex, Screen screen);
+
+    public:
+        void rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix);
+
+    public:
+        void projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen);        
+
+    public:
+        void drawObject(Face *faces, Vertex *vertices, Vertex *rotatedVertices, Vertex *faceNormals, Pixel *projectedPoints, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle);
+
+    public:
+        void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix, bool *result);
+
+    public:
+        void drawAllFaces(Face *face, Pixel *projectedPoints, Vertex *faceNormal, Screen screen, uint32_t *pixels, Matrix matrix);
 
 };

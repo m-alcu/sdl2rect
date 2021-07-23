@@ -37,9 +37,13 @@ int main(int argv, char** args)
 	Triangle triangle;
 	Desert desert;
 	Loader objectLoader;
+	Render render;
 
 	Uint32 ant;
 	Uint32 dif;
+	double xAngle = 0;
+	double yAngle = 0; 
+	double zAngle = 0;
 	
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -58,6 +62,7 @@ int main(int argv, char** args)
 	Pixel * projectedPoints = new Pixel[14];
 	Face * faces = new Face[24];
 	Vertex * faceNormals = new Vertex[24];
+	
 
 	objectLoader.loadVertices(vertices);
 	objectLoader.loadNormals(faceNormals);
@@ -86,8 +91,11 @@ int main(int argv, char** args)
 		for(int i=0;i<1;i++) {
 			//rectangle.randomDraw(pixels, screen);
 			memcpy(pixels, background, screen.width * screen.high * sizeof(Uint32));
-			triangle.randomDraw(pixels, screen);
+			//triangle.randomDraw(pixels, screen);
+			render.drawObject(faces, vertices, rotatedVertices, faceNormals, projectedPoints, pixels, screen, xAngle, yAngle, zAngle);
 		}
+		xAngle += 0.01;
+		yAngle += 0.02; 
 
 		dif = SDL_GetTicks() - ant;
 		ant += dif;

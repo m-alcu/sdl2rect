@@ -18,7 +18,7 @@ const double rawVertices[42] = { //14*3
         0,     0,-56755
 };
 
-const uint8_t rawFaces[96] = { //24 faces , color + *p1 + *p2 + *p3
+const uint16_t rawFaces[96] = { //24 faces , color + *p1 + *p2 + *p3
     2, 2, 0, 8,
     3, 0, 1, 8,
     2, 1, 3, 8,
@@ -97,9 +97,9 @@ void Loader::loadNormals(Vertex *normals) {
 
     for (int i=0; i<24; i++) {
 
-        normals[i].x = rawNormals[3*i];
-        normals[i].y = rawNormals[3*i+1];
-        normals[i].z = rawNormals[3*i+2];
+        normals[i].x = rawNormals[3*i] / 65536;
+        normals[i].y = rawNormals[3*i+1] / 65536;
+        normals[i].z = rawNormals[3*i+2] / 65536;
 
     }
 }
@@ -109,10 +109,10 @@ void Loader::loadFaces(Face *faces) {
     RGBValue color;
     for (int i=0; i<24; i++) {
 
-        if (rawFaces[i] == 2) {
+        if (rawFaces[4*i] == 2) {
             color.rgba.red = 0x00;
-            color.rgba.green = 0x16;
-            color.rgba.blue = 0x3f;
+            color.rgba.green = 0x16 * 4;
+            color.rgba.blue = 0x3f * 4;
         } else {
             color.rgba.red = 0xff;
             color.rgba.green = 0xff;
@@ -121,9 +121,9 @@ void Loader::loadFaces(Face *faces) {
         color.rgba.alpha = 0x00;
 
         faces[i].color = color.long_value;
-        faces[i].vertex1 = (int16_t) rawFaces[4*i+1];
-        faces[i].vertex2 = (int16_t) rawFaces[4*i+2];
-        faces[i].vertex3 = (int16_t) rawFaces[4*i+3];
+        faces[i].vertex1 = rawFaces[4*i+1];
+        faces[i].vertex2 = rawFaces[4*i+2];
+        faces[i].vertex3 = rawFaces[4*i+3];
 
     }
 }

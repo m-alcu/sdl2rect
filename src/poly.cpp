@@ -113,10 +113,19 @@ void Triangle::drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, i
 
 int32_t Triangle::calculateEdge(Pixel p1, Pixel p2) {
     int32_t long_y = (int32_t) (p2.y - p1.y);
+    int32_t long_x = ((int32_t) (p2.x - p1.x)) << 16;
     if (long_y > 0) {
-        int32_t long_x = ((int32_t) (p2.x - p1.x)) << 16;
         return long_x / long_y;
     } else {
-        return 0;    
+        if (long_x > 0) {
+            return INT32_MAX;
+        } else {
+            return INT32_MIN;    
+        }
     }
+};
+
+bool Triangle::visible() {
+
+    return (((int32_t) (p3.x-p2.x))*((int32_t) (p2.y-p1.y)) - ((int32_t) (p2.x-p1.x))*((int32_t) (p3.y-p2.y)) < 0);
 };
