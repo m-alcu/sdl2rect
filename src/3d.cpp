@@ -61,17 +61,13 @@ void Render::rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix
 
 void Render::drawAllFaces(Face *faces, Pixel *projectedPoints, Vertex *faceNormals, Screen screen, uint32_t *pixels, Matrix matrix) {
 
-
-    bool * results = new bool[24];
-
      for (int i=0; i<24; i++) {
-         drawFace(faces[i], projectedPoints, faceNormals[i], screen, pixels, matrix, &results[i]);
+         drawFace(faces[i], projectedPoints, faceNormals[i], screen, pixels, matrix);
      }
-     /*drawFace(faces[14], projectedPoints, faceNormals[14], screen, pixels, matrix, &results[14]);*/
 }
 
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, bool *result) {
+void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix) {
 
     Triangle triangle;
 
@@ -88,9 +84,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
     triangle.p3.x = projectedPoints[face.vertex3].x;
     triangle.p3.y = projectedPoints[face.vertex3].y;
 
-    *result = triangle.visible();
-
-    if (*result) {
+    if (triangle.visible()) {
 
         Vertex rotatedNormal = matrix.rotate(faceNormal);
 
