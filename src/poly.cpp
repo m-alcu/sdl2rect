@@ -127,5 +127,5 @@ int32_t Triangle::calculateEdge(Pixel p1, Pixel p2) {
 
 bool Triangle::visible() {
 
-    return (((int32_t) (p3.x-p2.x))*((int32_t) (p2.y-p1.y)) - ((int32_t) (p2.x-p1.x))*((int32_t) (p3.y-p2.y)) < 0);
+    return (((int32_t) (p3.x-p2.x)*(p2.y-p1.y)) - ((int32_t) (p2.x-p1.x)*(p3.y-p2.y)) < 0);
 };

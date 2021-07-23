@@ -88,7 +88,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         Vertex rotatedNormal = matrix.rotate(faceNormal);
 
-        double bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
+        double bright = abs(lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z);
 
         RGBValue color;
         color.long_value = face.color;
