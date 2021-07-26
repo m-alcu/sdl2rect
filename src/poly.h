@@ -116,10 +116,10 @@ class Loader {
         void loadVertices(Vertex *vertices);
 
     public:
-        void loadNormals(Vertex *normals);
+        void loadFaces(Face *faces);
 
     public:
-        void loadFaces(Face *faces);
+        void calculateNormals(Face *faces, Vertex *normals, Vertex *vertices);
 
 };
 

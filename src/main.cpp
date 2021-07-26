@@ -65,8 +65,8 @@ int main(int argv, char** args)
 	
 
 	objectLoader.loadVertices(vertices);
-	objectLoader.loadNormals(faceNormals);
 	objectLoader.loadFaces(faces);
+	objectLoader.calculateNormals(faces, faceNormals, vertices);
 
 
 	while (isRunning)
@@ -87,6 +87,9 @@ int main(int argv, char** args)
 				}
 			}
 		}
+
+		//xAngle = 2.24;
+		//xAngle = 7.18;
 		
 		for(int i=0;i<1;i++) {
 			//rectangle.randomDraw(pixels, screen);
@@ -100,7 +103,8 @@ int main(int argv, char** args)
 		dif = SDL_GetTicks() - ant;
 		ant += dif;
 
-		std::string s = std::to_string(dif);
+		//std::string s = std::to_string(dif);
+		std::string s = std::to_string(xAngle);
 		char const *num_char = s.c_str();
 		SDL_SetWindowTitle(window, num_char);
 		SDL_UpdateTexture(texture, NULL, pixels, screen.width * sizeof(Uint32));

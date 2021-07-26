@@ -75,7 +75,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
     lux.x = 0;
     lux.y = 0;
-    lux.z = -1;
+    lux.z = 1;
 
     triangle.p1.x = projectedPoints[face.vertex1].x;
     triangle.p1.y = projectedPoints[face.vertex1].y;
@@ -88,7 +88,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         Vertex rotatedNormal = matrix.rotate(faceNormal);
 
-        double bright = abs(lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z);
+        double bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
 
         RGBValue color;
         color.long_value = face.color;

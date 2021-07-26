@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "poly.h"
 
 const double rawVertices[42] = { //14*3
@@ -50,38 +51,6 @@ const uint16_t rawFaces[96] = { //24 faces , color + *p1 + *p2 + *p3
     3, 3, 1,13
 };
 
-const double rawNormals[72] = { //24 normals (1 normal per face)
-    38731,     0, 52887,
-    38731, 52887,     0,
-    38731,     0,-52887,
-    38731,-52887,     0,
-
-        0, 38731,-52887,
-    52887, 38731,     0,
-        0, 38731, 52887,
-   -52887, 38731,     0,
-
-   -52887,     0, 38731,
-        0, 52887, 38731,
-    52887,     0, 38731,
-        0,-52887, 38731,
-
-   -38731,     0, 52887,
-   -38731,-52887,     0,
-   -38731,     0,-52887,
-   -38731, 52887,     0,
-
-   -52887,-38731,     0,
-        0,-38731, 52887,
-    52887,-38731,     0,
-        0,-38731,-52887,
-
-        0, 52887,-38731,
-   -52887,     0,-38731,
-        0,-52887,-38731,
-    52887,     0,-38731
-};
-
 void Loader::loadVertices(Vertex *vertices) {
 
     for (int i=0; i<14; i++) {
@@ -93,15 +62,31 @@ void Loader::loadVertices(Vertex *vertices) {
     }
 }
 
-void Loader::loadNormals(Vertex *normals) {
+void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
 
-    for (int i=0; i<24; i++) {
+    Vertex v21;
+    Vertex v32;
+    Vertex normal;
 
-        normals[i].x = rawNormals[3*i] / 65536;
-        normals[i].y = rawNormals[3*i+1] / 65536;
-        normals[i].z = rawNormals[3*i+2] / 65536;
+     for (int i=0; i<24; i++) {
+        Vertex vertex1 = vertices[faces[i].vertex1];
+        Vertex vertex2 = vertices[faces[i].vertex2];
+        Vertex vertex3 = vertices[faces[i].vertex3];
+        v21.x = vertex2.x - vertex1.x;
+        v21.y = vertex2.y - vertex1.y;
+        v21.z = vertex2.z - vertex1.z;
+        v32.x = vertex3.x - vertex2.x;
+        v32.y = vertex3.y - vertex2.y;
+        v32.z = vertex3.z - vertex2.z;
+        normal.x = v21.y*v32.z - v32.y*v21.z;
+        normal.y = v21.z*v32.x - v32.z*v21.x;
+        normal.z = v21.x*v32.y - v32.x*v21.y;
+        double mag = sqrt(normal.x*normal.x+normal.y*normal.y+normal.z*normal.z);
+        normals[i].x = normal.x / mag;
+        normals[i].y = normal.y / mag;
+        normals[i].z = normal.z / mag;
+     }
 
-    }
 }
 
 void Loader::loadFaces(Face *faces) {
