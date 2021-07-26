@@ -69,15 +69,12 @@ void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
     Vertex normal;
 
      for (int i=0; i<24; i++) {
-        Vertex vertex1 = vertices[faces[i].vertex1];
-        Vertex vertex2 = vertices[faces[i].vertex2];
-        Vertex vertex3 = vertices[faces[i].vertex3];
-        v21.x = vertex2.x - vertex1.x;
-        v21.y = vertex2.y - vertex1.y;
-        v21.z = vertex2.z - vertex1.z;
-        v32.x = vertex3.x - vertex2.x;
-        v32.y = vertex3.y - vertex2.y;
-        v32.z = vertex3.z - vertex2.z;
+        v21.x = vertices[faces[i].vertex2].x - vertices[faces[i].vertex1].x;
+        v21.y = vertices[faces[i].vertex2].y - vertices[faces[i].vertex1].y;
+        v21.z = vertices[faces[i].vertex2].z - vertices[faces[i].vertex1].z;
+        v32.x = vertices[faces[i].vertex3].x - vertices[faces[i].vertex2].x;
+        v32.y = vertices[faces[i].vertex3].y - vertices[faces[i].vertex2].y;
+        v32.z = vertices[faces[i].vertex3].z - vertices[faces[i].vertex2].z;
         normal.x = v21.y*v32.z - v32.y*v21.z;
         normal.y = v21.z*v32.x - v32.z*v21.x;
         normal.z = v21.x*v32.y - v32.x*v21.y;
