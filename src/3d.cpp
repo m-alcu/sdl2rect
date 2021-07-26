@@ -104,9 +104,12 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(Face *faces, Vertex *vertices, Vertex *rotatedVertices, Vertex *faceNormals, Pixel *projectedPoints, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle) {
+void Render::drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle) {
 
     Matrix matrix;
+    Pixel * projectedPoints = new Pixel[14];
+    Vertex * rotatedVertices = new Vertex[14];
+
     matrix.init(xAngle, yAngle, zAngle);
     rotateAllVertices(vertices, rotatedVertices, matrix);
     projectAll2DPoints(rotatedVertices, projectedPoints, screen);

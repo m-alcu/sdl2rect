@@ -58,8 +58,6 @@ int main(int argv, char** args)
 
 
 	Vertex * vertices = new Vertex[14];
-	Vertex * rotatedVertices = new Vertex[14];
-	Pixel * projectedPoints = new Pixel[14];
 	Face * faces = new Face[24];
 	Vertex * faceNormals = new Vertex[24];
 	
@@ -95,7 +93,7 @@ int main(int argv, char** args)
 			//rectangle.randomDraw(pixels, screen);
 			memcpy(pixels, background, screen.width * screen.high * sizeof(Uint32));
 			//triangle.randomDraw(pixels, screen);
-			render.drawObject(faces, vertices, rotatedVertices, faceNormals, projectedPoints, pixels, screen, xAngle, yAngle, zAngle);
+			render.drawObject(faces, vertices, faceNormals, pixels, screen, xAngle, yAngle, zAngle);
 		}
 		xAngle += 0.01;
 		yAngle += 0.02; 

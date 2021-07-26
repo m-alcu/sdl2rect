@@ -159,7 +159,7 @@ class Render {
         void projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen);        
 
     public:
-        void drawObject(Face *faces, Vertex *vertices, Vertex *rotatedVertices, Vertex *faceNormals, Pixel *projectedPoints, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle);
+        void drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle);
 
     public:
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
