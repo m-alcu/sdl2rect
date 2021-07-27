@@ -60,21 +60,6 @@ class Desert {
 
 };
 
-class Rectangle {
-
-    public:
-        Pixel start;
-        Pixel end;
-        uint32_t color;
-
-    public:
-        void draw(uint32_t *pixels, Screen screen);
-
-    public:
-        void randomDraw(uint32_t *pixels, Screen screen);
-
-};
-
 class Triangle {
 
     public:
@@ -85,27 +70,24 @@ class Triangle {
         int32_t edge12; // 16.16
         int32_t edge23; // 16.16
         int32_t edge13; // 16.16
+        Screen screen;
+        uint32_t *pixels;
+        Triangle(uint32_t *pixs, Screen scr) {
+            screen = scr;
+            pixels = pixs;
+        }
 
     public:
-        void draw(uint32_t *pixels, Screen screen);
-
-    public:
-        void randomDraw(uint32_t *pixels, Screen screen);
+        void draw();
+        bool visible();
 
     private:
         void drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
-
-    private:
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-    
-    private:
         int32_t calculateEdge(Pixel p1, Pixel p2);
-
-    private:
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
-
-    public:
-        bool visible();
+        void swapNum( uint16_t *x, uint16_t *y);
+        void swapPixel(Pixel *p1, Pixel *p2);
 
 };
 
@@ -114,13 +96,8 @@ class Loader {
 
     public:
         void loadVertices(Vertex *vertices);
-
-    public:
         void loadFaces(Face *faces);
-
-    public:
         void calculateNormals(Face *faces, Vertex *normals, Vertex *vertices);
-
 };
 
 
@@ -141,8 +118,6 @@ class Matrix {
 
     public:
         void init(double xAngle, double yAngle, double zAngle);
-
-    public:
         Vertex rotate(Vertex vertex);
 
 };
@@ -151,20 +126,9 @@ class Render {
 
     public:
         Pixel proj3to2D(Vertex vertex, Screen screen);
-
-    public:
         void rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix);
-
-    public:
         void projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen);        
-
-    public:
         void drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle);
-
-    public:
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
-
-    public:
         void drawAllFaces(Face *face, Pixel *projectedPoints, Vertex *faceNormal, Screen screen, uint32_t *pixels, Matrix matrix);
-
 };

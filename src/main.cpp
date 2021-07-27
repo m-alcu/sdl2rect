@@ -33,8 +33,6 @@ int main(int argv, char** args)
 	bool isRunning = true;
 	SDL_Event event;
 	Uint32 color;
-	Rectangle rectangle;
-	Triangle triangle;
 	Desert desert;
 	Loader objectLoader;
 	Render render;

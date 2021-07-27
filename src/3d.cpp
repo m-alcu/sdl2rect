@@ -69,7 +69,7 @@ void Render::drawAllFaces(Face *faces, Pixel *projectedPoints, Vertex *faceNorma
 
 void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix) {
 
-    Triangle triangle;
+    Triangle triangle(pixels, screen);
 
     Vertex lux;
 
@@ -97,7 +97,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
         color.rgba.blue = (uint8_t) (color.rgba.blue * bright); 
         triangle.color = color.long_value;
 
-        triangle.draw(pixels, screen);
+        triangle.draw();
     }
 
 }
