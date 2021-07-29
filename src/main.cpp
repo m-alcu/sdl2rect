@@ -17,7 +17,6 @@ int main(int argv, char** args)
 	screen.high = 600;
 
 	SDL_Window *window = SDL_CreateWindow("Poly3d", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen.width, screen.high, 0);
-	//SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
                                                 SDL_RENDERER_ACCELERATED | 
                                                 SDL_RENDERER_PRESENTVSYNC);
@@ -84,13 +83,8 @@ int main(int argv, char** args)
 			}
 		}
 
-		//xAngle = 2.24;
-		//xAngle = 7.18;
-		
 		for(int i=0;i<1;i++) {
-			//rectangle.randomDraw(pixels, screen);
 			memcpy(pixels, background, screen.width * screen.high * sizeof(Uint32));
-			//triangle.randomDraw(pixels, screen);
 			render.drawObject(faces, vertices, faceNormals, pixels, screen, xAngle, yAngle, zAngle);
 		}
 		xAngle += 0.01;
@@ -99,8 +93,7 @@ int main(int argv, char** args)
 		dif = SDL_GetTicks() - ant;
 		ant += dif;
 
-		//std::string s = std::to_string(dif);
-		std::string s = std::to_string(xAngle);
+		std::string s = "frames (ms): "+ std::to_string(dif);
 		char const *num_char = s.c_str();
 		SDL_SetWindowTitle(window, num_char);
 		SDL_UpdateTexture(texture, NULL, pixels, screen.width * sizeof(Uint32));

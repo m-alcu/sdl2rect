@@ -41,11 +41,6 @@ typedef struct Face
 } Face;
 
 
-const uint8_t desertBase[40] = { 
-    15,15,16,16,17,19,21,23,26,29,31,31,31,35,39,42,45,43,60,57,
-    55,51,47,45,44,42,39,37,34,31,29,25,21,19,16,16,16,15,15,15  
-};
-
 class Desert {
 
     public:
@@ -54,8 +49,6 @@ class Desert {
 
     public:
         void calcPalette(uint32_t *palette);
-
-    public:
         void draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *greys);
 
 };
@@ -72,9 +65,9 @@ class Triangle {
         int32_t edge13; // 16.16
         Screen screen;
         uint32_t *pixels;
-        Triangle(uint32_t *pixs, Screen scr) {
-            screen = scr;
-            pixels = pixs;
+        Triangle(uint32_t *pixelsAux, Screen screenAux) {
+            screen = screenAux;
+            pixels = pixelsAux;
         }
 
     public:
