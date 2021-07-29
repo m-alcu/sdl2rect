@@ -27,9 +27,9 @@ typedef union
 
 typedef struct Vertex
 {
-    double x;
-    double y;
-    double z;
+    float x;
+    float y;
+    float z;
 } Vertex;
 
 typedef struct Face
@@ -97,20 +97,20 @@ class Loader {
 class Matrix {
 
     public:
-        double r00;
-        double r01;
-        double r02;
+        float r00;
+        float r01;
+        float r02;
 
-        double r10;
-        double r11;
-        double r12;
+        float r10;
+        float r11;
+        float r12;
 
-        double r20;
-        double r21;
-        double r22;
+        float r20;
+        float r21;
+        float r22;
 
     public:
-        void init(double xAngle, double yAngle, double zAngle);
+        void init(float xAngle, float yAngle, float zAngle);
         Vertex rotate(Vertex vertex);
 
 };
@@ -121,7 +121,7 @@ class Render {
         Pixel proj3to2D(Vertex vertex, Screen screen);
         void rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix);
         void projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen);        
-        void drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle);
+        void drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, float xAngle, float yAngle, float zAngle);
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
         void drawAllFaces(Face *face, Pixel *projectedPoints, Vertex *faceNormal, Screen screen, uint32_t *pixels, Matrix matrix);
 };

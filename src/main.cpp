@@ -38,9 +38,9 @@ int main(int argv, char** args)
 
 	Uint32 ant;
 	Uint32 dif;
-	double xAngle = 0;
-	double yAngle = 0; 
-	double zAngle = 0;
+	float xAngle = 0;
+	float yAngle = 0; 
+	float zAngle = 0;
 	
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

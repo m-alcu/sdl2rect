@@ -2,14 +2,14 @@
 #include <math.h>
 #include "poly.h"
 
-void Matrix::init(double xAngle, double yAngle, double zAngle) {
+void Matrix::init(float xAngle, float yAngle, float zAngle) {
 
-    double sinX = sin (xAngle);
-    double cosX = cos (xAngle);
-    double sinY = sin (yAngle);
-    double cosY = cos (yAngle);
-    double sinZ = sin (zAngle);
-    double cosZ = cos (zAngle);
+    float sinX = sin (xAngle);
+    float cosX = cos (xAngle);
+    float sinY = sin (yAngle);
+    float cosY = cos (yAngle);
+    float sinZ = sin (zAngle);
+    float cosZ = cos (zAngle);
 
     Matrix::r00 = cosY*cosZ;
     Matrix::r01 = cosY*sinZ;
@@ -88,7 +88,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         Vertex rotatedNormal = matrix.rotate(faceNormal);
 
-        double bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
+        float bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
 
         RGBValue color;
         color.long_value = face.color;
@@ -104,7 +104,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, double xAngle, double yAngle, double zAngle) {
+void Render::drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, float xAngle, float yAngle, float zAngle) {
 
     Matrix matrix;
     Pixel * projectedPoints = new Pixel[14];

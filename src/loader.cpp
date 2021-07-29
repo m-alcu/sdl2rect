@@ -5,7 +5,7 @@
 
 void Loader::loadVertices(Vertex *vertices) {
 
-    const double rawVertices[42] = { //14*3
+    const float rawVertices[42] = { //14*3
         32768, 32768, 32768,
         32768, 32768,-32768,
         32768,-32768, 32768,
@@ -47,7 +47,7 @@ void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
         normal.x = v21.y*v32.z - v32.y*v21.z;
         normal.y = v21.z*v32.x - v32.z*v21.x;
         normal.z = v21.x*v32.y - v32.x*v21.y;
-        double mag = sqrt(normal.x*normal.x+normal.y*normal.y+normal.z*normal.z);
+        float mag = sqrt(normal.x*normal.x+normal.y*normal.y+normal.z*normal.z);
         normals[i].x = normal.x / mag;
         normals[i].y = normal.y / mag;
         normals[i].z = normal.z / mag;
