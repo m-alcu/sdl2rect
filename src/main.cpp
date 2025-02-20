@@ -1,111 +1,126 @@
 #include <SDL2/SDL.h>
 #include <iostream>
-#include <string> 
+#include <string>
 #include "poly.h"
 
-int main(int argv, char** args)
+int main(int argc, char** argv)
 {
-	//SDL_Init(SDL_INIT_EVERYTHING);
-	if(SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
         return -1;
     }
 
-	Screen screen;
-	screen.width = 800;
-	screen.high = 600;
+    Screen screen;
+    screen.width = 800;
+    screen.high  = 600;
 
-	SDL_Window *window = SDL_CreateWindow("Poly3d", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen.width, screen.high, 0);
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
-                                                SDL_RENDERER_ACCELERATED | 
-                                                SDL_RENDERER_PRESENTVSYNC);
-	SDL_Texture * texture = SDL_CreateTexture(renderer,
-        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screen.width, screen.high);
-	Uint32 * pixels = new Uint32[screen.width * screen.high];
-	Uint32 * background = new Uint32[screen.width * screen.high];
-	Uint32 format = SDL_GetWindowPixelFormat( window );
-	SDL_PixelFormat* mappingFormat = SDL_AllocFormat( format );
+    SDL_Window* window = SDL_CreateWindow("Poly3d", 
+                                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                                          screen.width, screen.high, 0);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
+                                                SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	memset(pixels, 255, screen.width * screen.high * sizeof(Uint32));
+    // Use streaming texture for direct pixel access.
+    SDL_Texture* texture = SDL_CreateTexture(renderer,
+        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screen.width, screen.high);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
-	bool isRunning = true;
-	SDL_Event event;
-	Uint32 color;
-	Desert desert;
-	Loader objectLoader;
-	Render render;
+    // Allocate pixel buffers.
+    Uint32* pixels     = new Uint32[screen.width * screen.high];
+    Uint32* background = new Uint32[screen.width * screen.high];
 
-	Uint32 ant;
-	Uint32 dif;
-	float xAngle = 0;
-	float yAngle = 0; 
-	float zAngle = 0;
-	
+    bool isRunning = true;
+    SDL_Event event;
+    Uint32 ant = SDL_GetTicks();
+    Uint32 dif;
+    float xAngle = 0;
+    float yAngle = 0;
+    float zAngle = 0;
 
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
+    // Object data.
+    Vertex* vertices = new Vertex[14];
+    Face* faces = new Face[24];
+    Vertex* faceNormals = new Vertex[24];
+    Loader objectLoader;
+    Render render;
+    objectLoader.loadVertices(vertices);
+    objectLoader.loadFaces(faces);
+    objectLoader.calculateNormals(faces, faceNormals, vertices);
 
-	Uint32 * desertPalette = new Uint32[64];
+    // Desert background setup.
+    Uint32* desertPalette = new Uint32[64];
+    Desert desert;
+    desert.calcPalette(desertPalette);
+    Uint8* greys = new Uint8[screen.width * screen.high];
+    desert.draw(background, screen, desertPalette, greys);
 
-	desert.calcPalette(desertPalette);
-	Uint8 * greys = new Uint8[screen.width * screen.high];
-	desert.draw(background,screen,desertPalette,greys);
+	// Create a texture for the background.
+	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
+    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screen.width, screen.high);
+	SDL_UpdateTexture(backgroundTexture, NULL, background, screen.width * sizeof(Uint32));
 
+    // Main loop.
+    while (isRunning)
+    {
+        // Process events.
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                isRunning = false;
+            }
+            else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                isRunning = false;
+            }
+        }
 
-	Vertex * vertices = new Vertex[14];
-	Face * faces = new Face[24];
-	Vertex * faceNormals = new Vertex[24];
-	
+        // Calculate frame time.
+        dif = SDL_GetTicks() - ant;
+        ant = SDL_GetTicks();
+        std::string title = "frames (ms): " + std::to_string(dif);
+        SDL_SetWindowTitle(window, title.c_str());
 
-	objectLoader.loadVertices(vertices);
-	objectLoader.loadFaces(faces);
-	objectLoader.calculateNormals(faces, faceNormals, vertices);
+        //draw figure into pixels memory
+        memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
+        render.drawObject(faces, vertices, faceNormals, pixels, screen, xAngle, yAngle, zAngle);
 
+        // Lock the texture to update its pixel data.
+        void* texturePixels = nullptr;
+        int pitch = 0;
+        if (SDL_LockTexture(texture, NULL, &texturePixels, &pitch) == 0) {
+			memcpy(texturePixels, pixels, screen.width * screen.high * sizeof(Uint32));
+			SDL_UnlockTexture(texture);
+        } else {
+            std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;
+        }
 
-	while (isRunning)
-	{
-
-		while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				isRunning = false;
-				break;
-
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE)
-				{
-					isRunning = false;
-				}
-			}
-		}
-
-		for(int i=0;i<1;i++) {
-			memcpy(pixels, background, screen.width * screen.high * sizeof(Uint32));
-			render.drawObject(faces, vertices, faceNormals, pixels, screen, xAngle, yAngle, zAngle);
-		}
-		xAngle += 0.01;
-		yAngle += 0.02; 
-
-		dif = SDL_GetTicks() - ant;
-		ant += dif;
-
-		std::string s = "frames (ms): "+ std::to_string(dif);
-		char const *num_char = s.c_str();
-		SDL_SetWindowTitle(window, num_char);
-		SDL_UpdateTexture(texture, NULL, pixels, screen.width * sizeof(Uint32));
+        // Render the updated texture.
         SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
-		SDL_RenderPresent(renderer);
-	}
+        SDL_RenderPresent(renderer);
 
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+        // Update rotation angles.
+        xAngle += 0.01f;
+        yAngle += 0.02f;
+    }
 
-	return 0;
+    // Free resources.
+    delete[] pixels;
+    delete[] background;
+    delete[] desertPalette;
+    delete[] greys;
+    delete[] vertices;
+    delete[] faces;
+    delete[] faceNormals;
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;
 }

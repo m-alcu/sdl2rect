@@ -2,15 +2,9 @@
 #include "poly.h"
 
 
-void Triangle::swapNum( uint16_t *x, uint16_t *y) {
-    *x = *x + *y;
-    *y = *x - *y;
-    *x = *x - *y;
-}
-
 void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
-    swapNum(&(p1->x), &(p2->x));
-    swapNum(&(p1->y), &(p2->y));
+    std::swap(p1->x, p2->x);
+    std::swap(p1->y, p2->y);
 }
 
 void Triangle::draw() {

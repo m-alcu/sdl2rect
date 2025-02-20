@@ -1,32 +1,33 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "shell",
-			"label": "SDL2",
-			"command": "C:\\tools\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe",
-			"args": [
-				"-g",
-				"src\\*.cpp",
-				"-o",
-				"build\\game.exe",
-                "-IC:/tools/SDL2-2.0.14/x86_64-w64-mingw32/include",
-                "-LC:/tools/SDL2-2.0.14/x86_64-w64-mingw32/lib",
-				"-lmingw32",
-				"-lSDL2main",
-				"-lSDL2",
-				"-mwindows"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "SDL2",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
+            "args": [
+                "-g",
+                "src\\main.cpp",
+                "src\\3d.cpp",
+                "src\\desert.cpp",
+                "src\\loader.cpp",
+                "src\\poly.cpp",
+                "-o",
+                "build\\game.exe",
+                "-IC:/tools/SDL2-2.30.11/x86_64-w64-mingw32/include",
+                "-LC:/tools/SDL2-2.30.11/x86_64-w64-mingw32/lib",
+                "-lmingw32",
+                "-lSDL2main",
+                "-lSDL2",
+                "-mwindows"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        }
+    ]
 }

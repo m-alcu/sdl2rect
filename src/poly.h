@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdint>
 
 typedef struct Screen
 {
@@ -79,7 +80,6 @@ class Triangle {
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         int32_t calculateEdge(Pixel p1, Pixel p2);
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
-        void swapNum( uint16_t *x, uint16_t *y);
         void swapPixel(Pixel *p1, Pixel *p2);
 
 };

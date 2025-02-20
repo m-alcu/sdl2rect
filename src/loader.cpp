@@ -101,7 +101,7 @@ void Loader::loadFaces(Face *faces) {
             color.rgba.green = 0xff;
             color.rgba.blue = 0xff;           
         }
-        color.rgba.alpha = 0x00;
+        color.rgba.alpha = 0xff;
 
         faces[i].color = color.long_value;
         faces[i].vertex1 = rawFaces[4*i+1];
