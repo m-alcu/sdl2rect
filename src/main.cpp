@@ -49,11 +49,8 @@ int main(int argc, char** argv)
     objectLoader.calculateNormals(faces, faceNormals, vertices);
 
     // Desert background setup.
-    Uint32* desertPalette = new Uint32[64];
     Desert desert;
-    desert.calcPalette(desertPalette);
-    Uint8* greys = new Uint8[screen.width * screen.high];
-    desert.draw(background, screen, desertPalette, greys);
+    desert.draw(background, screen);
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
@@ -110,8 +107,6 @@ int main(int argc, char** argv)
     // Free resources.
     delete[] pixels;
     delete[] background;
-    delete[] desertPalette;
-    delete[] greys;
     delete[] vertices;
     delete[] faces;
     delete[] faceNormals;

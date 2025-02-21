@@ -26,10 +26,14 @@ void Desert::calcPalette(uint32_t *palette) {
 }
 
 
-void Desert::draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *greys) {
+void Desert::draw(uint32_t *pixels, Screen screen) {
 
     seed1 = 0x1234;
     seed2 = 0x2293;
+    uint8_t* greys = new uint8_t[screen.width * screen.high];
+
+    uint32_t* desertPalette = new uint32_t[64];
+    Desert::calcPalette(desertPalette);
 
     const uint8_t desertBase[40] = { 
         15,15,16,16,17,19,21,23,26,29,31,31,31,35,39,42,45,43,60,57,
@@ -39,7 +43,7 @@ void Desert::draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *g
     for(int point=0; point<screen.width; point++) {
         uint8_t grey = desertBase[point % sizeof(desertBase)];
         greys[point] = grey;
-        pixels[point] = palette[grey];
+        pixels[point] = desertPalette[grey];
     }
 
     for (int point=screen.width; point<(screen.width*screen.high - screen.width); point++) {
@@ -55,7 +59,10 @@ void Desert::draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *g
         }
         grey += (uint8_t) ((seed1 & 0x00ff) >> 6);
         greys[point] = grey;
-        pixels[point] = palette[grey];
+        pixels[point] = desertPalette[grey];
     }
+
+    delete[] desertPalette;
+    delete[] greys;
 
 }

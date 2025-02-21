@@ -49,9 +49,10 @@ class Desert {
         uint16_t seed2;
 
     public:
-        void calcPalette(uint32_t *palette);
-        void draw(uint32_t *pixels, Screen screen, uint32_t *palette, uint8_t *greys);
+        void draw(uint32_t *pixels, Screen screen);
 
+    private:
+        void calcPalette(uint32_t *palette);
 };
 
 class Triangle {
