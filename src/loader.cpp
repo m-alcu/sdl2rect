@@ -3,110 +3,82 @@
 #include "poly.h"
 
 
-void Loader::loadVertices(Vertex *vertices) {
+void Loader::loadVertices(Vertex* vertices) {
+    const float half = 32768.f;
+    const float axisDist = half * std::sqrt(3.f);  // ≈ 56755
 
-    const float rawVertices[42] = { //14*3
-        32768, 32768, 32768,
-        32768, 32768,-32768,
-        32768,-32768, 32768,
-        32768,-32768,-32768,
-       -32768, 32768, 32768,
-       -32768, 32768,-32768,
-       -32768,-32768, 32768,
-       -32768,-32768,-32768,
-        56755,     0,     0,
-            0, 56755,     0,
-            0,     0, 56755,
-       -56755,     0,     0,
-            0,-56755,     0,
-            0,     0,-56755
-    };    
-
-    for (int i=0; i<14; i++) {
-
-        vertices[i].x = rawVertices[3*i];
-        vertices[i].y = rawVertices[3*i+1];
-        vertices[i].z = rawVertices[3*i+2];
-
+    int index = 0;
+    // Generate the 8 cube vertices with explicit sign choices
+    for (int xSign : {1, -1}) {
+        for (int ySign : {1, -1}) {
+            for (int zSign : {1, -1}) {
+                vertices[index++] = { half * xSign, half * ySign, half * zSign };
+            }
+        }
     }
+
+    // Generate the 6 axis-aligned vertices
+    vertices[index++] = {  axisDist, 0,         0 };
+    vertices[index++] = {  0,         axisDist, 0 };
+    vertices[index++] = {  0,         0,         axisDist };
+    vertices[index++] = { -axisDist, 0,         0 };
+    vertices[index++] = {  0,        -axisDist, 0 };
+    vertices[index++] = {  0,         0,        -axisDist };
+}
+
+// Helper functions for vector math.
+inline Vertex subtract(const Vertex& a, const Vertex& b) {
+    return { a.x - b.x, a.y - b.y, a.z - b.z };
+}
+
+inline Vertex cross(const Vertex& a, const Vertex& b) {
+    return { a.y * b.z - a.z * b.y,
+             a.z * b.x - a.x * b.z,
+             a.x * b.y - a.y * b.x };
+}
+
+inline Vertex normalize(const Vertex& v) {
+    float mag = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    return { v.x / mag, v.y / mag, v.z / mag };
 }
 
 void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
+    for (int i = 0; i < 24; i++) {
+        const Face &face = faces[i];
+        Vertex v1 = vertices[face.vertex1];
+        Vertex v2 = vertices[face.vertex2];
+        Vertex v3 = vertices[face.vertex3];
 
-    Vertex v21;
-    Vertex v32;
-    Vertex normal;
+        // Calculate the edge vectors.
+        Vertex v21 = subtract(v2, v1);
+        Vertex v32 = subtract(v3, v2);
 
-     for (int i=0; i<24; i++) {
-        v21.x = vertices[faces[i].vertex2].x - vertices[faces[i].vertex1].x;
-        v21.y = vertices[faces[i].vertex2].y - vertices[faces[i].vertex1].y;
-        v21.z = vertices[faces[i].vertex2].z - vertices[faces[i].vertex1].z;
-        v32.x = vertices[faces[i].vertex3].x - vertices[faces[i].vertex2].x;
-        v32.y = vertices[faces[i].vertex3].y - vertices[faces[i].vertex2].y;
-        v32.z = vertices[faces[i].vertex3].z - vertices[faces[i].vertex2].z;
-        normal.x = v21.y*v32.z - v32.y*v21.z;
-        normal.y = v21.z*v32.x - v32.z*v21.x;
-        normal.z = v21.x*v32.y - v32.x*v21.y;
-        float mag = sqrt(normal.x*normal.x+normal.y*normal.y+normal.z*normal.z);
-        normals[i].x = normal.x / mag;
-        normals[i].y = normal.y / mag;
-        normals[i].z = normal.z / mag;
-     }
-
+        // Compute the face normal via the cross product and normalize it.
+        normals[i] = normalize(cross(v21, v32));
+    }
 }
 
 void Loader::loadFaces(Face *faces) {
+    // Define the quadrilaterals (outer vertices) and centers for each face group.
+    const uint16_t quads[6][4] = {
+        {2, 0, 1, 3},  // group 0, center 8
+        {5, 1, 0, 4},  // group 1, center 9
+        {6, 4, 0, 2},  // group 2, center 10
+        {4, 6, 7, 5},  // group 3, center 11
+        {7, 6, 2, 3},  // group 4, center 12
+        {1, 5, 7, 3}   // group 5, center 13
+    };
+    const uint16_t centers[6] = {8, 9, 10, 11, 12, 13};
 
-    const uint16_t rawFaces[96] = { //24 faces , color + *p1 + *p2 + *p3
-        2, 2, 0, 8,
-        3, 0, 1, 8,
-        2, 1, 3, 8,
-        3, 3, 2, 8,
-
-        3, 5, 1, 9,
-        2, 1, 0, 9,
-        3, 0, 4, 9,
-        2, 4, 5, 9,
-
-        3, 6, 4,10,
-        2, 4, 0,10,
-        3, 0, 2,10,
-        2, 2, 6,10,
-        
-        2, 4, 6,11,
-        3, 6, 7,11,
-        2, 7, 5,11,
-        3, 5, 4,11,
-
-        2, 7, 6,12,
-        3, 6, 2,12,
-        2, 2, 3,12,
-        3, 3, 7,12,
-
-        2, 1, 5,13,
-        3, 5, 7,13,
-        2, 7, 3,13,
-        3, 3, 1,13
-    };    
-
-    RGBValue color;
-    for (int i=0; i<24; i++) {
-
-        if (rawFaces[4*i] == 2) {
-            color.rgba.red = 0x00;
-            color.rgba.green = 0x16 * 4;
-            color.rgba.blue = 0x3f * 4;
-        } else {
-            color.rgba.red = 0xff;
-            color.rgba.green = 0xff;
-            color.rgba.blue = 0xff;           
+    // There are 6 groups, each generating 4 faces (triangles) = 24 total faces.
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            int faceIndex = i * 4 + j;
+            // Directly assign values to the face.
+            faces[faceIndex].color   = ((i == 1 || i == 2) ? ((j % 2 == 0) ? 0Xffffffff : 0xff0058fc) : ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff));
+            faces[faceIndex].vertex1 = quads[i][j];
+            faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            faces[faceIndex].vertex3 = centers[i];
         }
-        color.rgba.alpha = 0xff;
-
-        faces[i].color = color.long_value;
-        faces[i].vertex1 = rawFaces[4*i+1];
-        faces[i].vertex2 = rawFaces[4*i+2];
-        faces[i].vertex3 = rawFaces[4*i+3];
-
     }
 }
