@@ -37,18 +37,10 @@ Pixel Render::proj3to2D(Vertex vertex, Screen screen) {
 
 }
 
-void Render::projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen) {
+void Render::projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen, Matrix matrix) {
 
     for (int i=0; i<14; i++) {
-        projectedPoints[i] = proj3to2D(vertices[i], screen);
-    }
-
-}
-
-void Render::rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix) {
-
-    for (int i=0; i<14; i++) {
-        rotatedVertices[i] = matrix * vertices[i];
+        projectedPoints[i] = proj3to2D(matrix * vertices[i], screen);
     }
 
 }
@@ -71,12 +63,9 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
     lux.y = 0;
     lux.z = 1;
 
-    triangle.p1.x = projectedPoints[face.vertex1].x;
-    triangle.p1.y = projectedPoints[face.vertex1].y;
-    triangle.p2.x = projectedPoints[face.vertex2].x;
-    triangle.p2.y = projectedPoints[face.vertex2].y;
-    triangle.p3.x = projectedPoints[face.vertex3].x;
-    triangle.p3.y = projectedPoints[face.vertex3].y;
+    triangle.p1 = projectedPoints[face.vertex1];
+    triangle.p2 = projectedPoints[face.vertex2];
+    triangle.p3 = projectedPoints[face.vertex3];
 
     if (triangle.visible()) {
 
@@ -101,10 +90,8 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 void Render::drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen) {
 
     Pixel * projectedPoints = new Pixel[14];
-    Vertex * rotatedVertices = new Vertex[14];
     Matrix matrix = matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
-    rotateAllVertices(tetrakis.vertices, rotatedVertices, matrix);
-    projectAll2DPoints(rotatedVertices, projectedPoints, screen);
+    projectAll2DPoints(tetrakis.vertices, projectedPoints, screen, matrix);
     drawAllFaces(tetrakis.faces, projectedPoints, tetrakis.faceNormals, screen, pixels, matrix);
 
 }
