@@ -39,16 +39,14 @@ int main(int argc, char** argv)
     float zAngle = 0;
 
     // Object data.
-    Vertex* vertices = new Vertex[14];
-    Face* faces = new Face[24];
-    Vertex* faceNormals = new Vertex[24];
     Tetrakis tetrakis;
-    Render render;
-    tetrakis.loadVertices(vertices);
-    tetrakis.loadFaces(faces);
-    tetrakis.calculateNormals(faces, faceNormals, vertices);
+    tetrakis.setup();
 
+    // Backgroud
     Desert().draw(background, screen);
+
+    // Render engine
+    Render render;
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
@@ -79,7 +77,7 @@ int main(int argc, char** argv)
 
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        render.drawObject(faces, vertices, faceNormals, pixels, screen, xAngle, yAngle, zAngle);
+        render.drawObject(tetrakis.faces, tetrakis.vertices, tetrakis.faceNormals, pixels, screen, xAngle, yAngle, zAngle);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
@@ -105,9 +103,6 @@ int main(int argc, char** argv)
     // Free resources.
     delete[] pixels;
     delete[] background;
-    delete[] vertices;
-    delete[] faces;
-    delete[] faceNormals;
 
     SDL_DestroyTexture(texture);
     SDL_DestroyTexture(backgroundTexture);

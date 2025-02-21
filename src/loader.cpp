@@ -3,6 +3,14 @@
 #include "poly.h"
 
 
+void Tetrakis::setup() {
+
+    Tetrakis::loadVertices(Tetrakis::vertices);
+    Tetrakis::loadFaces(Tetrakis::faces);
+    Tetrakis::calculateNormals(Tetrakis::faces, Tetrakis::faceNormals, Tetrakis::vertices);
+}
+
+
 void Tetrakis::loadVertices(Vertex* vertices) {
     const float half = 32768.f;
     const float axisDist = half * std::sqrt(3.f);  // ≈ 56755

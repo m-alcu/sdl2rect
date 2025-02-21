@@ -89,6 +89,12 @@ class Triangle {
 class Tetrakis {
 
     public:
+        Vertex* vertices = new Vertex[14];
+        Face* faces = new Face[24];
+        Vertex* faceNormals = new Vertex[24];
+
+    public:
+        void setup();
         void loadVertices(Vertex *vertices);
         void loadFaces(Face *faces);
         void calculateNormals(Face *faces, Vertex *normals, Vertex *vertices);
