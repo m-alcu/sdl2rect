@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     Uint32 dif;
 
     // Object data.
-    Tetrakis tetrakis;
+    Tetrakis tetrakis(14, 24);
     tetrakis.setup();
 
     // Backgroud

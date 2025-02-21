@@ -87,21 +87,35 @@ class Triangle {
 
 
 class Tetrakis {
-
     public:
-        Vertex* vertices = new Vertex[14];
-        Face* faces = new Face[24];
-        Vertex* faceNormals = new Vertex[24];
-        float xAngle = 0;
-        float yAngle = 0;
-        float zAngle = 0;
-
+        Vertex* vertices;
+        Face* faces;
+        Vertex* faceNormals;
+        int numVertices;
+        int numFaces;
+        float xAngle;
+        float yAngle;
+        float zAngle;
+    
     public:
+        // Constructor that takes the number of vertices and faces as parameters.
+        Tetrakis(int verticesCount, int facesCount)
+        {
+            numVertices = verticesCount;
+            numFaces = facesCount;
+            vertices = new Vertex[numVertices];
+            faces = new Face[numFaces];
+            // Assuming one normal per face
+            faceNormals = new Vertex[numFaces];
+        }
+    
+        // Other member functions
         void setup();
         void loadVertices();
         void loadFaces();
         void calculateNormals();
-};
+    };
+    
 
 
 class Matrix {
@@ -157,5 +171,5 @@ class Render {
         void projectRotateAllPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen, Matrix matrix);        
         void drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen);
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
-        void drawAllFaces(Face *face, Pixel *projectedPoints, Vertex *faceNormal, Screen screen, uint32_t *pixels, Matrix matrix);
+        void drawAllFaces(Tetrakis tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix);
 };

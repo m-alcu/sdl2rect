@@ -45,10 +45,10 @@ void Render::projectRotateAllPoints(Vertex *vertices, Pixel *projectedPoints, Sc
 
 }
 
-void Render::drawAllFaces(Face *faces, Pixel *projectedPoints, Vertex *faceNormals, Screen screen, uint32_t *pixels, Matrix matrix) {
+void Render::drawAllFaces(Tetrakis tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix) {
 
-     for (int i=0; i<24; i++) {
-         drawFace(faces[i], projectedPoints, faceNormals[i], screen, pixels, matrix);
+     for (int i=0; i<tetrakis.numFaces; i++) {
+         drawFace(tetrakis.faces[i], projectedPoints, tetrakis.faceNormals[i], screen, pixels, matrix);
      }
 }
 
@@ -87,6 +87,6 @@ void Render::drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen) {
     Pixel * projectedPoints = new Pixel[14];
     Matrix matrix = matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
     projectRotateAllPoints(tetrakis.vertices, projectedPoints, screen, matrix);
-    drawAllFaces(tetrakis.faces, projectedPoints, tetrakis.faceNormals, screen, pixels, matrix);
+    drawAllFaces(tetrakis, projectedPoints, screen, pixels, matrix);
 
 }
