@@ -131,7 +131,7 @@ class Render {
         Pixel proj3to2D(Vertex vertex, Screen screen);
         void rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix);
         void projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen);        
-        void drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, float xAngle, float yAngle, float zAngle);
+        void drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen);
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
         void drawAllFaces(Face *face, Pixel *projectedPoints, Vertex *faceNormal, Screen screen, uint32_t *pixels, Matrix matrix);
 };

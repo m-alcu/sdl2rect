@@ -1,6 +1,4 @@
 #include <SDL2/SDL.h>
-#include <iostream>
-#include <string>
 #include "poly.h"
 
 int main(int argc, char** argv)
@@ -72,7 +70,7 @@ int main(int argc, char** argv)
 
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        render.drawObject(tetrakis.faces, tetrakis.vertices, tetrakis.faceNormals, pixels, screen, tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
+        render.drawObject(tetrakis, pixels, screen);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;

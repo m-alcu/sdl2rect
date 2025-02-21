@@ -104,15 +104,15 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(Face *faces, Vertex *vertices, Vertex *faceNormals, uint32_t *pixels, Screen screen, float xAngle, float yAngle, float zAngle) {
+void Render::drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen) {
 
     Matrix matrix;
     Pixel * projectedPoints = new Pixel[14];
     Vertex * rotatedVertices = new Vertex[14];
 
-    matrix.init(xAngle, yAngle, zAngle);
-    rotateAllVertices(vertices, rotatedVertices, matrix);
+    matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
+    rotateAllVertices(tetrakis.vertices, rotatedVertices, matrix);
     projectAll2DPoints(rotatedVertices, projectedPoints, screen);
-    drawAllFaces(faces, projectedPoints, faceNormals, screen, pixels, matrix);
+    drawAllFaces(tetrakis.faces, projectedPoints, tetrakis.faceNormals, screen, pixels, matrix);
 
 }
