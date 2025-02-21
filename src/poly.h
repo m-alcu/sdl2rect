@@ -168,7 +168,7 @@ class Render {
 
     public:
         Pixel proj3to2D(Vertex vertex, Screen screen);
-        void projectRotateAllPoints(Vertex *vertices, Pixel *projectedPoints, Screen screen, Matrix matrix);        
+        Pixel* projectRotateAllPoints(const Tetrakis& tetrakis, const Screen& screen, const Matrix& matrix);        
         void drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen);
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
         void drawAllFaces(Tetrakis tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix);
