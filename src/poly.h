@@ -98,9 +98,9 @@ class Tetrakis {
 
     public:
         void setup();
-        void loadVertices(Vertex *vertices);
-        void loadFaces(Face *faces);
-        void calculateNormals(Face *faces, Vertex *normals, Vertex *vertices);
+        void loadVertices();
+        void loadFaces();
+        void calculateNormals();
 };
 
 

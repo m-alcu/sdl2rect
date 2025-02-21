@@ -5,13 +5,13 @@
 
 void Tetrakis::setup() {
 
-    Tetrakis::loadVertices(Tetrakis::vertices);
-    Tetrakis::loadFaces(Tetrakis::faces);
-    Tetrakis::calculateNormals(Tetrakis::faces, Tetrakis::faceNormals, Tetrakis::vertices);
+    Tetrakis::loadVertices();
+    Tetrakis::loadFaces();
+    Tetrakis::calculateNormals();
 }
 
 
-void Tetrakis::loadVertices(Vertex* vertices) {
+void Tetrakis::loadVertices() {
     const float half = 32768.f;
     const float axisDist = half * std::sqrt(3.f);  // ≈ 56755
 
@@ -20,18 +20,18 @@ void Tetrakis::loadVertices(Vertex* vertices) {
     for (int xSign : {1, -1}) {
         for (int ySign : {1, -1}) {
             for (int zSign : {1, -1}) {
-                vertices[index++] = { half * xSign, half * ySign, half * zSign };
+                Tetrakis::vertices[index++] = { half * xSign, half * ySign, half * zSign };
             }
         }
     }
 
     // Generate the 6 axis-aligned vertices
-    vertices[index++] = {  axisDist, 0,         0 };
-    vertices[index++] = {  0,         axisDist, 0 };
-    vertices[index++] = {  0,         0,         axisDist };
-    vertices[index++] = { -axisDist, 0,         0 };
-    vertices[index++] = {  0,        -axisDist, 0 };
-    vertices[index++] = {  0,         0,        -axisDist };
+    Tetrakis::vertices[index++] = {  axisDist, 0,         0 };
+    Tetrakis::vertices[index++] = {  0,         axisDist, 0 };
+    Tetrakis::vertices[index++] = {  0,         0,         axisDist };
+    Tetrakis::vertices[index++] = { -axisDist, 0,         0 };
+    Tetrakis::vertices[index++] = {  0,        -axisDist, 0 };
+    Tetrakis::vertices[index++] = {  0,         0,        -axisDist };
 }
 
 // Helper functions for vector math.
@@ -50,23 +50,23 @@ inline Vertex normalize(const Vertex& v) {
     return { v.x / mag, v.y / mag, v.z / mag };
 }
 
-void Tetrakis::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
+void Tetrakis::calculateNormals() {
     for (int i = 0; i < 24; i++) {
-        const Face &face = faces[i];
-        Vertex v1 = vertices[face.vertex1];
-        Vertex v2 = vertices[face.vertex2];
-        Vertex v3 = vertices[face.vertex3];
+        const Face &face = Tetrakis::faces[i];
+        Vertex v1 = Tetrakis::vertices[face.vertex1];
+        Vertex v2 = Tetrakis::vertices[face.vertex2];
+        Vertex v3 = Tetrakis::vertices[face.vertex3];
 
         // Calculate the edge vectors.
         Vertex v21 = subtract(v2, v1);
         Vertex v32 = subtract(v3, v2);
 
         // Compute the face normal via the cross product and normalize it.
-        normals[i] = normalize(cross(v21, v32));
+        Tetrakis::faceNormals[i] = normalize(cross(v21, v32));
     }
 }
 
-void Tetrakis::loadFaces(Face *faces) {
+void Tetrakis::loadFaces() {
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
         {2, 0, 1, 3},  // group 0, center 8
@@ -83,10 +83,10 @@ void Tetrakis::loadFaces(Face *faces) {
         for (int j = 0; j < 4; j++) {
             int faceIndex = i * 4 + j;
             // Directly assign values to the face.
-            faces[faceIndex].color   = ((i == 1 || i == 2) ? ((j % 2 == 0) ? 0Xffffffff : 0xff0058fc) : ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff));
-            faces[faceIndex].vertex1 = quads[i][j];
-            faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
-            faces[faceIndex].vertex3 = centers[i];
+            Tetrakis::faces[faceIndex].color   = ((i == 1 || i == 2) ? ((j % 2 == 0) ? 0Xffffffff : 0xff0058fc) : ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff));
+            Tetrakis::faces[faceIndex].vertex1 = quads[i][j];
+            Tetrakis::faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            Tetrakis::faces[faceIndex].vertex3 = centers[i];
         }
     }
 }
