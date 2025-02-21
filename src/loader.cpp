@@ -3,7 +3,7 @@
 #include "poly.h"
 
 
-void Loader::loadVertices(Vertex* vertices) {
+void Tetrakis::loadVertices(Vertex* vertices) {
     const float half = 32768.f;
     const float axisDist = half * std::sqrt(3.f);  // ≈ 56755
 
@@ -42,7 +42,7 @@ inline Vertex normalize(const Vertex& v) {
     return { v.x / mag, v.y / mag, v.z / mag };
 }
 
-void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
+void Tetrakis::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
     for (int i = 0; i < 24; i++) {
         const Face &face = faces[i];
         Vertex v1 = vertices[face.vertex1];
@@ -58,7 +58,7 @@ void Loader::calculateNormals(Face *faces, Vertex *normals, Vertex *vertices) {
     }
 }
 
-void Loader::loadFaces(Face *faces) {
+void Tetrakis::loadFaces(Face *faces) {
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
         {2, 0, 1, 3},  // group 0, center 8

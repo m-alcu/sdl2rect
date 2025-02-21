@@ -86,7 +86,7 @@ class Triangle {
 };
 
 
-class Loader {
+class Tetrakis {
 
     public:
         void loadVertices(Vertex *vertices);

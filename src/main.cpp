@@ -42,15 +42,13 @@ int main(int argc, char** argv)
     Vertex* vertices = new Vertex[14];
     Face* faces = new Face[24];
     Vertex* faceNormals = new Vertex[24];
-    Loader objectLoader;
+    Tetrakis tetrakis;
     Render render;
-    objectLoader.loadVertices(vertices);
-    objectLoader.loadFaces(faces);
-    objectLoader.calculateNormals(faces, faceNormals, vertices);
+    tetrakis.loadVertices(vertices);
+    tetrakis.loadFaces(faces);
+    tetrakis.calculateNormals(faces, faceNormals, vertices);
 
-    // Desert background setup.
-    Desert desert;
-    desert.draw(background, screen);
+    Desert().draw(background, screen);
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
