@@ -11,9 +11,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Screen screen;
-    screen.width = 800;
-    screen.high  = 600;
+    Screen screen = {600, 800};
 
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
@@ -34,9 +32,6 @@ int main(int argc, char** argv)
     SDL_Event event;
     Uint32 ant = SDL_GetTicks();
     Uint32 dif;
-    float xAngle = 0;
-    float yAngle = 0;
-    float zAngle = 0;
 
     // Object data.
     Tetrakis tetrakis;
@@ -77,7 +72,7 @@ int main(int argc, char** argv)
 
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        render.drawObject(tetrakis.faces, tetrakis.vertices, tetrakis.faceNormals, pixels, screen, xAngle, yAngle, zAngle);
+        render.drawObject(tetrakis.faces, tetrakis.vertices, tetrakis.faceNormals, pixels, screen, tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
@@ -96,8 +91,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        xAngle += 0.01f;
-        yAngle += 0.02f;
+        tetrakis.xAngle += 0.01f;
+        tetrakis.yAngle += 0.02f;
     }
 
     // Free resources.

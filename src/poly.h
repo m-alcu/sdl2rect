@@ -92,6 +92,9 @@ class Tetrakis {
         Vertex* vertices = new Vertex[14];
         Face* faces = new Face[24];
         Vertex* faceNormals = new Vertex[24];
+        float xAngle = 0;
+        float yAngle = 0;
+        float zAngle = 0;
 
     public:
         void setup();
