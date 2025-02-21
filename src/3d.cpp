@@ -2,36 +2,30 @@
 #include <math.h>
 #include "poly.h"
 
-void Matrix::init(float xAngle, float yAngle, float zAngle) {
+Matrix Matrix::init(float xAngle, float yAngle, float zAngle) {
+    // Create individual rotation matrices
+    Matrix Rx = {
+        1,         0,          0,
+        0, cos(xAngle), -sin(xAngle),
+        0, sin(xAngle),  cos(xAngle)
+    };
 
-    float sinX = sin (xAngle);
-    float cosX = cos (xAngle);
-    float sinY = sin (yAngle);
-    float cosY = cos (yAngle);
-    float sinZ = sin (zAngle);
-    float cosZ = cos (zAngle);
+    Matrix Ry = {
+         cos(yAngle), 0, sin(yAngle),
+                 0, 1,         0,
+        -sin(yAngle), 0, cos(yAngle)
+    };
 
-    Matrix::r00 = cosY*cosZ;
-    Matrix::r01 = cosY*sinZ;
-    Matrix::r02 = sinY;
+    Matrix Rz = {
+        cos(zAngle), -sin(zAngle), 0,
+        sin(zAngle),  cos(zAngle), 0,
+                0,          0, 1
+    };
 
-    Matrix::r10 = -sinX*sinY*cosZ - cosX*sinZ;
-    Matrix::r11 = -sinX*sinY*sinZ + cosX*cosZ;
-    Matrix::r12 = sinX*cosY;
+    // Multiply matrices in the proper order (for example: R = Rz * Ry * Rx)
+    Matrix R = Rz * Ry * Rx;  // Assuming you've overloaded the operator*
 
-    Matrix::r20 = -cosX*sinY*cosZ + sinX*sinZ;
-    Matrix::r21 = -cosX*sinY*sinZ - sinX*cosZ;
-    Matrix::r22 = cosX*cosY;
-}
-
-Vertex Matrix::rotate(Vertex vertex) {
-
-    Vertex result;
-    result.x = Matrix::r00*vertex.x + Matrix::r01*vertex.y + Matrix::r02*vertex.z;
-    result.y = Matrix::r10*vertex.x + Matrix::r11*vertex.y + Matrix::r12*vertex.z;
-    result.z = Matrix::r20*vertex.x + Matrix::r21*vertex.y + Matrix::r22*vertex.z;
-    return result;
-
+    return R;
 }
 
 Pixel Render::proj3to2D(Vertex vertex, Screen screen) {
@@ -54,7 +48,7 @@ void Render::projectAll2DPoints(Vertex *vertices, Pixel *projectedPoints, Screen
 void Render::rotateAllVertices(Vertex *vertices, Vertex *rotatedVertices, Matrix matrix) {
 
     for (int i=0; i<14; i++) {
-        rotatedVertices[i] = matrix.rotate(vertices[i]);
+        rotatedVertices[i] = matrix * vertices[i];
     }
 
 }
@@ -86,7 +80,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
     if (triangle.visible()) {
 
-        Vertex rotatedNormal = matrix.rotate(faceNormal);
+        Vertex rotatedNormal = matrix * faceNormal;
 
         float bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
 
@@ -106,11 +100,9 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 void Render::drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen) {
 
-    Matrix matrix;
     Pixel * projectedPoints = new Pixel[14];
     Vertex * rotatedVertices = new Vertex[14];
-
-    matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
+    Matrix matrix = matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
     rotateAllVertices(tetrakis.vertices, rotatedVertices, matrix);
     projectAll2DPoints(rotatedVertices, projectedPoints, screen);
     drawAllFaces(tetrakis.faces, projectedPoints, tetrakis.faceNormals, screen, pixels, matrix);
