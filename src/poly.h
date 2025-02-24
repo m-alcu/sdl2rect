@@ -98,15 +98,20 @@ class Tetrakis {
         float zAngle;
     
     public:
-        // Constructor that takes the number of vertices and faces as parameters.
+        // Constructor that takes the number of vertices and faces as parameters. https://stackoverflow.com/questions/16119762/destructor-of-an-object-causes-crashing
         Tetrakis(int verticesCount, int facesCount)
+            : numVertices(verticesCount), numFaces(facesCount),
+              vertices(new Vertex[verticesCount]),
+              faces(new Face[facesCount]),
+              faceNormals(new Vertex[facesCount]) // Assuming one normal per face
         {
-            numVertices = verticesCount;
-            numFaces = facesCount;
-            vertices = new Vertex[numVertices];
-            faces = new Face[numFaces];
-            // Assuming one normal per face
-            faceNormals = new Vertex[numFaces];
+        }
+    
+        // Destructor to deallocate memory
+        ~Tetrakis() {
+            delete[] vertices;
+            delete[] faces;
+            delete[] faceNormals;
         }
     
         // Other member functions
@@ -115,6 +120,7 @@ class Tetrakis {
         void loadFaces();
         void calculateNormals();
     };
+    
     
 
 
@@ -169,7 +175,7 @@ class Render {
     public:
         Pixel proj3to2D(Vertex vertex, Screen screen);
         Pixel* projectRotateAllPoints(const Tetrakis& tetrakis, const Screen& screen, const Matrix& matrix);        
-        void drawObject(Tetrakis tetrakis, uint32_t *pixels, Screen screen);
+        void drawObject(const Tetrakis& tetrakis, uint32_t *pixels, Screen screen);
         void drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels,  Matrix matrix);
-        void drawAllFaces(Tetrakis tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix);
+        void drawAllFaces(const Tetrakis& tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix);
 };

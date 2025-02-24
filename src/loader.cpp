@@ -70,8 +70,8 @@ void Tetrakis::loadFaces() {
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
         {2, 0, 1, 3},  // group 0, center 8
-        {5, 1, 0, 4},  // group 1, center 9
-        {6, 4, 0, 2},  // group 2, center 10
+        {4, 5, 1, 0},  // group 1, center 9
+        {2, 6, 4, 0},  // group 2, center 10
         {4, 6, 7, 5},  // group 3, center 11
         {7, 6, 2, 3},  // group 4, center 12
         {1, 5, 7, 3}   // group 5, center 13
@@ -83,7 +83,7 @@ void Tetrakis::loadFaces() {
         for (int j = 0; j < 4; j++) {
             int faceIndex = i * 4 + j;
             // Directly assign values to the face.
-            Tetrakis::faces[faceIndex].color   = ((i == 1 || i == 2) ? ((j % 2 == 0) ? 0Xffffffff : 0xff0058fc) : ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff));
+            Tetrakis::faces[faceIndex].color   = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
             Tetrakis::faces[faceIndex].vertex1 = quads[i][j];
             Tetrakis::faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
             Tetrakis::faces[faceIndex].vertex3 = centers[i];
