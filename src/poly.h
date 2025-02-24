@@ -114,8 +114,9 @@ class Tetrakis {
             delete[] faceNormals;
         }
     
-        // Other member functions
         void setup();
+        // Other member functions
+    private:   
         void loadVertices();
         void loadFaces();
         void calculateNormals();
