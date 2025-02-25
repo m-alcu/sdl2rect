@@ -1,5 +1,5 @@
 #include <iostream>
-#include "poly.h"
+#include "poly.hpp"
 
 
 void Desert::calcPalette(uint32_t *palette) {

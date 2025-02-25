@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "poly.h"
+#include "poly.hpp"
 
 
 void Tetrakis::setup() {

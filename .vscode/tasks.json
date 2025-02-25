@@ -8,7 +8,7 @@
             "args": [
                 "-g",
                 "src\\main.cpp",
-                "src\\3d.cpp",
+                "src\\render.cpp",
                 "src\\desert.cpp",
                 "src\\loader.cpp",
                 "src\\poly.cpp",

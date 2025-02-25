@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "poly.h"
+#include "poly.hpp"
 
 Matrix Matrix::init(float xAngle, float yAngle, float zAngle) {
     // Create individual rotation matrices

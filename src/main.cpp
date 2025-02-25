@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include "poly.h"
+#include "poly.hpp"
 
 int main(int argc, char** argv)
 {

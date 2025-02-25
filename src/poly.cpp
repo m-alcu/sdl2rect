@@ -1,5 +1,5 @@
 #include <iostream>
-#include "poly.h"
+#include "poly.hpp"
 
 
 void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
