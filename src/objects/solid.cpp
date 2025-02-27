@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "poly.hpp"
+#include "../poly.hpp"
 
 // Helper functions for vector math.
 inline Vertex subtract(const Vertex& a, const Vertex& b) {

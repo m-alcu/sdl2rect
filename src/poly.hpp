@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cstdint>
 #include "space3d.hpp"
-#include "tetrakis.hpp"
+#include "objects/tetrakis.hpp"
 
 typedef struct Screen
 {

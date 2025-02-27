@@ -2,7 +2,7 @@
 #ifndef SOLID_HPP
 #define SOLID_HPP
 
-#include "space3d.hpp"
+#include "../space3d.hpp"
 
 class Solid {
 public:

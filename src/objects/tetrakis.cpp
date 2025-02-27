@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "poly.hpp"
+#include "../poly.hpp"
 
 
 void Tetrakis::loadVertices() {
