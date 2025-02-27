@@ -1,9 +1,12 @@
 # sdl2rect
 
-Test of SDL2 to ckeck performance.
+Test of SDL2 to ckeck performance of solid flat shading.
 
 Build:
 
-To compile and test download SDL2 SDK for minGW in C:\tools
+To compile:
 
-Performance on core i5 7th Gen: 100.000 squares in 14 seconds
+- Download SDL2
+- Install g++
+
+See tasks.json for more details. It's ready for vscode.

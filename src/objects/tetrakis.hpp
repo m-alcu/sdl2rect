@@ -1,7 +1,6 @@
 #ifndef TETRAKIS_HPP
 #define TETRAKIS_HPP
 
-#include "../space3d.hpp"
 #include "solid.hpp"
 
 class Tetrakis : public Solid {
