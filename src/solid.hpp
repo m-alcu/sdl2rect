@@ -39,11 +39,12 @@ public:
         calculateNormals();
     }
 
+    virtual void calculateNormals();
+
 protected:
     // Protected virtual methods to be implemented by derived classes.
     virtual void loadVertices() = 0;
     virtual void loadFaces() = 0;
-    virtual void calculateNormals() = 0;
 };
 
 #endif

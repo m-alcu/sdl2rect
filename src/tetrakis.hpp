@@ -11,17 +11,10 @@ class Tetrakis : public Solid {
         : Solid(verticesCount, facesCount)
     {
     }
-    
-        // Optionally, override setup if additional Tetrakis-specific setup is needed.
-        void setup() override {
-            Solid::setup(); // calls loadVertices, loadFaces, calculateNormals
-            // Add Tetrakis-specific initialization here if necessary.
-        }
-        // Other member functions
+
     protected:   
         void loadVertices() override;
         void loadFaces() override;
-        void calculateNormals() override;
     };
 
 #endif

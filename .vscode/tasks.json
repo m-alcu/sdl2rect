@@ -10,6 +10,7 @@
                 "src\\main.cpp",
                 "src\\render.cpp",
                 "src\\desert.cpp",
+                "src\\solid.cpp",
                 "src\\tetrakis.cpp",
                 "src\\space3d.cpp",
                 "src\\poly.cpp",
