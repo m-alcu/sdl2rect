@@ -2,41 +2,26 @@
 #define TETRAKIS_HPP
 
 #include "space3d.hpp"
+#include "solid.hpp"
 
-class Tetrakis {
-    public:
-        Vertex* vertices;
-        Face* faces;
-        Vertex* faceNormals;
-        int numVertices;
-        int numFaces;
-        float xAngle;
-        float yAngle;
-        float zAngle;
-    
+class Tetrakis : public Solid {
     public:
         // Constructor that takes the number of vertices and faces as parameters. https://stackoverflow.com/questions/16119762/destructor-of-an-object-causes-crashing
         Tetrakis(int verticesCount, int facesCount)
-            : numVertices(verticesCount), numFaces(facesCount),
-              vertices(new Vertex[verticesCount]),
-              faces(new Face[facesCount]),
-              faceNormals(new Vertex[facesCount]) // Assuming one normal per face
-        {
-        }
+        : Solid(verticesCount, facesCount)
+    {
+    }
     
-        // Destructor to deallocate memory
-        ~Tetrakis() {
-            delete[] vertices;
-            delete[] faces;
-            delete[] faceNormals;
+        // Optionally, override setup if additional Tetrakis-specific setup is needed.
+        void setup() override {
+            Solid::setup(); // calls loadVertices, loadFaces, calculateNormals
+            // Add Tetrakis-specific initialization here if necessary.
         }
-    
-        void setup();
         // Other member functions
-    private:   
-        void loadVertices();
-        void loadFaces();
-        void calculateNormals();
+    protected:   
+        void loadVertices() override;
+        void loadFaces() override;
+        void calculateNormals() override;
     };
 
 #endif
