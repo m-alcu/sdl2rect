@@ -9,6 +9,7 @@ Pixel Render::proj3to2D(Vertex vertex, Screen screen) {
     Pixel pixel;
     pixel.x = (int16_t) ((720 * vertex.x) / (vertex.z+200000)) + screen.width / 2;
     pixel.y = (int16_t) ((720 * vertex.y) / (vertex.z+200000)) + screen.high / 2;
+    pixel.z = (int32_t) vertex.z * 0xffff;
     return pixel;
 
 }
@@ -24,7 +25,7 @@ Pixel* Render::projectRotateAllPoints(const Tetrakis& tetrakis, const Screen& sc
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Tetrakis& tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix) {
+void Render::drawAllFaces(const Tetrakis& tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
 
      for (int i=0; i<tetrakis.numFaces; i++) {
          drawFace(tetrakis.faces[i], projectedPoints, tetrakis.faceNormals[i], screen, pixels, matrix);
@@ -61,11 +62,11 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(const Tetrakis& tetrakis, uint32_t *pixels, Screen screen) {
+void Render::drawObject(const Tetrakis& tetrakis, uint32_t *pixels, Screen screen, int32_t *zBuffer) {
 
     Matrix matrix = matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
     Pixel * projectedPoints = projectRotateAllPoints(tetrakis, screen, matrix);
-    drawAllFaces(tetrakis, projectedPoints, screen, pixels, matrix);
+    drawAllFaces(tetrakis, projectedPoints, screen, pixels, matrix, zBuffer);
     delete[] projectedPoints;
 
 }

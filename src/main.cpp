@@ -25,6 +25,7 @@ int main(int argc, char** argv)
 
     // Allocate pixel buffers.
     Uint32* pixels     = new Uint32[screen.width * screen.high];
+    int32_t* zBuffer     = new int32_t[screen.width * screen.high];
     Uint32* background = new Uint32[screen.width * screen.high];
 
     bool isRunning = true;
@@ -71,7 +72,8 @@ int main(int argc, char** argv)
 
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        render.drawObject(*tetrakis, pixels, screen);
+        memset(zBuffer, INT32_MIN, screen.width * screen.high * sizeof(int32_t));
+        render.drawObject(*tetrakis, pixels, screen, zBuffer);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
@@ -96,6 +98,7 @@ int main(int argc, char** argv)
 
     // Free resources.
     delete[] pixels;
+    delete[] zBuffer;
     delete[] background;
 
     SDL_DestroyTexture(texture);

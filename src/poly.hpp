@@ -16,6 +16,7 @@ typedef struct Pixel
 {
     uint16_t x;
     uint16_t y;
+    int32_t z;
 } Pixel;
 
 typedef union
