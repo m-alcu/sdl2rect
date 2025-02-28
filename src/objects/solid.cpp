@@ -19,7 +19,7 @@ inline Vertex normalize(const Vertex& v) {
 }
 
 void Solid::calculateNormals() {
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < numFaces; i++) {
         const Face &face = Solid::faces[i];
         Vertex v1 = Solid::vertices[face.vertex1];
         Vertex v2 = Solid::vertices[face.vertex2];
