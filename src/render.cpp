@@ -14,21 +14,21 @@ Pixel Render::proj3to2D(Vertex vertex, Screen screen) {
 
 }
 
-Pixel* Render::projectRotateAllPoints(const Tetrakis& tetrakis, const Screen& screen, const Matrix& matrix) {
+Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, const Matrix& matrix) {
     // Allocate an array of Pixels on the heap
-    Pixel* projectedPoints = new Pixel[tetrakis.numVertices];
+    Pixel* projectedPoints = new Pixel[solid.numVertices];
     // Process each vertex and store the result in the allocated array
-    for (int i = 0; i < tetrakis.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(matrix * tetrakis.vertices[i], screen);
+    for (int i = 0; i < solid.numVertices; i++) {
+        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], screen);
     }
     // Return the pointer to the array
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Tetrakis& tetrakis, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
+void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
 
-     for (int i=0; i<tetrakis.numFaces; i++) {
-         drawFace(tetrakis.faces[i], projectedPoints, tetrakis.faceNormals[i], screen, pixels, matrix);
+     for (int i=0; i<solid.numFaces; i++) {
+         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix);
      }
 }
 
@@ -62,11 +62,11 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(const Tetrakis& tetrakis, uint32_t *pixels, Screen screen, int32_t *zBuffer) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int32_t *zBuffer) {
 
-    Matrix matrix = matrix.init(tetrakis.xAngle, tetrakis.yAngle, tetrakis.zAngle);
-    Pixel * projectedPoints = projectRotateAllPoints(tetrakis, screen, matrix);
-    drawAllFaces(tetrakis, projectedPoints, screen, pixels, matrix, zBuffer);
+    Matrix matrix = matrix.init(solid.xAngle, solid.yAngle, solid.zAngle);
+    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix);
+    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer);
     delete[] projectedPoints;
 
 }
