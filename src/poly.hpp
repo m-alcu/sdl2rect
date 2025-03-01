@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "space3d.hpp"
 #include "objects/tetrakis.hpp"
+#include "objects/test.hpp"
 
 typedef struct Screen
 {
@@ -23,6 +24,8 @@ typedef struct Gradient
 {
     int32_t dx;
     int32_t dz;
+    int32_t du;
+    int32_t dv;
 } Gradient;
 
 typedef union
@@ -74,7 +77,7 @@ class Triangle {
         bool outside();
 
     private:
-        void drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
+        void drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient calculateEdge(Pixel p1, Pixel p2);
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);

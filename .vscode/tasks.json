@@ -12,6 +12,7 @@
                 "src\\desert.cpp",
                 "src\\objects\\solid.cpp",
                 "src\\objects\\tetrakis.cpp",
+                "src\\objects\\test.cpp",                
                 "src\\space3d.cpp",
                 "src\\poly.cpp",
                 "-o",

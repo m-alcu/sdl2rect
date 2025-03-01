@@ -15,14 +15,18 @@ void Triangle::draw() {
 
     int32_t leftSide = ( p1.x << 16 ) + 0x8000;
     int32_t rightSide = leftSide;
+    Gradient left;
+    left.dx = ( p1.x << 16 ) + 0x8000;
+    left.dz = ( p1.z << 16 ) + 0x8000;
+    Gradient right = left;
     if(Triangle::edge13.dx < Triangle::edge12.dx) {
-        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
+        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         rightSide = (p2.x << 16) + 0x8000;
-        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
+        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
-        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
+        drawTriSector(p1.y, p2.y, &leftSide, &rightSide, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
         leftSide = (p2.x << 16) + 0x8000;
-        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
+        drawTriSector(p2.y, p3.y, &leftSide, &rightSide, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
 
@@ -38,7 +42,7 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
     Triangle::edge13 = calculateEdge(p1,p3);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
     for(int16_t hy=top; hy<bottom; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
             for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
@@ -58,12 +62,12 @@ Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
     int32_t dz = ((int32_t) (p2.z - p1.z)) << 16;
     Gradient grad;
     if (dy > 0) {
-        return { dx / dy , dz / dy};
+        return { dx / dy , dz / dy, 0, 0};
     } else {
         if (dx > 0) {
-            return { INT32_MAX , 0};
+            return { INT32_MAX , 0, 0, 0};
         } else {
-            return { INT32_MIN , 0};
+            return { INT32_MIN , 0, 0, 0};
         }
     }
 };

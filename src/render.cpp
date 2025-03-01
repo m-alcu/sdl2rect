@@ -48,6 +48,8 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         float bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
 
+        if (bright < 0) bright = 0;
+
         RGBValue color;
         color.long_value = face.color;
         color.rgba.red = (uint8_t) (color.rgba.red * bright);
