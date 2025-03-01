@@ -19,6 +19,12 @@ typedef struct Pixel
     int32_t z;
 } Pixel;
 
+typedef struct Gradient
+{
+    int32_t dx;
+    int32_t dz;
+} Gradient;
+
 typedef union
 {
     struct
@@ -52,9 +58,9 @@ class Triangle {
         Pixel p2;
         Pixel p3;
         uint32_t color;  // RGBA
-        int32_t edge12; // 16.16
-        int32_t edge23; // 16.16
-        int32_t edge13; // 16.16
+        Gradient edge12; // dx 16.16 dz 16.16
+        Gradient edge23; // dx 16.16 dz 16.16
+        Gradient edge13; // dx 16.16 dz 16.16
         Screen screen;
         uint32_t *pixels;
         Triangle(uint32_t *pixelsAux, Screen screenAux) {
@@ -67,9 +73,9 @@ class Triangle {
         bool visible();
 
     private:
-        void drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge);
+        void drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        int32_t calculateEdge(Pixel p1, Pixel p2);
+        Gradient calculateEdge(Pixel p1, Pixel p2);
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
         void swapPixel(Pixel *p1, Pixel *p2);
 

@@ -15,7 +15,7 @@ void Triangle::draw() {
 
     int32_t leftSide = ( p1.x << 16 ) + 0x8000;
     int32_t rightSide = leftSide;
-    if(Triangle::edge13 < Triangle::edge12) {
+    if(Triangle::edge13.dx < Triangle::edge12.dx) {
         drawTriSector(p1.y, p2.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         rightSide = (p2.x << 16) + 0x8000;
         drawTriSector(p2.y, p3.y, &leftSide, &rightSide, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
@@ -38,26 +38,28 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
     Triangle::edge13 = calculateEdge(p1,p3);
 }
 
-void Triangle::drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, int32_t leftEdge, int32_t rightEdge) {
+void Triangle::drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
     for(uint16_t hy=top; hy<bottom; hy++) {
         for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
             pixels[hy * screen.width + hx] = Triangle::color;
         }
-        *leftSide += leftEdge;
-        *rightSide += rightEdge;
+        *leftSide += leftEdge.dx;
+        *rightSide += rightEdge.dx;
     }
 };
 
-int32_t Triangle::calculateEdge(Pixel p1, Pixel p2) {
-    int32_t long_y = (int32_t) (p2.y - p1.y);
-    int32_t long_x = ((int32_t) (p2.x - p1.x)) << 16;
-    if (long_y > 0) {
-        return long_x / long_y;
+Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
+    int32_t dy = (int32_t) (p2.y - p1.y);
+    int32_t dx = ((int32_t) (p2.x - p1.x)) << 16;
+    int32_t dz = ((int32_t) (p2.z - p1.z)) << 16;
+    Gradient grad;
+    if (dy > 0) {
+        return { dx / dy , dz / dy};
     } else {
-        if (long_x > 0) {
-            return INT32_MAX;
+        if (dx > 0) {
+            return { INT32_MAX , 0};
         } else {
-            return INT32_MIN;    
+            return { INT32_MIN , 0};
         }
     }
 };
