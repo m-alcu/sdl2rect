@@ -36,6 +36,11 @@ int main(int argc, char** argv)
     // Object data.
     Tetrakis* tetrakis = new Tetrakis(14, 24);
     tetrakis->setup();
+    Position position;
+    position.z = 200000;
+    position.x = screen.width / 2;
+    position.y = screen.high / 2;
+    position.zoom = 720;
 
     // Backgroud
     Desert().draw(background, screen);
@@ -73,7 +78,7 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         memset(zBuffer, INT32_MIN, screen.width * screen.high * sizeof(int32_t));
-        render.drawObject(*tetrakis, pixels, screen, zBuffer);
+        render.drawObject(*tetrakis, pixels, screen, zBuffer, position);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
@@ -92,8 +97,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        tetrakis->xAngle += 0.01f;
-        tetrakis->yAngle += 0.02f;
+        position.xAngle += 0.01f;
+        position.yAngle += 0.02f;
     }
 
     // Free resources.

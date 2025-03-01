@@ -4,22 +4,22 @@
 #include "render.hpp"
 
 
-Pixel Render::proj3to2D(Vertex vertex, Screen screen) {
+Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position) {
 
     Pixel pixel;
-    pixel.x = (int16_t) ((720 * vertex.x) / (vertex.z+200000)) + screen.width / 2;
-    pixel.y = (int16_t) ((720 * vertex.y) / (vertex.z+200000)) + screen.high / 2;
-    pixel.z = (int32_t) vertex.z * 0xffff;
+    pixel.x = (int16_t) ((position.zoom * vertex.x) / (vertex.z + position.z)) + position.x;
+    pixel.y = (int16_t) ((position.zoom * vertex.y) / (vertex.z + position.z)) + position.y;
+    pixel.z = (int32_t) vertex.z + position.z;
     return pixel;
 
 }
 
-Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, const Matrix& matrix) {
+Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, const Matrix& matrix, Position position) {
     // Allocate an array of Pixels on the heap
     Pixel* projectedPoints = new Pixel[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], screen);
+        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], screen, position);
     }
     // Return the pointer to the array
     return projectedPoints;
@@ -62,10 +62,10 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int32_t *zBuffer) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int32_t *zBuffer, Position position) {
 
-    Matrix matrix = matrix.init(solid.xAngle, solid.yAngle, solid.zAngle);
-    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix);
+    Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
+    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);
     drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer);
     delete[] projectedPoints;
 

@@ -11,9 +11,6 @@ public:
     Vertex* faceNormals;
     int numVertices;
     int numFaces;
-    float xAngle;
-    float yAngle;
-    float zAngle;
 
 public:
     // Base constructor that allocates memory for common data members.

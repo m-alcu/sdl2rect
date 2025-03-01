@@ -3,6 +3,17 @@
 
 #include <cstdint>
 
+typedef struct Position
+{
+    float x;
+    float y;
+    float z;
+    int zoom;
+    float xAngle;
+    float yAngle;
+    float zAngle;    
+} Position;
+
 typedef struct Vertex
 {
     float x;
