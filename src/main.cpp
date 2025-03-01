@@ -59,13 +59,22 @@ int main(int argc, char** argv)
         // Process events.
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-            {
+            if (event.type == SDL_QUIT) {
                 isRunning = false;
-            }
-            else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-            {
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
+                position.y = position.y - 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
+                position.y = position.y + 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
+                position.x = position.x - 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                position.x = position.x + 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
+                position.zoom = position.zoom + 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
+                position.zoom = position.zoom - 10;
             }
         }
 

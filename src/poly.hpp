@@ -14,8 +14,8 @@ typedef struct Screen
 
 typedef struct Pixel
 {
-    uint16_t x;
-    uint16_t y;
+    int16_t x;
+    int16_t y;
     int32_t z;
 } Pixel;
 
@@ -74,7 +74,7 @@ class Triangle {
         bool outside();
 
     private:
-        void drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
+        void drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient calculateEdge(Pixel p1, Pixel p2);
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);

@@ -38,11 +38,11 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
     Triangle::edge13 = calculateEdge(p1,p3);
 }
 
-void Triangle::drawTriSector(uint16_t top, uint16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
-    for(uint16_t hy=top; hy<bottom; hy++) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, int32_t *leftSide, int32_t *rightSide, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
+    for(int16_t hy=top; hy<bottom; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
             for(int hx=(*leftSide >> 16); hx<(*rightSide >> 16); hx++) {
-                if (hx >= 0 && hx <= screen.width) { //horizontal clipping
+                if (hx >= 0 && hx < screen.width) { //horizontal clipping
                     pixels[hy * screen.width + hx] = Triangle::color;
                 }
             }
