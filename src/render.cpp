@@ -42,7 +42,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
     triangle.p2 = projectedPoints[face.vertex2];
     triangle.p3 = projectedPoints[face.vertex3];
 
-    if (triangle.visible()) {
+    if (triangle.visible() && !triangle.outside()) {
 
         Vertex rotatedNormal = matrix * faceNormal;
 

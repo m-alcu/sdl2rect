@@ -68,3 +68,12 @@ bool Triangle::visible() {
 
     return (((int32_t) (p3.x-p2.x)*(p2.y-p1.y)) - ((int32_t) (p2.x-p1.x)*(p3.y-p2.y)) < 0);
 };
+
+bool Triangle::outside() {
+
+    return ((p1.x < 0 && p2.x < 0 && p3.x < 0) || 
+            (p1.x >= screen.width && p2.x >= screen.width && p3.x >= screen.width) ||
+            (p1.y < 0 && p2.y < 0 && p3.y < 0) ||
+            (p1.y >= screen.high && p2.y >= screen.high && p3.y >= screen.high)
+            );
+};
