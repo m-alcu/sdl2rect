@@ -1,4 +1,6 @@
 #include <SDL2/SDL.h>
+#include <sstream>
+#include <iomanip>
 #include "poly.hpp"
 #include "render.hpp"
 
@@ -40,11 +42,11 @@ int main(int argc, char** argv)
     test->setup();
     Position position;
     position.z = 200000;
-    position.x = screen.width / 2;
-    position.y = screen.high / 2;
-    position.zoom = 200;
-    position.xAngle = 0.05f;
-    position.yAngle = 0.10f;    
+    position.x = 25000;
+    position.y = -48000;
+    position.zoom = 310;
+    position.xAngle = 0.80f;
+    position.yAngle = 1.60f;    
 
     // Backgroud
     Desert().draw(background, screen);
@@ -68,13 +70,13 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                position.y = position.y - 10;
+                position.y = position.y - 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                position.y = position.y + 10;
+                position.y = position.y + 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                position.x = position.x - 10;
+                position.x = position.x - 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                position.x = position.x + 10;
+                position.x = position.x + 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
                 position.zoom = position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
@@ -85,7 +87,15 @@ int main(int argc, char** argv)
         // Calculate frame time.
         dif = SDL_GetTicks() - ant;
         ant = SDL_GetTicks();
-        std::string title = "frames (ms): " + std::to_string(dif);
+
+        std::ostringstream oss;
+        oss << "xAngle: " << std::fixed << std::setprecision(2) << position.xAngle
+            << " yAngle: " << std::fixed << std::setprecision(2) << position.yAngle
+            << " xPos: " << std::fixed << std::setprecision(2) << position.x
+            << " yPos: " << std::fixed << std::setprecision(2) << position.y
+            << " zoom: " << position.zoom
+            << " frames (ms): " << dif;
+        std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());
 
         //draw figure into pixels memory

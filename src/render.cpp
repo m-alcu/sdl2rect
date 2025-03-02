@@ -7,8 +7,8 @@
 Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position) {
 
     Pixel pixel;
-    pixel.x = (int16_t) ((position.zoom * vertex.x) / (vertex.z + position.z)) + position.x;
-    pixel.y = (int16_t) ((position.zoom * vertex.y) / (vertex.z + position.z)) + position.y;
+    pixel.x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
+    pixel.y = (int16_t) ((position.zoom * (vertex.y + position.y)) / (vertex.z + position.z)) + screen.high / 2;
     pixel.z = (int32_t) vertex.z + position.z;
     return pixel;
 
@@ -28,12 +28,15 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
 void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
 
      for (int i=0; i<solid.numFaces; i++) {
-         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix);
+         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer);
      }
 }
 
+inline float dotProduct(const Vertex& a, const Vertex& b) {
+    return { a.x * b.x + a.y * b.y + a.z * b.z };
+}
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix) {
+void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
 
     Triangle triangle(pixels, screen);
 
@@ -44,11 +47,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
     if (triangle.visible() && !triangle.outside()) {
 
-        Vertex rotatedNormal = matrix * faceNormal;
-
-        float bright = lux.x*rotatedNormal.x + lux.y*rotatedNormal.y + lux.z*rotatedNormal.z;
-
-        if (bright < 0) bright = 0;
+        float bright = std::max(0.0f,dotProduct(lux, matrix * faceNormal));
 
         RGBValue color;
         color.long_value = face.color;
