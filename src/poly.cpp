@@ -20,10 +20,12 @@ void Triangle::draw() {
     if(Triangle::edge13.dx < Triangle::edge12.dx) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         right.dx = (p2.x << 16) + 0x8000;
+        right.dz = (p2.z << 16) + 0x8000;
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
         left.dx = (p2.x << 16) + 0x8000;
+        left.dz = (p2.z << 16) + 0x8000;
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
@@ -41,16 +43,34 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
 }
 
 void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
+
     for(int16_t hy=top.y; hy<bottom.y; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
+
+            int16_t dx = (right.dx - left.dx) >> 16;
+            int32_t dz;
+
+            if (dx == 0) {
+                dz = 0;
+            } else {
+                dz = (right.dz - left.dz) / dx;
+            }
+
+            int32_t z = left.dz;
             for(int hx=(left.dx >> 16); hx<(right.dx >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    pixels[hy * screen.width + hx] = Triangle::color;
+                    if (zBuffer[hy * screen.width + hx] < z) {
+                        pixels[hy * screen.width + hx] = Triangle::color;
+                        zBuffer[hy * screen.width + hx] = z;
+                    }
                 }
+                z += dz;
             }
         }
         left.dx += leftEdge.dx;
         right.dx += rightEdge.dx;
+        left.dz += leftEdge.dz;
+        right.dz += rightEdge.dz;
     }
 };
 
@@ -63,9 +83,9 @@ Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
         return { dx / dy , dz / dy, 0, 0};
     } else {
         if (dx > 0) {
-            return { INT32_MAX , 0, 0, 0};
+            return { INT32_MAX , INT32_MAX, 0, 0};
         } else {
-            return { INT32_MIN , 0, 0, 0};
+            return { INT32_MIN , INT32_MIN, 0, 0};
         }
     }
 };

@@ -38,7 +38,7 @@ inline float dotProduct(const Vertex& a, const Vertex& b) {
 
 void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
 
-    Triangle triangle(pixels, screen);
+    Triangle triangle(pixels, zBuffer, screen);
 
     Vertex lux = {0,0,1};
     triangle.p1 = projectedPoints[face.vertex1];

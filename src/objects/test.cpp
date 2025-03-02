@@ -21,6 +21,8 @@ void Test::loadVertices() {
 
 void Test::loadFaces() {
 
+
+    
     Test::faces[0].color   = 0xff0058fc;
     Test::faces[0].vertex1 = 0+4;
     Test::faces[0].vertex2 = 1+4; 

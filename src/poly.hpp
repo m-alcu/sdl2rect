@@ -66,9 +66,11 @@ class Triangle {
         Gradient edge13; // dx 16.16 dz 16.16
         Screen screen;
         uint32_t *pixels;
-        Triangle(uint32_t *pixelsAux, Screen screenAux) {
+        int32_t *zBuffer;
+        Triangle(uint32_t *pixelsAux, int32_t *zBufferAux, Screen screenAux) {
             screen = screenAux;
             pixels = pixelsAux;
+            zBuffer = zBufferAux;
         }
 
     public:

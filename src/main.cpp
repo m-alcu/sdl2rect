@@ -26,9 +26,10 @@ int main(int argc, char** argv)
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
     // Allocate pixel buffers.
-    Uint32* pixels     = new Uint32[screen.width * screen.high];
+    Uint32* pixels       = new Uint32[screen.width * screen.high];
+    int32_t* zBufferInit = new int32_t[screen.width * screen.high];
     int32_t* zBuffer     = new int32_t[screen.width * screen.high];
-    Uint32* background = new Uint32[screen.width * screen.high];
+    Uint32* background   = new Uint32[screen.width * screen.high];
 
     bool isRunning = true;
     SDL_Event event;
@@ -43,13 +44,14 @@ int main(int argc, char** argv)
     Position position;
     position.z = 200000;
     position.x = 25000;
-    position.y = -48000;
+    position.y = -13000;
     position.zoom = 310;
-    position.xAngle = 0.80f;
-    position.yAngle = 1.60f;    
+    position.xAngle = 24.79f;
+    position.yAngle = 49.99f;    
 
     // Backgroud
     Desert().draw(background, screen);
+    std::fill(zBufferInit, zBufferInit + (screen.width * screen.high), INT32_MIN);
 
     // Render engine
     Render render;
@@ -100,7 +102,7 @@ int main(int argc, char** argv)
 
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        memset(zBuffer, INT32_MIN, screen.width * screen.high * sizeof(int32_t));
+        std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
         render.drawObject(*test, pixels, screen, zBuffer, position);
 
         // Lock the texture to update its pixel data.
@@ -120,13 +122,14 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        //position.xAngle += 0.001f;
-        //position.yAngle += 0.002f;
+        //position.xAngle += 0.01f;
+        //position.yAngle += 0.02f;
     }
 
     // Free resources.
     delete[] pixels;
     delete[] zBuffer;
+    delete[] zBufferInit;
     delete[] background;
 
     SDL_DestroyTexture(texture);
