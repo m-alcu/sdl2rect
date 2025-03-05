@@ -39,13 +39,15 @@ int main(int argc, char** argv)
     // Object data.
     //Tetrakis* tetrakis = new Tetrakis(14, 24);
     //tetrakis->setup();
-    Test * test = new Test(8, 4);
-    test->setup();
+    //Test * test = new Test(8, 4);
+    //test->setup();
+    Torus* torus = new Torus(20*10, 20*10*2);
+    torus->setup(20, 10, 500, 250);
     Position position;
-    position.z = 200000;
-    position.x = 25000;
-    position.y = -13000;
-    position.zoom = 90;
+    position.z = 2000;
+    position.x = 0;
+    position.y = 0;
+    position.zoom = 500;
     position.xAngle = 24.79f;
     position.yAngle = 49.99f;    
 
@@ -80,9 +82,9 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
                 position.x = position.x + 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                position.zoom = position.zoom + 10;
+                position.zoom = position.zoom + 100;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                position.zoom = position.zoom - 10;
+                position.zoom = position.zoom - 100;
             }
         }
 
@@ -103,7 +105,7 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*test, pixels, screen, zBuffer, position);
+        render.drawObject(*torus, pixels, screen, zBuffer, position);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
