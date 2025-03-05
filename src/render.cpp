@@ -25,7 +25,7 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
+void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer) {
 
      for (int i=0; i<solid.numFaces; i++) {
          drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer);
@@ -36,7 +36,7 @@ inline float dotProduct(const Vertex& a, const Vertex& b) {
     return { a.x * b.x + a.y * b.y + a.z * b.z };
 }
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int32_t *zBuffer) {
+void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer) {
 
     Triangle triangle(pixels, zBuffer, screen);
 
@@ -63,7 +63,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int32_t *zBuffer, Position position) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position) {
 
     Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
     Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);

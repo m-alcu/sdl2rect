@@ -15,17 +15,17 @@ void Triangle::draw() {
 
     Gradient left;
     left.dx = ( p1.x << 16 ) + 0x8000;
-    left.dz = ( p1.z << 16 ) + 0x8000;
+    left.dz = ( p1.z << 32 ) + 0x80000000;
     Gradient right = left;
     if(Triangle::edge13.dx < Triangle::edge12.dx) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         right.dx = (p2.x << 16) + 0x8000;
-        right.dz = (p2.z << 16) + 0x8000;
+        right.dz = (p2.z << 32) + 0x80000000;
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
         left.dx = (p2.x << 16) + 0x8000;
-        left.dz = (p2.z << 16) + 0x8000;
+        left.dz = (p2.z << 32) + 0x80000000;
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
@@ -48,7 +48,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
         if (hy >= 0 && hy < screen.high) { //vertical clipping
 
             int16_t dx = (right.dx - left.dx) >> 16;
-            int32_t dz;
+            int64_t dz;
 
             if (dx == 0) {
                 dz = 0;
@@ -56,10 +56,10 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
                 dz = (right.dz - left.dz) / dx;
             }
 
-            int32_t z = left.dz;
+            int64_t z = left.dz;
             for(int hx=(left.dx >> 16); hx<(right.dx >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] < z) {
+                    if (zBuffer[hy * screen.width + hx] > z) {
                         pixels[hy * screen.width + hx] = Triangle::color;
                         zBuffer[hy * screen.width + hx] = z;
                     }

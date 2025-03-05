@@ -27,8 +27,8 @@ int main(int argc, char** argv)
 
     // Allocate pixel buffers.
     Uint32* pixels       = new Uint32[screen.width * screen.high];
-    int32_t* zBufferInit = new int32_t[screen.width * screen.high];
-    int32_t* zBuffer     = new int32_t[screen.width * screen.high];
+    int64_t* zBufferInit = new int64_t[screen.width * screen.high];
+    int64_t* zBuffer     = new int64_t[screen.width * screen.high];
     Uint32* background   = new Uint32[screen.width * screen.high];
 
     bool isRunning = true;
@@ -45,13 +45,13 @@ int main(int argc, char** argv)
     position.z = 200000;
     position.x = 25000;
     position.y = -13000;
-    position.zoom = 310;
+    position.zoom = 90;
     position.xAngle = 24.79f;
     position.yAngle = 49.99f;    
 
     // Backgroud
     Desert().draw(background, screen);
-    std::fill(zBufferInit, zBufferInit + (screen.width * screen.high), INT32_MIN);
+    std::fill(zBufferInit, zBufferInit + (screen.width * screen.high), INT64_MAX);
 
     // Render engine
     Render render;
@@ -122,8 +122,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        //position.xAngle += 0.01f;
-        //position.yAngle += 0.02f;
+        position.xAngle += 0.01f;
+        position.yAngle += 0.02f;
     }
 
     // Free resources.

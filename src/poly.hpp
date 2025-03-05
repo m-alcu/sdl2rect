@@ -17,13 +17,13 @@ typedef struct Pixel
 {
     int16_t x;
     int16_t y;
-    int32_t z;
+    int64_t z;
 } Pixel;
 
 typedef struct Gradient
 {
     int32_t dx;
-    int32_t dz;
+    int64_t dz;
     int32_t du;
     int32_t dv;
 } Gradient;
@@ -66,8 +66,8 @@ class Triangle {
         Gradient edge13; // dx 16.16 dz 16.16
         Screen screen;
         uint32_t *pixels;
-        int32_t *zBuffer;
-        Triangle(uint32_t *pixelsAux, int32_t *zBufferAux, Screen screenAux) {
+        int64_t *zBuffer;
+        Triangle(uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux) {
             screen = screenAux;
             pixels = pixelsAux;
             zBuffer = zBufferAux;
