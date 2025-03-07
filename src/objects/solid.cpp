@@ -33,3 +33,20 @@ void Solid::calculateNormals() {
         Solid::faceNormals[i] = normalize(cross(v21, v32));
     }
 }
+
+void Solid::calculateVertexNormals() {
+
+    for (int i = 0; i < numVertices; i++) { 
+        Vertex vertexNormal = { 0, 0, 0 };
+        for(int j = 0; j < numFaces; j++) {
+            if (Solid::faces[j].vertex1 == i || 
+                Solid::faces[j].vertex2 == i || 
+                Solid::faces[j].vertex3 == i) {
+                    vertexNormal.x += Solid::faceNormals[j].x;
+                    vertexNormal.y += Solid::faceNormals[j].y;
+                    vertexNormal.z += Solid::faceNormals[j].z;
+            }
+        }
+        Solid::vertexNormals[i] = normalize(vertexNormal);
+    }
+}
