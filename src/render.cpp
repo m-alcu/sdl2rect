@@ -45,7 +45,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
     triangle.p2 = projectedPoints[face.vertex2];
     triangle.p3 = projectedPoints[face.vertex3];
 
-    if (triangle.visible() && !triangle.outside()) {
+    if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
 
         float bright = std::max(0.0f,dotProduct(lux, matrix * faceNormal));
 

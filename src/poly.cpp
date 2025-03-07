@@ -103,3 +103,8 @@ bool Triangle::outside() {
             (p1.y >= screen.high && p2.y >= screen.high && p3.y >= screen.high)
             );
 };
+
+bool Triangle::behind() {
+
+    return (p1.z < 0 && p2.z < 0 && p3.z < 0);
+};

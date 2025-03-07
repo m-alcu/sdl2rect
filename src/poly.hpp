@@ -17,16 +17,20 @@ typedef struct Screen
 typedef struct Pixel
 {
     int16_t x;
-    int16_t y;
-    int64_t z;
+    int16_t y; 
+    int64_t z; 
+    int32_t s; //shining in pixel 16.16
+    int32_t u; //phong normal     16.16
+    int32_t v; //phong normal     16.16
 } Pixel;
 
 typedef struct Gradient
 {
     int32_t dx;
     int64_t dz;
-    int32_t du;
-    int32_t dv;
+    int32_t ds; //shining gradient (gouraud)
+    int32_t du; //phong normal
+    int32_t dv; //phong normal
 } Gradient;
 
 typedef union
@@ -78,6 +82,7 @@ class Triangle {
         void draw();
         bool visible();
         bool outside();
+        bool behind();
 
     private:
         void drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);

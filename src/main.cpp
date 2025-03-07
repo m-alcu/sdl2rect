@@ -12,7 +12,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Screen screen = {600, 800};
+    Screen screen = {768, 1024};
 
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
@@ -37,12 +37,16 @@ int main(int argc, char** argv)
     Uint32 dif;
 
     // Object data.
-    //Tetrakis* tetrakis = new Tetrakis(14, 24);
-    //tetrakis->setup();
-    //Test * test = new Test(8, 4);
-    //test->setup();
-    Torus* torus = new Torus(20*10, 20*10*2);
-    torus->setup(20, 10, 500, 250);
+    
+    //Tetrakis* poly = new Tetrakis(14, 24);
+    //poly->setup();
+    
+    //Test * poly = new Test(8, 4);
+    //poly->setup();
+    
+    Torus* poly = new Torus(20*10, 20*10*2);
+    poly->setup(20, 10, 500, 250);
+
     Position position;
     position.z = 2000;
     position.x = 0;
@@ -74,17 +78,17 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                position.y = position.y - 1000;
+                position.y = position.y - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                position.y = position.y + 1000;
+                position.y = position.y + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                position.x = position.x - 1000;
+                position.x = position.x - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                position.x = position.x + 1000;
+                position.x = position.x + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                position.zoom = position.zoom + 100;
+                position.zoom = position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                position.zoom = position.zoom - 100;
+                position.zoom = position.zoom - 10;
             }
         }
 
@@ -105,7 +109,7 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*torus, pixels, screen, zBuffer, position);
+        render.drawObject(*poly, pixels, screen, zBuffer, position);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
