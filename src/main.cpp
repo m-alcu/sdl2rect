@@ -55,6 +55,8 @@ int main(int argc, char** argv)
     position.xAngle = 24.79f;
     position.yAngle = 49.99f;    
 
+    Vertex lux = {0,0,1};
+
     // Backgroud
     Desert().draw(background, screen);
     std::fill(zBufferInit, zBufferInit + (screen.width * screen.high), INT64_MAX);
@@ -109,7 +111,7 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*poly, pixels, screen, zBuffer, position);
+        render.drawObject(*poly, pixels, screen, zBuffer, position, lux);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;

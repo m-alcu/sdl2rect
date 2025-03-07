@@ -4,7 +4,7 @@
 #include "render.hpp"
 
 
-Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position) {
+Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position, Vertex lux, const Matrix& matrix) {
 
     Pixel pixel;
     pixel.x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
@@ -14,21 +14,21 @@ Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position) {
 
 }
 
-Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, const Matrix& matrix, Position position) {
+Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, const Matrix& matrix, Position position, Vertex lux) {
     // Allocate an array of Pixels on the heap
     Pixel* projectedPoints = new Pixel[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], screen, position);
+        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], screen, position, lux, matrix);
     }
     // Return the pointer to the array
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer) {
+void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux) {
 
      for (int i=0; i<solid.numFaces; i++) {
-         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer);
+         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux);
      }
 }
 
@@ -36,11 +36,11 @@ inline float dotProduct(const Vertex& a, const Vertex& b) {
     return { a.x * b.x + a.y * b.y + a.z * b.z };
 }
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer) {
+void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux) {
 
     Triangle triangle(pixels, zBuffer, screen);
 
-    Vertex lux = {0,0,1};
+    
     triangle.p1 = projectedPoints[face.vertex1];
     triangle.p2 = projectedPoints[face.vertex2];
     triangle.p3 = projectedPoints[face.vertex3];
@@ -63,11 +63,11 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
 
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vertex lux) {
 
     Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
-    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);
-    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer);
+    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position, lux);
+    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer, lux);
     delete[] projectedPoints;
 
 }
