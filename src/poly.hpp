@@ -39,7 +39,8 @@ class Gradient {
         }
 
     public:
-        Gradient step(const Gradient &left, const Gradient &right);
+        static Gradient computePixelStep(const Gradient &left, const Gradient &right);
+
 };
 
 typedef union

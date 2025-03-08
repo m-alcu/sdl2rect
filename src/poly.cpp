@@ -53,10 +53,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
     for(int16_t hy=top.y; hy<bottom.y; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
 
-            int16_t dx = (right.dx - left.dx) >> 16; //lengh of x in pixels (steps to plot)
-            int64_t dz = dx == 0 ? 0 : (right.dz - left.dz) / dx;
-            int32_t ds = dx == 0 ? 0 : (right.ds - left.ds) / dx;
-            Gradient pixelStep = {dx, dz, ds, 0, 0};
+            Gradient pixelStep = Gradient::computePixelStep(left, right);
 
             Gradient pixelGradient = left;
             RGBValue color;
@@ -120,3 +117,15 @@ bool Triangle::behind() {
     return (p1.z < 0 && p2.z < 0 && p3.z < 0);
 };
 
+// Computes the pixel step gradient from left and right gradients.
+// left: starting gradient
+// right: ending gradient
+Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right) {
+    // Calculate the change in x, then shift right by 16 bits to get pixel steps.
+    int16_t stepDx = (right.dx - left.dx) >> 16;
+    // Avoid division by zero
+    int64_t stepDz = (stepDx == 0) ? 0 : (right.dz - left.dz) / stepDx;
+    int32_t stepDs = (stepDx == 0) ? 0 : (right.ds - left.ds) / stepDx;
+    // For phong normals, you might calculate du and dv similarly if needed.
+    return { stepDx, stepDz, stepDs, 0, 0 };
+}
