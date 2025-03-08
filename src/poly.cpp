@@ -56,37 +56,31 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
             int16_t dx = (right.dx - left.dx) >> 16; //lengh of x in pixels (steps to plot)
             int64_t dz = dx == 0 ? 0 : (right.dz - left.dz) / dx;
             int32_t ds = dx == 0 ? 0 : (right.ds - left.ds) / dx;
+            Gradient pixelStep = {dx, dz, ds, 0, 0};
 
-            int64_t z = left.dz;
-            int32_t s = left.ds;
+            Gradient pixelGradient = left;
             RGBValue color;
             for(int hx=(left.dx >> 16); hx<(right.dx >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] > z) {
+                    if (zBuffer[hy * screen.width + hx] > pixelGradient.dz) {
 
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
                             color.long_value = Triangle::color;
-                            color.rgba.red = (uint8_t) ((color.rgba.red * s) >> 16);
-                            color.rgba.green = (uint8_t) ((color.rgba.green * s) >> 16);
-                            color.rgba.blue = (uint8_t) ((color.rgba.blue * s) >> 16); 
+                            color.rgba.red = (uint8_t) ((color.rgba.red * pixelGradient.ds) >> 16);
+                            color.rgba.green = (uint8_t) ((color.rgba.green * pixelGradient.ds) >> 16);
+                            color.rgba.blue = (uint8_t) ((color.rgba.blue * pixelGradient.ds) >> 16); 
                             pixels[hy * screen.width + hx] = color.long_value;
                         }
-                        zBuffer[hy * screen.width + hx] = z;
+                        zBuffer[hy * screen.width + hx] = pixelGradient.dz;
                     }
                 }
-                z += dz;
-                s += ds;
+                pixelGradient = pixelGradient + pixelStep;
             }
         }
-        left.dx += leftEdge.dx;
-        right.dx += rightEdge.dx;
-        left.dz += leftEdge.dz;
-        right.dz += rightEdge.dz;
-        left.ds += leftEdge.ds;
-        right.ds += rightEdge.ds;
-
+        left = left + leftEdge;
+        right = right + rightEdge;
     }
 };
 
@@ -125,3 +119,4 @@ bool Triangle::behind() {
 
     return (p1.z < 0 && p2.z < 0 && p3.z < 0);
 };
+

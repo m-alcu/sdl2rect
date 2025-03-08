@@ -24,14 +24,23 @@ typedef struct Pixel
     int32_t v; //phong normal     16.16
 } Pixel;
 
-typedef struct Gradient
-{
-    int32_t dx;
-    int64_t dz;
-    int32_t ds; //shining gradient (gouraud)
-    int32_t du; //phong normal
-    int32_t dv; //phong normal
-} Gradient;
+class Gradient {
+
+    public:
+        int32_t dx;
+        int64_t dz;
+        int32_t ds; //shining gradient (gouraud)
+        int32_t du; //phong normal
+        int32_t dv; //phong normal
+
+        // Overload operator+
+        Gradient operator+(const Gradient &g) const {
+            return { dx + g.dx, dz + g.dz, ds + g.ds, du + g.du, dv + g.dv };
+        }
+
+    public:
+        Gradient step(const Gradient &left, const Gradient &right);
+};
 
 typedef union
 {
