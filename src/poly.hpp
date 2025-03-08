@@ -33,6 +33,25 @@ class Gradient {
         int32_t du; //phong normal
         int32_t dv; //phong normal
 
+        Gradient() {            
+        }
+
+        // Prime constructor
+        Gradient(int32_t x, int64_t z, int32_t s, int32_t u, int32_t v) {
+            dx = x;
+            dz = z;
+            ds = s;
+            du = u;
+            dv = v;
+        } 
+
+        // From a pixel
+        Gradient(const Pixel &p) {
+            dx = ( p.x << 16 ) + 0x8000;
+            dz = ( p.z << 32 ) + 0x80000000;
+            ds = (int32_t) (p.s * 65536); //is float
+        }        
+
         // Overload operator+
         Gradient operator+(const Gradient &g) const {
             return { dx + g.dx, dz + g.dz, ds + g.ds, du + g.du, dv + g.dv };
@@ -40,7 +59,6 @@ class Gradient {
 
     public:
         static Gradient computePixelStep(const Gradient &left, const Gradient &right);
-
 };
 
 class RGBValue {

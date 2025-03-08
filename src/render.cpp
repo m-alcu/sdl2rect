@@ -40,8 +40,6 @@ void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen scr
 void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading) {
 
     Triangle triangle(pixels, zBuffer, screen);
-
-    
     triangle.p1 = projectedPoints[face.vertex1];
     triangle.p2 = projectedPoints[face.vertex2];
     triangle.p3 = projectedPoints[face.vertex3];
@@ -51,14 +49,12 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         if (shading == Shading::Flat) {
             int32_t bright = (int32_t) (std::max(0.0f,dotProduct(lux, matrix * faceNormal)) * 65536); 
-            RGBValue color = RGBValue(face.color, bright);
-            triangle.color = color.long_value;
+            triangle.color = RGBValue(face.color, bright).long_value;
         } else {
             triangle.color = face.color;
         }
         triangle.draw();
     }
-
 }
 
 
