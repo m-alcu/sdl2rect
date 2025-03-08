@@ -20,15 +20,11 @@ void Triangle::draw() {
     Gradient right = left;
     if(Triangle::edge13.dx < Triangle::edge12.dx) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
-        right.dx = (p2.x << 16) + 0x8000;
-        right.dz = (p2.z << 32) + 0x80000000;
-        right.ds = (int32_t) (p2.s * 65536);
+        right.update(p2);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
-        left.dx = (p2.x << 16) + 0x8000;
-        left.dz = (p2.z << 32) + 0x80000000;
-        left.ds = (int32_t) (p2.s * 65536);
+        left.update(p2);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
@@ -116,5 +112,11 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
     int32_t stepDs = (stepDx == 0) ? 0 : (right.ds - left.ds) / stepDx;
     // For phong normals, you might calculate du and dv similarly if needed.
     return { stepDx, stepDz, stepDs, 0, 0 };
+}
+
+void Gradient::update(const Pixel &p) {
+    dx = ( p.x << 16 ) + 0x8000;
+    dz = ( p.z << 32 ) + 0x80000000;
+    ds = (int32_t) (p.s * 65536); //is float
 }
 

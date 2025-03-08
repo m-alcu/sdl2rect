@@ -59,6 +59,7 @@ class Gradient {
 
     public:
         static Gradient computePixelStep(const Gradient &left, const Gradient &right);
+        void update(const Pixel &p);
 };
 
 class RGBValue {
