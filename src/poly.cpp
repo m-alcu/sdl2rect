@@ -73,7 +73,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
 Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
     int32_t dy = (int32_t) (p2.y - p1.y);
     int32_t dx = ((int32_t) (p2.x - p1.x)) << 16;
-    int64_t dz = ((int32_t) (p2.z - p1.z)) << 16;
+    int64_t dz = ((int64_t) (p2.z - p1.z)) << 32;
     int32_t ds = (int32_t) ((p2.s - p1.s) * 65536); 
     if (dy > 0) {
         return  { dx / dy , dz / dy, ds / dy, 0, 0 };
