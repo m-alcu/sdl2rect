@@ -54,20 +54,8 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
         if (hy >= 0 && hy < screen.high) { //vertical clipping
 
             int16_t dx = (right.dx - left.dx) >> 16; //lengh of x in pixels (steps to plot)
-            int64_t dz;
-            int32_t ds;
-
-            if (dx == 0) {
-                dz = 0;
-            } else {
-                dz = (right.dz - left.dz) / dx;
-            }
-
-            if (dx == 0) {
-                ds = 0;
-            } else {
-                ds = (right.ds - left.ds) / dx;
-            }
+            int64_t dz = dx == 0 ? 0 : (right.dz - left.dz) / dx;
+            int32_t ds = dx == 0 ? 0 : (right.ds - left.ds) / dx;
 
             int64_t z = left.dz;
             int32_t s = left.ds;
