@@ -71,7 +71,7 @@ class RGBValue {
                 unsigned char red;
                 unsigned char alpha;
             } rgba;
-            uint32_t long_value;
+            uint32_t bgra_value;
         };
     
         // Optionally, you can add constructors or member functions if needed.
@@ -83,14 +83,14 @@ class RGBValue {
         }
 
         RGBValue(uint32_t value, int32_t shining) {
-            long_value = value;
+            bgra_value = value;
             rgba.red = (uint8_t) ((rgba.red * shining) >> 16);
             rgba.green = (uint8_t) ((rgba.green * shining) >> 16);
             rgba.blue = (uint8_t) ((rgba.blue * shining) >> 16);             
         }
 
         RGBValue(uint32_t value) {
-            long_value = value;
+            bgra_value = value;
         }
 
     };

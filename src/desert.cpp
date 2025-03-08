@@ -13,7 +13,7 @@ void Desert::calcPalette(uint32_t *palette) {
     uint16_t b_dif = 0x0074 * 4;
 
     for (int p=0; p<64; p++) {
-        palette[p] = RGBValue((uint8_t) ( r_i >> 8 ), (uint8_t) ( g_i >> 8 ), (uint8_t) ( b_i >> 8 ), 0x00).long_value;
+        palette[p] = RGBValue((uint8_t) ( r_i >> 8 ), (uint8_t) ( g_i >> 8 ), (uint8_t) ( b_i >> 8 ), 0x00).bgra_value;
         r_i -= r_dif;
         g_i -= g_dif;
         b_i -= b_dif;

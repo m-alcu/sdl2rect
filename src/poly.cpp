@@ -53,7 +53,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
-                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, pixelGradient.ds).long_value;
+                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, pixelGradient.ds).bgra_value;
                         }
                         zBuffer[hy * screen.width + hx] = pixelGradient.dz;
                     }

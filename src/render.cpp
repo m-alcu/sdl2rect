@@ -49,7 +49,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
         if (shading == Shading::Flat) {
             int32_t bright = (int32_t) (std::max(0.0f,dotProduct(lux, matrix * faceNormal)) * 65536); 
-            triangle.color = RGBValue(face.color, bright).long_value;
+            triangle.color = RGBValue(face.color, bright).bgra_value;
         } else {
             triangle.color = face.color;
         }
