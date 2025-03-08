@@ -4,7 +4,6 @@
 
 void Desert::calcPalette(uint32_t *palette) {
 
-    RGBValue color;
     uint16_t r_i = 0x2d80 * 4;
     uint16_t g_i = 0x2380 * 4;
     uint16_t b_i = 0x2d80 * 4;
@@ -14,11 +13,7 @@ void Desert::calcPalette(uint32_t *palette) {
     uint16_t b_dif = 0x0074 * 4;
 
     for (int p=0; p<64; p++) {
-        color.rgba.red = (uint8_t) ( r_i >> 8 );
-        color.rgba.green = (uint8_t) ( g_i >> 8 );
-        color.rgba.blue = (uint8_t) ( b_i >> 8 );
-        color.rgba.alpha = 0x00;           
-        palette[p] = color.long_value;
+        palette[p] = RGBValue((uint8_t) ( r_i >> 8 ), (uint8_t) ( g_i >> 8 ), (uint8_t) ( b_i >> 8 ), 0x00).long_value;
         r_i -= r_dif;
         g_i -= g_dif;
         b_i -= b_dif;

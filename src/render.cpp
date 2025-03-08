@@ -49,17 +49,13 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 
     if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
 
-        float bright = 1;
         if (shading == Shading::Flat) {
-            bright = std::max(0.0f,dotProduct(lux, matrix * faceNormal));
+            int32_t bright = (int32_t) (std::max(0.0f,dotProduct(lux, matrix * faceNormal)) * 65536); 
+            RGBValue color = RGBValue(face.color, bright);
+            triangle.color = color.long_value;
+        } else {
+            triangle.color = face.color;
         }
-        RGBValue color;
-        color.long_value = face.color;
-        color.rgba.red = (uint8_t) (color.rgba.red * bright);
-        color.rgba.green = (uint8_t) (color.rgba.green * bright);
-        color.rgba.blue = (uint8_t) (color.rgba.blue * bright); 
-        triangle.color = color.long_value;
-
         triangle.draw();
     }
 

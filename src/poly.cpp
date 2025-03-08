@@ -52,23 +52,15 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
 
     for(int16_t hy=top.y; hy<bottom.y; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
-
             Gradient pixelStep = Gradient::computePixelStep(left, right);
-
             Gradient pixelGradient = left;
-            RGBValue color;
             for(int hx=(left.dx >> 16); hx<(right.dx >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
                     if (zBuffer[hy * screen.width + hx] > pixelGradient.dz) {
-
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
-                            color.long_value = Triangle::color;
-                            color.rgba.red = (uint8_t) ((color.rgba.red * pixelGradient.ds) >> 16);
-                            color.rgba.green = (uint8_t) ((color.rgba.green * pixelGradient.ds) >> 16);
-                            color.rgba.blue = (uint8_t) ((color.rgba.blue * pixelGradient.ds) >> 16); 
-                            pixels[hy * screen.width + hx] = color.long_value;
+                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, pixelGradient.ds).long_value;
                         }
                         zBuffer[hy * screen.width + hx] = pixelGradient.dz;
                     }

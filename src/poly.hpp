@@ -43,18 +43,38 @@ class Gradient {
 
 };
 
-typedef union
-{
-    struct
-    {
-        unsigned char blue;
-        unsigned char green;
-        unsigned char red;
-        unsigned char alpha;
-    } rgba;
+class RGBValue {
+    public:
+        union {
+            struct {
+                unsigned char blue;
+                unsigned char green;
+                unsigned char red;
+                unsigned char alpha;
+            } rgba;
+            uint32_t long_value;
+        };
+    
+        // Optionally, you can add constructors or member functions if needed.
+        RGBValue(unsigned char blue, unsigned char green, unsigned char red, unsigned char alpha) {
+            rgba.blue = blue;
+            rgba.green = green;
+            rgba.red = red;
+            rgba.alpha = alpha;
+        }
 
-    uint32_t long_value;
-} RGBValue;
+        RGBValue(uint32_t value, int32_t shining) {
+            long_value = value;
+            rgba.red = (uint8_t) ((rgba.red * shining) >> 16);
+            rgba.green = (uint8_t) ((rgba.green * shining) >> 16);
+            rgba.blue = (uint8_t) ((rgba.blue * shining) >> 16);             
+        }
+
+        RGBValue(uint32_t value) {
+            long_value = value;
+        }
+
+    };
 
 class Desert {
 
