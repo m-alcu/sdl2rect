@@ -19,7 +19,7 @@ typedef struct Pixel
     int16_t x;
     int16_t y; 
     int64_t z; 
-    int32_t s; //shining in pixel 16.16
+    float s; //shining
     int32_t u; //phong normal     16.16
     int32_t v; //phong normal     16.16
 } Pixel;
@@ -66,6 +66,7 @@ class Triangle {
         Pixel p2;
         Pixel p3;
         uint32_t color;  // RGBA
+        Shading shading;
         Gradient edge12; // dx 16.16 dz 16.16
         Gradient edge23; // dx 16.16 dz 16.16
         Gradient edge13; // dx 16.16 dz 16.16

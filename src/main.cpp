@@ -56,6 +56,7 @@ int main(int argc, char** argv)
     position.yAngle = 49.99f;    
 
     Vertex lux = {0,0,1};
+    Shading shading = Shading::Flat;
 
     // Backgroud
     Desert().draw(background, screen);
@@ -91,6 +92,10 @@ int main(int argc, char** argv)
                 position.zoom = position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
                 position.zoom = position.zoom - 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
+                shading = Shading::Gouraud;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
+                shading = Shading::Flat;
             }
         }
 
@@ -111,7 +116,7 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*poly, pixels, screen, zBuffer, position, lux);
+        render.drawObject(*poly, pixels, screen, zBuffer, position, lux, shading);
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;

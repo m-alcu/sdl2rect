@@ -29,6 +29,12 @@ typedef struct Face
     int32_t color;
 } Face;
 
+enum class Shading {
+    Flat,
+    Gouraud,
+    Phong
+};
+
 class Matrix {
 
     public:
