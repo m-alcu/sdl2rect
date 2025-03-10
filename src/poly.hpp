@@ -21,6 +21,8 @@ typedef struct Pixel
 
     int64_t v_z; 
     float s; //shining
+
+    int16_t vtx;
 } Pixel;
 
 class Gradient {

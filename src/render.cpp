@@ -7,12 +7,13 @@ inline float dotProduct(const Vertex& a, const Vertex& b) {
     return { a.x * b.x + a.y * b.y + a.z * b.z };
 }
 
-Pixel Render::proj3to2D(Vertex vertex, Vertex vertexNormal, Screen screen, Position position, Vertex lux) {
+Pixel Render::proj3to2D(Vertex vertex, Vertex vertexNormal, Screen screen, Position position, Vertex lux, int16_t i) {
 
     Pixel pixel;
     pixel.p_x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
     pixel.p_y = (int16_t) ((position.zoom * (vertex.y + position.y)) / (vertex.z + position.z)) + screen.high / 2;
     pixel.v_z = (int32_t) vertex.z + position.z;
+    pixel.vtx = i;
     pixel.s = std::max(0.0f,dotProduct(lux, vertexNormal));
     return pixel;
 }
@@ -22,7 +23,7 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
     Pixel* projectedPoints = new Pixel[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], matrix * solid.vertexNormals[i], screen, position, lux);
+        projectedPoints[i] = proj3to2D(matrix * solid.vertices[i], matrix * solid.vertexNormals[i], screen, position, lux, i);
     }
     // Return the pointer to the array
     return projectedPoints;
