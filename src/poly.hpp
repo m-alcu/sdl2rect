@@ -20,41 +20,41 @@ typedef struct Pixel
     int16_t y; 
     int64_t z; 
     float s; //shining
-    int32_t u; //phong normal     16.16
-    int32_t v; //phong normal     16.16
 } Pixel;
 
 class Gradient {
 
     public:
-        int32_t dx;
-        int64_t dz;
+        int32_t p_x;
+
+        int64_t v_x;
+        int64_t v_y;
+        int64_t v_z;
+
         int32_t ds; //shining gradient (gouraud)
-        int32_t du; //phong normal
-        int32_t dv; //phong normal
 
         Gradient() {            
         }
 
         // Prime constructor
-        Gradient(int32_t x, int64_t z, int32_t s, int32_t u, int32_t v) {
-            dx = x;
-            dz = z;
+        Gradient(int32_t p_x_in, int64_t v_x_in, int64_t v_y_in, int64_t v_z_in, int32_t s) {
+            p_x = p_x_in;
+            v_x = v_x_in;
+            v_y = v_y_in;
+            v_z = v_z_in;
             ds = s;
-            du = u;
-            dv = v;
         } 
 
         // From a pixel
         Gradient(const Pixel &p) {
-            dx = ( p.x << 16 ) + 0x8000;
-            dz = ( p.z << 32 ) + 0x80000000;
+            p_x = ( p.x << 16 ) + 0x8000;
+            v_z = ( p.z << 32 ) + 0x80000000;
             ds = (int32_t) (p.s * 65536); //is float
         }        
 
         // Overload operator+
         Gradient operator+(const Gradient &g) const {
-            return { dx + g.dx, dz + g.dz, ds + g.ds, du + g.du, dv + g.dv };
+            return { p_x + g.p_x, v_x + g.v_x, v_y + g.v_y, v_z + g.v_z, ds + g.ds };
         }
 
     public:

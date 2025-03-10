@@ -7,8 +7,6 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->y, p2->y);
     std::swap(p1->z, p2->z);
     std::swap(p1->s, p2->s);
-    std::swap(p1->u, p2->u);
-    std::swap(p1->v, p2->v);
 }
 
 void Triangle::draw() {
@@ -18,7 +16,7 @@ void Triangle::draw() {
 
     Gradient left = Gradient(p1);
     Gradient right = left;
-    if(Triangle::edge13.dx < Triangle::edge12.dx) {
+    if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         right.update(p2);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
@@ -47,15 +45,15 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
         if (hy >= 0 && hy < screen.high) { //vertical clipping
             Gradient pixelStep = Gradient::computePixelStep(left, right);
             Gradient pixelGradient = left;
-            for(int hx=(left.dx >> 16); hx<(right.dx >> 16); hx++) {
+            for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] > pixelGradient.dz) {
+                    if (zBuffer[hy * screen.width + hx] > pixelGradient.v_z) {
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
                             pixels[hy * screen.width + hx] = RGBValue(Triangle::color, pixelGradient.ds).bgra_value;
                         }
-                        zBuffer[hy * screen.width + hx] = pixelGradient.dz;
+                        zBuffer[hy * screen.width + hx] = pixelGradient.v_z;
                     }
                 }
                 pixelGradient = pixelGradient + pixelStep;
@@ -72,12 +70,12 @@ Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
     int64_t dz = ((int64_t) (p2.z - p1.z)) << 32;
     int32_t ds = (int32_t) ((p2.s - p1.s) * 65536); 
     if (dy > 0) {
-        return  { dx / dy , dz / dy, ds / dy, 0, 0 };
+        return  { dx / dy , dx / dy, dy / dy, dz / dy, ds / dy };
     } else {
         if (dx > 0) {
-            return { INT32_MAX , INT32_MAX, INT32_MAX, 0, 0};
+            return { INT32_MAX , INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
         } else {
-            return { INT32_MIN , INT32_MIN, INT32_MIN, 0, 0};
+            return { INT32_MIN , INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN};
         }
     }
 };
@@ -106,17 +104,19 @@ bool Triangle::behind() {
 // right: ending gradient
 Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right) {
     // Calculate the change in x, then shift right by 16 bits to get pixel steps.
-    int16_t stepDx = (right.dx - left.dx) >> 16;
+    int16_t stepDx = (right.p_x - left.p_x) >> 16;
     // Avoid division by zero
-    int64_t stepDz = (stepDx == 0) ? 0 : (right.dz - left.dz) / stepDx;
+    int64_t stepVx = (stepDx == 0) ? 0 : (right.v_x - left.v_x) / stepDx;
+    int64_t stepVy = (stepDx == 0) ? 0 : (right.v_y - left.v_y) / stepDx;
+    int64_t stepVz = (stepDx == 0) ? 0 : (right.v_z - left.v_z) / stepDx;
     int32_t stepDs = (stepDx == 0) ? 0 : (right.ds - left.ds) / stepDx;
     // For phong normals, you might calculate du and dv similarly if needed.
-    return { stepDx, stepDz, stepDs, 0, 0 };
+    return { stepDx, stepVz, stepVy, stepVz, stepDs };
 }
 
 void Gradient::update(const Pixel &p) {
-    dx = ( p.x << 16 ) + 0x8000;
-    dz = ( p.z << 32 ) + 0x80000000;
+    p_x = ( p.x << 16 ) + 0x8000;
+    v_z = ( p.z << 32 ) + 0x80000000;
     ds = (int32_t) (p.s * 65536); //is float
 }
 
