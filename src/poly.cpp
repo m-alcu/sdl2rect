@@ -3,9 +3,9 @@
 
 
 void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
-    std::swap(p1->x, p2->x);
-    std::swap(p1->y, p2->y);
-    std::swap(p1->z, p2->z);
+    std::swap(p1->p_x, p2->p_x);
+    std::swap(p1->p_y, p2->p_y);
+    std::swap(p1->v_z, p2->v_z);
     std::swap(p1->s, p2->s);
 }
 
@@ -28,9 +28,9 @@ void Triangle::draw() {
 };
 
 void Triangle::orderPixels(Pixel *p1, Pixel *p2, Pixel *p3) {
-    if (p1->y > p2->y) swapPixel(p1,p2);
-    if (p2->y > p3->y) swapPixel(p2,p3);
-    if (p1->y > p2->y) swapPixel(p1,p2);
+    if (p1->p_y > p2->p_y) swapPixel(p1,p2);
+    if (p2->p_y > p3->p_y) swapPixel(p2,p3);
+    if (p1->p_y > p2->p_y) swapPixel(p1,p2);
 }
 
 void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
@@ -41,7 +41,7 @@ void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
 
 void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
 
-    for(int16_t hy=top.y; hy<bottom.y; hy++) {
+    for(int16_t hy=top.p_y; hy<bottom.p_y; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
             Gradient pixelStep = Gradient::computePixelStep(left, right);
             Gradient pixelGradient = left;
@@ -65,9 +65,9 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
 };
 
 Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
-    int32_t dy = (int32_t) (p2.y - p1.y);
-    int32_t dx = ((int32_t) (p2.x - p1.x)) << 16;
-    int64_t dz = ((int64_t) (p2.z - p1.z)) << 32;
+    int32_t dy = (int32_t) (p2.p_y - p1.p_y);
+    int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
+    int64_t dz = ((int64_t) (p2.v_z - p1.v_z)) << 32;
     int32_t ds = (int32_t) ((p2.s - p1.s) * 65536); 
     if (dy > 0) {
         return  { dx / dy , dx / dy, dy / dy, dz / dy, ds / dy };
@@ -82,21 +82,21 @@ Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
 
 bool Triangle::visible() {
 
-    return (((int32_t) (p3.x-p2.x)*(p2.y-p1.y)) - ((int32_t) (p2.x-p1.x)*(p3.y-p2.y)) < 0);
+    return (((int32_t) (p3.p_x-p2.p_x)*(p2.p_y-p1.p_y)) - ((int32_t) (p2.p_x-p1.p_x)*(p3.p_y-p2.p_y)) < 0);
 };
 
 bool Triangle::outside() {
 
-    return ((p1.x < 0 && p2.x < 0 && p3.x < 0) || 
-            (p1.x >= screen.width && p2.x >= screen.width && p3.x >= screen.width) ||
-            (p1.y < 0 && p2.y < 0 && p3.y < 0) ||
-            (p1.y >= screen.high && p2.y >= screen.high && p3.y >= screen.high)
+    return ((p1.p_x < 0 && p2.p_x < 0 && p3.p_x < 0) || 
+            (p1.p_x >= screen.width && p2.p_x >= screen.width && p3.p_x >= screen.width) ||
+            (p1.p_y < 0 && p2.p_y < 0 && p3.p_y < 0) ||
+            (p1.p_y >= screen.high && p2.p_y >= screen.high && p3.p_y >= screen.high)
             );
 };
 
 bool Triangle::behind() {
 
-    return (p1.z < 0 && p2.z < 0 && p3.z < 0);
+    return (p1.v_z < 0 && p2.v_z < 0 && p3.v_z < 0);
 };
 
 // Computes the pixel step gradient from left and right gradients.
@@ -115,8 +115,8 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
 }
 
 void Gradient::update(const Pixel &p) {
-    p_x = ( p.x << 16 ) + 0x8000;
-    v_z = ( p.z << 32 ) + 0x80000000;
+    p_x = ( p.p_x << 16 ) + 0x8000;
+    v_z = ( p.v_z << 32 ) + 0x80000000;
     ds = (int32_t) (p.s * 65536); //is float
 }
 

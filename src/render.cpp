@@ -10,9 +10,9 @@ inline float dotProduct(const Vertex& a, const Vertex& b) {
 Pixel Render::proj3to2D(Vertex vertex, Vertex vertexNormal, Screen screen, Position position, Vertex lux) {
 
     Pixel pixel;
-    pixel.x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
-    pixel.y = (int16_t) ((position.zoom * (vertex.y + position.y)) / (vertex.z + position.z)) + screen.high / 2;
-    pixel.z = (int32_t) vertex.z + position.z;
+    pixel.p_x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
+    pixel.p_y = (int16_t) ((position.zoom * (vertex.y + position.y)) / (vertex.z + position.z)) + screen.high / 2;
+    pixel.v_z = (int32_t) vertex.z + position.z;
     pixel.s = std::max(0.0f,dotProduct(lux, vertexNormal));
     return pixel;
 }

@@ -16,9 +16,10 @@ typedef struct Screen
 
 typedef struct Pixel
 {
-    int16_t x;
-    int16_t y; 
-    int64_t z; 
+    int16_t p_x;
+    int16_t p_y;
+
+    int64_t v_z; 
     float s; //shining
 } Pixel;
 
@@ -47,8 +48,8 @@ class Gradient {
 
         // From a pixel
         Gradient(const Pixel &p) {
-            p_x = ( p.x << 16 ) + 0x8000;
-            v_z = ( p.z << 32 ) + 0x80000000;
+            p_x = ( p.p_x << 16 ) + 0x8000;
+            v_z = ( p.v_z << 32 ) + 0x80000000;
             ds = (int32_t) (p.s * 65536); //is float
         }        
 
