@@ -110,38 +110,32 @@ class Desert {
 };
 
 class Triangle {
-
     public:
-        Pixel p1;
-        Pixel p2;
-        Pixel p3;
+        Pixel p1, p2, p3;
         uint32_t color;  // RGBA
         Shading shading;
-        Gradient edge12; // dx 16.16 dz 16.16
-        Gradient edge23; // dx 16.16 dz 16.16
-        Gradient edge13; // dx 16.16 dz 16.16
+        Gradient edge12, edge23, edge13;
         Screen screen;
         uint32_t *pixels;
         int64_t *zBuffer;
-        Triangle(uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux) {
-            screen = screenAux;
-            pixels = pixelsAux;
-            zBuffer = zBufferAux;
-        }
-
-    public:
+        const Solid* solid;  // Pointer to the abstract Solid
+    
+        // Updated constructor that also accepts a Solid pointer.
+        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux)
+          : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux), screen(screenAux) {}
+    
         void draw();
         bool visible();
         bool outside();
         bool behind();
-
+    
     private:
         void drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient calculateEdge(Pixel p1, Pixel p2);
         void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
         void swapPixel(Pixel *p1, Pixel *p2);
-
-};
+    };
+    
 
 #endif

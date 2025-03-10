@@ -31,24 +31,26 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
 void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading) {
 
      for (int i=0; i<solid.numFaces; i++) {
-         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux, shading);
+         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux, shading, solid);
      }
 }
 
 
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading) {
+void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, 
+                        uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, 
+                        Shading shading, const Solid& solid) {
 
-    Triangle triangle(pixels, zBuffer, screen);
+    // Pass the address of 'solid' since it is a reference to an abstract Solid.
+    Triangle triangle(&solid, pixels, zBuffer, screen);
     triangle.p1 = projectedPoints[face.vertex1];
     triangle.p2 = projectedPoints[face.vertex2];
     triangle.p3 = projectedPoints[face.vertex3];
     triangle.shading = shading;
 
     if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
-
         if (shading == Shading::Flat) {
-            int32_t bright = (int32_t) (std::max(0.0f,dotProduct(lux, matrix * faceNormal)) * 65536); 
+            int32_t bright = (int32_t)(std::max(0.0f, dotProduct(lux, matrix * faceNormal)) * 65536);
             triangle.color = RGBValue(face.color, bright).bgra_value;
         } else {
             triangle.color = face.color;
@@ -56,7 +58,6 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
         triangle.draw();
     }
 }
-
 
 
 void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vertex lux, Shading shading) {
