@@ -5,7 +5,7 @@
 void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->p_x, p2->p_x);
     std::swap(p1->p_y, p2->p_y);
-    std::swap(p1->v_z, p2->v_z);
+    std::swap(p1->p_z, p2->p_z);
     std::swap(p1->s, p2->s);
 }
 
@@ -67,7 +67,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
 Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
     int32_t dy = (int32_t) (p2.p_y - p1.p_y);
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
-    int64_t dz = ((int64_t) (p2.v_z - p1.v_z)) << 32;
+    int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
     int32_t ds = (int32_t) ((p2.s - p1.s) * 65536); 
     if (dy > 0) {
         return  { dx / dy , dx / dy, dy / dy, dz / dy, ds / dy };
@@ -96,7 +96,7 @@ bool Triangle::outside() {
 
 bool Triangle::behind() {
 
-    return (p1.v_z < 0 && p2.v_z < 0 && p3.v_z < 0);
+    return (p1.p_z < 0 && p2.p_z < 0 && p3.p_z < 0);
 };
 
 // Computes the pixel step gradient from left and right gradients.
@@ -116,7 +116,7 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
 
 void Gradient::update(const Pixel &p) {
     p_x = ( p.p_x << 16 ) + 0x8000;
-    v_z = ( p.v_z << 32 ) + 0x80000000;
+    v_z = p.p_z;
     ds = (int32_t) (p.s * 65536); //is float
 }
 
