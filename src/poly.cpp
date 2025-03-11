@@ -6,6 +6,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->p_x, p2->p_x);
     std::swap(p1->p_y, p2->p_y);
     std::swap(p1->p_z, p2->p_z);
+    std::swap(p1->vtx, p2->vtx);
     std::swap(p1->s, p2->s);
 }
 

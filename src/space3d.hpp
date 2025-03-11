@@ -78,6 +78,7 @@ class Matrix {
 
     public:
         Matrix init(float xAngle, float yAngle, float zAngle);
+        Matrix initInverse(float xAngle, float yAngle, float zAngle);
 
 };
 
