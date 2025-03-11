@@ -29,10 +29,10 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading) {
+void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading, Matrix inverseMatrix) {
 
      for (int i=0; i<solid.numFaces; i++) {
-         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux, shading, solid);
+         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux, shading, solid, inverseMatrix);
      }
 }
 
@@ -40,7 +40,7 @@ void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen scr
 
 void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, 
                         uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, 
-                        Shading shading, const Solid& solid) {
+                        Shading shading, const Solid& solid, Matrix inverseMatrix) {
 
     // Pass the address of 'solid' since it is a reference to an abstract Solid.
     Triangle triangle(&solid, pixels, zBuffer, screen);
@@ -55,6 +55,18 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
             triangle.color = RGBValue(face.color, bright).bgra_value;
         } else {
             triangle.color = face.color;
+
+            Vertex luxInverse = inverseMatrix * lux;
+
+            Vertex p1Normal = solid.vertexNormals[triangle.p1.vtx];
+            triangle.p1.s = std::max(0.0f,dotProduct(luxInverse, p1Normal));
+
+            Vertex p2Normal = solid.vertexNormals[triangle.p2.vtx];
+            triangle.p2.s = std::max(0.0f,dotProduct(luxInverse, p2Normal));
+
+            Vertex p3Normal = solid.vertexNormals[triangle.p3.vtx];
+            triangle.p3.s = std::max(0.0f,dotProduct(luxInverse, p3Normal));
+
         }
         triangle.draw();
     }
@@ -64,8 +76,9 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
 void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vertex lux, Shading shading) {
 
     Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
+    Matrix inverseMatrix = inverseMatrix.initInverse(position.xAngle, position.yAngle, position.zAngle);
     Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position, lux);
-    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer, lux, shading);
+    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer, lux, shading, inverseMatrix);
     delete[] projectedPoints;
 
 }
