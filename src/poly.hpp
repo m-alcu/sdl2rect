@@ -33,6 +33,8 @@ class Gradient {
         int64_t v_y;
         int64_t v_z;
 
+        Vertex vertexNormal;
+
         int32_t ds; //shining gradient (gouraud)
 
         Gradient() {            
@@ -48,7 +50,7 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const Pixel &p) {
+        Gradient(const Pixel &p, const Solid& solid, Vertex lux) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             v_z = p.p_z;
             ds = (int32_t) (p.s * 65536); //is float
@@ -61,7 +63,7 @@ class Gradient {
 
     public:
         static Gradient computePixelStep(const Gradient &left, const Gradient &right);
-        void update(const Pixel &p);
+        void update(const Pixel &p, const Solid& solid, Vertex lux);
 };
 
 class RGBValue {
@@ -125,7 +127,7 @@ class Triangle {
         Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux), screen(screenAux) {}
     
-        void draw();
+        void draw(const Solid& solid, Vertex lux);
         bool visible();
         bool outside();
         bool behind();
@@ -133,8 +135,8 @@ class Triangle {
     private:
         void drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        Gradient calculateEdge(Pixel p1, Pixel p2);
-        void calculateEdges(Pixel p1, Pixel p2, Pixel p3);
+        Gradient calculateEdge(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
+        void calculateEdges(Pixel p1, Pixel p2, Pixel p3, const Solid& solid, Vertex lux);
         void swapPixel(Pixel *p1, Pixel *p2);
     };
     

@@ -48,14 +48,14 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
     triangle.p3 = projectedPoints[face.vertex3];
     triangle.shading = shading;
 
+    Vertex luxInverse = inverseMatrix * lux;
+
     if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
         if (shading == Shading::Flat) {
             int32_t bright = (int32_t)(std::max(0.0f, dotProduct(lux, matrix * faceNormal)) * 65536);
             triangle.color = RGBValue(face.color, bright).bgra_value;
         } else {
             triangle.color = face.color;
-
-            Vertex luxInverse = inverseMatrix * lux;
 
             Vertex p1Normal = solid.vertexNormals[triangle.p1.vtx];
             triangle.p1.s = std::max(0.0f,dotProduct(luxInverse, p1Normal));
@@ -67,7 +67,7 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
             triangle.p3.s = std::max(0.0f,dotProduct(luxInverse, p3Normal));
 
         }
-        triangle.draw();
+        triangle.draw(solid, luxInverse);
     }
 }
 

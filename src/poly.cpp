@@ -10,20 +10,20 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->s, p2->s);
 }
 
-void Triangle::draw() {
+void Triangle::draw(const Solid& solid, Vertex lux) {
 
     orderPixels(&p1, &p2, &p3);
-    calculateEdges(p1,p2,p3);
+    calculateEdges(p1,p2,p3, solid, lux);
 
-    Gradient left = Gradient(p1);
+    Gradient left = Gradient(p1, solid, lux);
     Gradient right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
-        right.update(p2);
+        right.update(p2, solid, lux);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
-        left.update(p2);
+        left.update(p2, solid, lux);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
@@ -34,10 +34,10 @@ void Triangle::orderPixels(Pixel *p1, Pixel *p2, Pixel *p3) {
     if (p1->p_y > p2->p_y) swapPixel(p1,p2);
 }
 
-void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3) {
-    Triangle::edge12 = calculateEdge(p1,p2);
-    Triangle::edge23 = calculateEdge(p2,p3);
-    Triangle::edge13 = calculateEdge(p1,p3);
+void Triangle::calculateEdges(Pixel p1, Pixel p2, Pixel p3, const Solid& solid, Vertex lux) {
+    Triangle::edge12 = calculateEdge(p1, p2, solid, lux);
+    Triangle::edge23 = calculateEdge(p2, p3, solid, lux);
+    Triangle::edge13 = calculateEdge(p1, p3, solid, lux);
 }
 
 void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge) {
@@ -65,7 +65,7 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
     }
 };
 
-Gradient Triangle::calculateEdge(Pixel p1, Pixel p2) {
+Gradient Triangle::calculateEdge(Pixel p1, Pixel p2, const Solid& solid, Vertex lux) {
     int32_t dy = (int32_t) (p2.p_y - p1.p_y);
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
@@ -115,7 +115,7 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
     return { stepDx, stepVz, stepVy, stepVz, stepDs };
 }
 
-void Gradient::update(const Pixel &p) {
+void Gradient::update(const Pixel &p, const Solid& solid, Vertex lux) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     v_z = p.p_z;
     ds = (int32_t) (p.s * 65536); //is float
