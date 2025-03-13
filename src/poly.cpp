@@ -68,12 +68,21 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
 
     int32_t ds = (int32_t) ((s2 - s1) * 65536); 
     if (dy > 0) {
-        return  { dx / dy , dx / dy, dy / dy, dz / dy, ds / dy };
+
+        float vDx = solid.vertices[p2.vtx].x - solid.vertices[p1.vtx].x;
+        float vDy = solid.vertices[p2.vtx].y - solid.vertices[p1.vtx].y;
+        float vDz = solid.vertices[p2.vtx].z - solid.vertices[p1.vtx].z;
+        Vertex v = { vDx / dy, vDy / dy , vDz / dy };
+        float nDx = solid.vertexNormals[p2.vtx].x - solid.vertexNormals[p1.vtx].x;
+        float nDy = solid.vertexNormals[p2.vtx].y - solid.vertexNormals[p1.vtx].y;
+        float nDz = solid.vertexNormals[p2.vtx].z - solid.vertexNormals[p1.vtx].z;
+        Vertex n = { nDx / dy, nDy / dy , nDz / dy };
+        return  { dx / dy , dz / dy, v, n, ds / dy };
     } else {
         if (dx > 0) {
-            return { INT32_MAX , INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+            return { INT32_MAX , INT64_MAX, {0,0,0}, {0,0,0}, INT32_MAX};
         } else {
-            return { INT32_MIN , INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN};
+            return { INT32_MIN , INT64_MIN, {0,0,0}, {0,0,0}, INT32_MIN};
         }
     }
 };
@@ -81,7 +90,7 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
 void Gradient::update(const Pixel &p, const Solid& solid, Vertex lux) {
 
     p_x = ( p.p_x << 16 ) + 0x8000;
-    v_z = p.p_z;
+    p_z = p.p_z;
     Vertex pNormal = solid.vertexNormals[p.vtx];
     float s = std::max(0.0f,(lux.x * pNormal.x + lux.y * pNormal.y + lux.z * pNormal.z));
     ds = (int32_t) (s * 65536); //is float
@@ -95,13 +104,13 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
             Gradient initGradient = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] > initGradient.v_z) {
+                    if (zBuffer[hy * screen.width + hx] > initGradient.p_z) {
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
                             pixels[hy * screen.width + hx] = RGBValue(Triangle::color, initGradient.ds).bgra_value;
                         }
-                        zBuffer[hy * screen.width + hx] = initGradient.v_z;
+                        zBuffer[hy * screen.width + hx] = initGradient.p_z;
                     }
                 }
                 initGradient = initGradient + gradientDx;
@@ -120,12 +129,16 @@ Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
     // Calculate the change in x, then shift right by 16 bits to get pixel steps.
     int16_t stepDx = (right.p_x - left.p_x) >> 16;
     // Avoid division by zero
-    int64_t stepVx = (stepDx == 0) ? 0 : (right.v_x - left.v_x) / stepDx;
-    int64_t stepVy = (stepDx == 0) ? 0 : (right.v_y - left.v_y) / stepDx;
-    int64_t stepVz = (stepDx == 0) ? 0 : (right.v_z - left.v_z) / stepDx;
+    float stepVx = (stepDx == 0) ? 0 : (right.vertexPoint.x - left.vertexPoint.x) / stepDx;
+    float stepVy = (stepDx == 0) ? 0 : (right.vertexPoint.y - left.vertexPoint.y) / stepDx;
+    float stepVz = (stepDx == 0) ? 0 : (right.vertexPoint.z - left.vertexPoint.z) / stepDx;
+    float stepNx = (stepDx == 0) ? 0 : (right.vertexNormal.x - left.vertexNormal.x) / stepDx;
+    float stepNy = (stepDx == 0) ? 0 : (right.vertexNormal.y - left.vertexNormal.y) / stepDx;
+    float stepNz = (stepDx == 0) ? 0 : (right.vertexNormal.z - left.vertexNormal.z) / stepDx;
+    int64_t stepDz = (stepDx == 0) ? 0 : (right.p_z - left.p_z) / stepDx;
     int32_t stepDs = (stepDx == 0) ? 0 : (right.ds - left.ds) / stepDx;
     // For phong normals, you might calculate du and dv similarly if needed.
-    return { stepDx, stepVz, stepVy, stepVz, stepDs };
+    return { stepDx, stepDz, {stepVx, stepVy, stepVz}, {stepNx, stepNy, stepNz}, stepDs };
 }
 
 

@@ -26,11 +26,9 @@ class Gradient {
 
     public:
         int32_t p_x;
+        int64_t p_z;
 
-        int64_t v_x;
-        int64_t v_y;
-        int64_t v_z;
-
+        Vertex vertexPoint;
         Vertex vertexNormal;
 
         int32_t ds; //shining gradient (gouraud)
@@ -39,18 +37,18 @@ class Gradient {
         }
 
         // Prime constructor
-        Gradient(int32_t p_x_in, int64_t v_x_in, int64_t v_y_in, int64_t v_z_in, int32_t s) {
+        Gradient(int32_t p_x_in, int64_t p_z_in, Vertex p, Vertex n, int32_t s) {
             p_x = p_x_in;
-            v_x = v_x_in;
-            v_y = v_y_in;
-            v_z = v_z_in;
+            p_z = p_z_in;
+            vertexPoint = p;
+            vertexNormal = n;
             ds = s;
         } 
 
         // From a pixel
         Gradient(const Pixel &p, const Solid& solid, Vertex lux) {
             p_x = ( p.p_x << 16 ) + 0x8000;
-            v_z = p.p_z;
+            p_z = p.p_z;
 
             Vertex p1Normal = solid.vertexNormals[p.vtx];
             float dotP = lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z;
@@ -60,7 +58,9 @@ class Gradient {
 
         // Overload operator+
         Gradient operator+(const Gradient &g) const {
-            return { p_x + g.p_x, v_x + g.v_x, v_y + g.v_y, v_z + g.v_z, ds + g.ds };
+            Vertex p = { vertexPoint.x + g.vertexPoint.x, vertexPoint.y + g.vertexPoint.y, vertexPoint.z + g.vertexPoint.z }; 
+            Vertex n = { vertexNormal.x + g.vertexNormal.x, vertexNormal.y + g.vertexNormal.y, vertexNormal.z + g.vertexNormal.z };
+            return { p_x + g.p_x, p_z + g.p_z, p, n, ds + g.ds };
         }
 
     public:
