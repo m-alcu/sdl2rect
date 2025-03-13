@@ -19,8 +19,6 @@ typedef struct Pixel
     int16_t p_x;
     int16_t p_y;
     int64_t p_z; 
-    float s; //shining
-
     int16_t vtx;
 } Pixel;
 
@@ -53,7 +51,11 @@ class Gradient {
         Gradient(const Pixel &p, const Solid& solid, Vertex lux) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             v_z = p.p_z;
-            ds = (int32_t) (p.s * 65536); //is float
+
+            Vertex p1Normal = solid.vertexNormals[p.vtx];
+            float dotP = lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z;
+            float s = std::max(0.0f,dotP);
+            ds = (int32_t) (s * 65536); //is float
         }        
 
         // Overload operator+

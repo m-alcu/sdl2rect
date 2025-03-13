@@ -56,16 +56,6 @@ void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Scre
             triangle.color = RGBValue(face.color, bright).bgra_value;
         } else {
             triangle.color = face.color;
-
-            Vertex p1Normal = solid.vertexNormals[triangle.p1.vtx];
-            triangle.p1.s = std::max(0.0f,dotProduct(luxInverse, p1Normal));
-
-            Vertex p2Normal = solid.vertexNormals[triangle.p2.vtx];
-            triangle.p2.s = std::max(0.0f,dotProduct(luxInverse, p2Normal));
-
-            Vertex p3Normal = solid.vertexNormals[triangle.p3.vtx];
-            triangle.p3.s = std::max(0.0f,dotProduct(luxInverse, p3Normal));
-
         }
         triangle.draw(solid, luxInverse);
     }

@@ -7,7 +7,6 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->p_y, p2->p_y);
     std::swap(p1->p_z, p2->p_z);
     std::swap(p1->vtx, p2->vtx);
-    std::swap(p1->s, p2->s);
 }
 
 void Triangle::draw(const Solid& solid, Vertex lux) {
@@ -69,7 +68,13 @@ Gradient Triangle::calculateEdge(Pixel p1, Pixel p2, const Solid& solid, Vertex 
     int32_t dy = (int32_t) (p2.p_y - p1.p_y);
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
-    int32_t ds = (int32_t) ((p2.s - p1.s) * 65536); 
+
+    Vertex p1Normal = solid.vertexNormals[p1.vtx];
+    float s1 = std::max(0.0f,(lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z));
+    Vertex p2Normal = solid.vertexNormals[p2.vtx];
+    float s2 = std::max(0.0f,(lux.x * p2Normal.x + lux.y * p2Normal.y + lux.z * p2Normal.z));
+
+    int32_t ds = (int32_t) ((s2 - s1) * 65536); 
     if (dy > 0) {
         return  { dx / dy , dx / dy, dy / dy, dz / dy, ds / dy };
     } else {
@@ -118,6 +123,9 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
 void Gradient::update(const Pixel &p, const Solid& solid, Vertex lux) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     v_z = p.p_z;
-    ds = (int32_t) (p.s * 65536); //is float
+
+    Vertex p1Normal = solid.vertexNormals[p.vtx];
+    float s = std::max(0.0f,(lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z));
+    ds = (int32_t) (s * 65536); //is float
 }
 
