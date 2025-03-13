@@ -28,34 +28,34 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
     return projectedPoints;
 }
 
-void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, Shading shading, Matrix inverseMatrix) {
+void Render::drawAllFaces(const Solid& solid, Pixel *projectedPoints, Screen screen, uint32_t *pixels, int64_t *zBuffer, Vertex lux, Shading shading, Matrix inverseMatrix) {
 
      for (int i=0; i<solid.numFaces; i++) {
-         drawFace(solid.faces[i], projectedPoints, solid.faceNormals[i], screen, pixels, matrix, zBuffer, lux, shading, solid, inverseMatrix);
+         drawFace(i, projectedPoints, screen, pixels, zBuffer, lux, shading, solid, inverseMatrix);
      }
 }
 
 
 
-void Render::drawFace(Face face, Pixel *projectedPoints, Vertex faceNormal, Screen screen, 
-                        uint32_t *pixels, Matrix matrix, int64_t *zBuffer, Vertex lux, 
+void Render::drawFace(int i, Pixel *projectedPoints, Screen screen, 
+                        uint32_t *pixels, int64_t *zBuffer, Vertex lux, 
                         Shading shading, const Solid& solid, Matrix inverseMatrix) {
 
     // Pass the address of 'solid' since it is a reference to an abstract Solid.
     Triangle triangle(&solid, pixels, zBuffer, screen);
-    triangle.p1 = projectedPoints[face.vertex1];
-    triangle.p2 = projectedPoints[face.vertex2];
-    triangle.p3 = projectedPoints[face.vertex3];
+    triangle.p1 = projectedPoints[solid.faces[i].vertex1];
+    triangle.p2 = projectedPoints[solid.faces[i].vertex2];
+    triangle.p3 = projectedPoints[solid.faces[i].vertex3];
     triangle.shading = shading;
 
     Vertex luxInverse = inverseMatrix * lux;
 
     if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
         if (shading == Shading::Flat) {
-            int32_t bright = (int32_t)(std::max(0.0f, dotProduct(lux, matrix * faceNormal)) * 65536);
-            triangle.color = RGBValue(face.color, bright).bgra_value;
+            int32_t bright = (int32_t)(std::max(0.0f, dotProduct(inverseMatrix * lux, solid.faceNormals[i])) * 65536);
+            triangle.color = RGBValue(solid.faces[i].color, bright).bgra_value;
         } else {
-            triangle.color = face.color;
+            triangle.color = solid.faces[i].color;
         }
         triangle.draw(solid, luxInverse);
     }
@@ -67,7 +67,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int
     Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
     Matrix inverseMatrix = inverseMatrix.initInverse(position.xAngle, position.yAngle, position.zAngle);
     Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);
-    drawAllFaces(solid, projectedPoints, screen, pixels, matrix, zBuffer, lux, shading, inverseMatrix);
+    drawAllFaces(solid, projectedPoints, screen, pixels, zBuffer, lux, shading, inverseMatrix);
     delete[] projectedPoints;
 
 }

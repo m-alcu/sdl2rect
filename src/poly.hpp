@@ -64,7 +64,7 @@ class Gradient {
         }
 
     public:
-        static Gradient computePixelStep(const Gradient &left, const Gradient &right);
+        static Gradient gradientDx(const Gradient &left, const Gradient &right);
         void update(const Pixel &p, const Solid& solid, Vertex lux);
 };
 
@@ -137,8 +137,7 @@ class Triangle {
     private:
         void drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        Gradient calculateEdge(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
-        void calculateEdges(Pixel p1, Pixel p2, Pixel p3, const Solid& solid, Vertex lux);
+        Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
         void swapPixel(Pixel *p1, Pixel *p2);
     };
     
