@@ -123,9 +123,8 @@ Gradient Gradient::computePixelStep(const Gradient &left, const Gradient &right)
 void Gradient::update(const Pixel &p, const Solid& solid, Vertex lux) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     v_z = p.p_z;
-
-    Vertex p1Normal = solid.vertexNormals[p.vtx];
-    float s = std::max(0.0f,(lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z));
+    Vertex pNormal = solid.vertexNormals[p.vtx];
+    float s = std::max(0.0f,(lux.x * pNormal.x + lux.y * pNormal.y + lux.z * pNormal.z));
     ds = (int32_t) (s * 65536); //is float
 }
 
