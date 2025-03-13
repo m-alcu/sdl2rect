@@ -25,11 +25,11 @@ typedef struct Pixel
 class Gradient {
 
     public:
-        int32_t p_x;
-        int64_t p_z;
+        int32_t p_x; // for draw triangles
+        int64_t p_z; // for z-Buffer
 
-        Vertex vertexPoint;
-        Vertex vertexNormal;
+        Vertex vertexPoint;  // for distances light to surface (light near)
+        Vertex vertexNormal; // for normal interpolation
 
         int32_t ds; //shining gradient (gouraud)
 
@@ -50,6 +50,8 @@ class Gradient {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
 
+            vertexPoint = { solid.vertices[p.vtx].x, solid.vertices[p.vtx].y, solid.vertices[p.vtx].z };
+            vertexNormal = { solid.vertexNormals[p.vtx].x, solid.vertexNormals[p.vtx].y, solid.vertexNormals[p.vtx].z };
             Vertex p1Normal = solid.vertexNormals[p.vtx];
             float dotP = lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z;
             float s = std::max(0.0f,dotP);
@@ -65,7 +67,7 @@ class Gradient {
 
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void update(const Pixel &p, const Solid& solid, Vertex lux);
+        void updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux);
 };
 
 class RGBValue {

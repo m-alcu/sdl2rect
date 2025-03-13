@@ -31,11 +31,11 @@ void Triangle::draw(const Solid& solid, Vertex lux) {
     Gradient right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
-        right.update(p2, solid, lux);
+        right.updateFromPixel(p2, solid, lux);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
-        left.update(p2, solid, lux);
+        left.updateFromPixel(p2, solid, lux);
         drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
@@ -87,7 +87,7 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
     }
 };
 
-void Gradient::update(const Pixel &p, const Solid& solid, Vertex lux) {
+void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
 
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;

@@ -33,8 +33,8 @@ int main(int argc, char** argv)
 
     bool isRunning = true;
     SDL_Event event;
-    Uint32 ant = SDL_GetTicks();
-    Uint32 dif;
+    Uint32 from;
+    Uint32 to;
 
     // Object data.
     
@@ -55,7 +55,8 @@ int main(int argc, char** argv)
     position.xAngle = 24.79f;
     position.yAngle = 49.99f;    
 
-    Vertex lux = {0,0,1};
+    Vertex lux = {0, 0.7071, 0.7071};
+
     Shading shading = Shading::Flat;
 
     // Backgroud
@@ -100,8 +101,14 @@ int main(int argc, char** argv)
         }
 
         // Calculate frame time.
-        dif = SDL_GetTicks() - ant;
-        ant = SDL_GetTicks();
+
+
+        from = SDL_GetTicks();
+        //draw figure into pixels memory
+        memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
+        std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
+        render.drawObject(*poly, pixels, screen, zBuffer, position, lux, shading);
+        to = SDL_GetTicks();
 
         std::ostringstream oss;
         oss << "xAngle: " << std::fixed << std::setprecision(2) << position.xAngle
@@ -109,14 +116,9 @@ int main(int argc, char** argv)
             << " xPos: " << std::fixed << std::setprecision(2) << position.x
             << " yPos: " << std::fixed << std::setprecision(2) << position.y
             << " zoom: " << position.zoom
-            << " frames (ms): " << dif;
+            << " frames (ms): " << (to - from);
         std::string title = oss.str();
-        SDL_SetWindowTitle(window, title.c_str());
-
-        //draw figure into pixels memory
-        memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*poly, pixels, screen, zBuffer, position, lux, shading);
+        SDL_SetWindowTitle(window, title.c_str());        
 
         // Lock the texture to update its pixel data.
         void* texturePixels = nullptr;
