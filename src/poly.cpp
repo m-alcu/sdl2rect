@@ -88,11 +88,11 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
 };
 
 void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
-
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
-    Vertex pNormal = solid.vertexNormals[p.vtx];
-    float s = std::max(0.0f,(lux.x * pNormal.x + lux.y * pNormal.y + lux.z * pNormal.z));
+    vertexPoint = solid.vertices[p.vtx];
+    vertexNormal = solid.vertexNormals[p.vtx];
+    float s = std::max(0.0f,(lux.x * vertexNormal.x + lux.y * vertexNormal.y + lux.z * vertexNormal.z));
     ds = (int32_t) (s * 65536); //is float
 }
 

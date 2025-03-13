@@ -101,8 +101,6 @@ int main(int argc, char** argv)
         }
 
         // Calculate frame time.
-
-
         from = SDL_GetTicks();
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));

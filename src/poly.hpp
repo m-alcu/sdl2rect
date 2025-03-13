@@ -49,12 +49,9 @@ class Gradient {
         Gradient(const Pixel &p, const Solid& solid, Vertex lux) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
-
-            vertexPoint = { solid.vertices[p.vtx].x, solid.vertices[p.vtx].y, solid.vertices[p.vtx].z };
-            vertexNormal = { solid.vertexNormals[p.vtx].x, solid.vertexNormals[p.vtx].y, solid.vertexNormals[p.vtx].z };
-            Vertex p1Normal = solid.vertexNormals[p.vtx];
-            float dotP = lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z;
-            float s = std::max(0.0f,dotP);
+            vertexPoint = solid.vertices[p.vtx];
+            vertexNormal = solid.vertexNormals[p.vtx];
+            float s = std::max(0.0f,(lux.x * vertexNormal.x + lux.y * vertexNormal.y + lux.z * vertexNormal.z));
             ds = (int32_t) (s * 65536); //is float
         }        
 
