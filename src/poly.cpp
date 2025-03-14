@@ -69,9 +69,9 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
         return  { dx / dy , dz / dy, v, n, ds / dy };
     } else {
         if (dx > 0) {
-            return { INT32_MAX , INT64_MAX, {0,0,0}, {0,0,0}, INT32_MAX};
+            return { INT32_MAX , 0, {0,0,0}, {0,0,0}, 0};
         } else {
-            return { INT32_MIN , INT64_MIN, {0,0,0}, {0,0,0}, INT32_MIN};
+            return { INT32_MIN , 0, {0,0,0}, {0,0,0}, 0};
         }
     }
 };
