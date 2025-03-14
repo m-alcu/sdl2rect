@@ -86,19 +86,19 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
 
 void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy) {
 
-    for(int16_t hy=top; hy<bottom; hy++) {
-        if (hy >= 0 && hy < screen.high) { //vertical clipping
+    for(int hy=(top * screen.width); hy<(bottom * screen.width); hy+=screen.width) {
+        if (hy >= 0 && hy < (screen.width * screen.high)) { //vertical clipping
             Gradient gDx = Gradient::gradientDx(left, right);
             Gradient gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] > gRaster.p_z) {
+                    if (zBuffer[hy + hx] > gRaster.p_z) {
                         if (shading == Shading::Flat) {
-                            pixels[hy * screen.width + hx] = Triangle::color;
+                            pixels[hy + hx] = Triangle::color;
                         } else {
-                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
+                            pixels[hy + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
                         }
-                        zBuffer[hy * screen.width + hx] = gRaster.p_z;
+                        zBuffer[hy + hx] = gRaster.p_z;
                     }
                 }
                 gRaster += gDx;
