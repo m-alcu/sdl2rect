@@ -60,22 +60,12 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
 
-    Vertex p1Normal = solid.vertexNormals[p1.vtx];
-    float s1 = std::max(0.0f,(lux.x * p1Normal.x + lux.y * p1Normal.y + lux.z * p1Normal.z));
-    Vertex p2Normal = solid.vertexNormals[p2.vtx];
-    float s2 = std::max(0.0f,(lux.x * p2Normal.x + lux.y * p2Normal.y + lux.z * p2Normal.z));
-
+    float s1 = std::max(0.0f,(lux.dot(solid.vertexNormals[p1.vtx])));
+    float s2 = std::max(0.0f,(lux.dot(solid.vertexNormals[p2.vtx])));
     int32_t ds = (int32_t) ((s2 - s1) * 65536); 
     if (dy > 0) {
-
-        float vDx = solid.vertices[p2.vtx].x - solid.vertices[p1.vtx].x;
-        float vDy = solid.vertices[p2.vtx].y - solid.vertices[p1.vtx].y;
-        float vDz = solid.vertices[p2.vtx].z - solid.vertices[p1.vtx].z;
-        Vertex v = { vDx / dy, vDy / dy , vDz / dy };
-        float nDx = solid.vertexNormals[p2.vtx].x - solid.vertexNormals[p1.vtx].x;
-        float nDy = solid.vertexNormals[p2.vtx].y - solid.vertexNormals[p1.vtx].y;
-        float nDz = solid.vertexNormals[p2.vtx].z - solid.vertexNormals[p1.vtx].z;
-        Vertex n = { nDx / dy, nDy / dy , nDz / dy };
+        Vertex v = (solid.vertices[p2.vtx] - solid.vertices[p1.vtx]) / dy;
+        Vertex n = (solid.vertexNormals[p2.vtx] - solid.vertexNormals[p1.vtx]) / dy;
         return  { dx / dy , dz / dy, v, n, ds / dy };
     } else {
         if (dx > 0) {
@@ -91,7 +81,7 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
     p_z = p.p_z;
     vertexPoint = solid.vertices[p.vtx];
     vertexNormal = solid.vertexNormals[p.vtx];
-    float s = std::max(0.0f,(lux.x * vertexNormal.x + lux.y * vertexNormal.y + lux.z * vertexNormal.z));
+    float s = std::max(0.0f,lux.dot(vertexNormal));
     ds = (int32_t) (s * 65536); //is float
 }
 

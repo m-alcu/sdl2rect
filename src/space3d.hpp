@@ -2,6 +2,7 @@
 #define SPACE3D_HPP
 
 #include <cstdint>
+#include <cmath>
 
 typedef struct Position
 {
@@ -19,6 +20,65 @@ typedef struct Vertex
     float x;
     float y;
     float z;
+
+    // Default constructor
+    Vertex() : x(0.0f), y(0.0f), z(0.0f) {}
+
+    // Constructor with parameters
+    Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    // Addition
+    Vertex operator+(const Vertex& other) const {
+        return Vertex(x + other.x, y + other.y, z + other.z);
+    }
+
+    // Subtraction
+    Vertex operator-(const Vertex& other) const {
+        return Vertex(x - other.x, y - other.y, z - other.z);
+    }
+
+    // Scalar multiplication
+    Vertex operator*(float scalar) const {
+        return Vertex(x * scalar, y * scalar, z * scalar);
+    }
+
+    // Scalar division
+    Vertex operator/(float scalar) const {
+        return Vertex(x / scalar, y / scalar, z / scalar);
+    }
+
+    // Dot product
+    float dot(const Vertex& other) const {
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    // Cross product
+    Vertex cross(const Vertex& other) const {
+        return Vertex(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    // Magnitude (length) of the vector
+    float magnitude() const {
+        return std::sqrt(x * x + y * y + z * z);
+    }
+
+    // Normalize the vector (returns unit vector)
+    Vertex normalize() const {
+        float mag = magnitude();
+        if (mag == 0.0f)
+            return Vertex(0.0f, 0.0f, 0.0f);
+        return *this / mag;
+    }
+
+    // Print the vector (for debugging)
+    void print() const {
+        std::cout << "(" << x << ", " << y << ", " << z << ")\n";
+    }
+
 } Vertex;
 
 typedef struct Face
