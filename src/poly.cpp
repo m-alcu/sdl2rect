@@ -101,11 +101,11 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
                         zBuffer[hy * screen.width + hx] = gRaster.p_z;
                     }
                 }
-                gRaster = gRaster + gDx;
+                gRaster += gDx;
             }
         }
-        left = left + leftDy;
-        right = right + rightDy;
+        left += leftDy;
+        right += rightDy;
     }
 };
 

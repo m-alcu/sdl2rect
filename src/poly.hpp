@@ -61,6 +61,15 @@ class Gradient {
             return { p_x + g.p_x, p_z + g.p_z, p, n, ds + g.ds };
         }
 
+        Gradient& operator+=(const Gradient &g) {
+            p_x += g.p_x;
+            p_z += g.p_z;
+            vertexPoint += g.vertexPoint;
+            vertexNormal += g.vertexNormal;
+            ds += g.ds;
+            return *this;
+        }        
+
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
         void updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux);
