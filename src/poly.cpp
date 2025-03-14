@@ -56,7 +56,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
 
 Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux) {
 
-    int16_t dy = (int16_t) (p2.p_y - p1.p_y);
+    int16_t dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
 
@@ -116,18 +116,16 @@ void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& 
 Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
 
     // Calculate the change in x, then shift right by 16 bits to get pixel steps.
-    int16_t stepDx = (right.p_x - left.p_x) >> 16;
-    // Avoid division by zero
-    float stepVx = (stepDx == 0) ? 0 : (right.vertexPoint.x - left.vertexPoint.x) / stepDx;
-    float stepVy = (stepDx == 0) ? 0 : (right.vertexPoint.y - left.vertexPoint.y) / stepDx;
-    float stepVz = (stepDx == 0) ? 0 : (right.vertexPoint.z - left.vertexPoint.z) / stepDx;
-    float stepNx = (stepDx == 0) ? 0 : (right.vertexNormal.x - left.vertexNormal.x) / stepDx;
-    float stepNy = (stepDx == 0) ? 0 : (right.vertexNormal.y - left.vertexNormal.y) / stepDx;
-    float stepNz = (stepDx == 0) ? 0 : (right.vertexNormal.z - left.vertexNormal.z) / stepDx;
-    int64_t stepDz = (stepDx == 0) ? 0 : (right.p_z - left.p_z) / stepDx;
-    int32_t stepDs = (stepDx == 0) ? 0 : (right.ds - left.ds) / stepDx;
+    int16_t dx = (right.p_x - left.p_x) >> 16;
+
+    if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
+
+    Vertex v = (right.vertexPoint - left.vertexPoint) / dx;
+    Vertex n = (right.vertexNormal - left.vertexNormal) / dx;
+    int64_t stepDz = (right.p_z - left.p_z) / dx;
+    int32_t stepDs = (right.ds - left.ds) / dx;
     // For phong normals, you might calculate du and dv similarly if needed.
-    return { stepDx, stepDz, {stepVx, stepVy, stepVz}, {stepNx, stepNy, stepNz}, stepDs };
+    return { dx, stepDz, v, n, stepDs };
 }
 
 

@@ -51,14 +51,14 @@ class Gradient {
             p_z = p.p_z;
             vertexPoint = solid.vertices[p.vtx];
             vertexNormal = solid.vertexNormals[p.vtx];
-            float s = std::max(0.0f,(lux.x * vertexNormal.x + lux.y * vertexNormal.y + lux.z * vertexNormal.z));
+            float s = std::max(0.0f,(lux.dot(vertexNormal)));
             ds = (int32_t) (s * 65536); //is float
         }        
 
         // Overload operator+
         Gradient operator+(const Gradient &g) const {
-            Vertex p = { vertexPoint.x + g.vertexPoint.x, vertexPoint.y + g.vertexPoint.y, vertexPoint.z + g.vertexPoint.z }; 
-            Vertex n = { vertexNormal.x + g.vertexNormal.x, vertexNormal.y + g.vertexNormal.y, vertexNormal.z + g.vertexNormal.z };
+            Vertex p = vertexPoint + g.vertexPoint; 
+            Vertex n = vertexNormal + g.vertexNormal;
             return { p_x + g.p_x, p_z + g.p_z, p, n, ds + g.ds };
         }
 
