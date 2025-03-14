@@ -29,13 +29,13 @@ void Triangle::draw(const Solid& solid, Vertex lux) {
 
     Gradient left = Gradient(p1, solid, lux), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
-        drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         right.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23);
     } else {
-        drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13);
         left.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2, p3, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13);
     }
 };
 
@@ -84,9 +84,9 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
     ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
-void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy) {
 
-    for(int16_t hy=top.p_y; hy<bottom.p_y; hy++) {
+    for(int16_t hy=top; hy<bottom; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
             Gradient gDx = Gradient::gradientDx(left, right);
             Gradient gRaster = left;

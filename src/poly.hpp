@@ -142,7 +142,7 @@ class Triangle {
         bool behind();
     
     private:
-        void drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
+        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
         void swapPixel(Pixel *p1, Pixel *p2);

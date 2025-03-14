@@ -10,7 +10,6 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int
     Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);
     drawFaces(projectedPoints, screen, pixels, zBuffer, lux, shading, solid, inverseMatrix);
     delete[] projectedPoints;
-
 }
 
 Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position, int16_t i) {
@@ -48,7 +47,7 @@ void Render::drawFaces(Pixel *projectedPoints, Screen screen,
 
         if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
             if (shading == Shading::Flat) {
-                int32_t bright = (int32_t) (std::max(0.0f, (solid.faceNormals[i]).dot(inverseMatrix * lux)) * 65536);
+                int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(inverseMatrix * lux)) * 65536);
                 triangle.color = RGBValue(solid.faces[i].color, bright).bgra_value;
             } else {
                 triangle.color = solid.faces[i].color;
