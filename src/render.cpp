@@ -50,8 +50,6 @@ void Render::drawFaces(Pixel *projectedPoints, Screen screen,
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
         triangle.shading = shading;
 
-        Vertex luxInverse = inverseMatrix * lux;
-
         if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
             if (shading == Shading::Flat) {
                 int32_t bright = (int32_t)(std::max(0.0f, dotProduct(inverseMatrix * lux, solid.faceNormals[i])) * 65536);
@@ -59,8 +57,7 @@ void Render::drawFaces(Pixel *projectedPoints, Screen screen,
             } else {
                 triangle.color = solid.faces[i].color;
             }
-            triangle.draw(solid, luxInverse);
+            triangle.draw(solid, inverseMatrix * lux);
         }
-
     }                        
 }

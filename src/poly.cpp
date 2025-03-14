@@ -27,8 +27,7 @@ void Triangle::draw(const Solid& solid, Vertex lux) {
     Triangle::edge23 = gradientDy(p2, p3, solid, lux);
     Triangle::edge13 = gradientDy(p1, p3, solid, lux);
 
-    Gradient left = Gradient(p1, solid, lux);
-    Gradient right = left;
+    Gradient left = Gradient(p1, solid, lux), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1, p2, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12);
         right.updateFromPixel(p2, solid, lux);
@@ -57,7 +56,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
 
 Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux) {
 
-    int32_t dy = (int32_t) (p2.p_y - p1.p_y);
+    int16_t dy = (int16_t) (p2.p_y - p1.p_y);
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
 
