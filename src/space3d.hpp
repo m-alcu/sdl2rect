@@ -32,6 +32,13 @@ typedef struct Vertex
         return Vertex(x + other.x, y + other.y, z + other.z);
     }
 
+    Vertex& operator+=(const Vertex& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
+
     // Subtraction
     Vertex operator-(const Vertex& other) const {
         return Vertex(x - other.x, y - other.y, z - other.z);
