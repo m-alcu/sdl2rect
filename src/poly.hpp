@@ -51,8 +51,7 @@ class Gradient {
             p_z = p.p_z;
             vertexPoint = solid.vertices[p.vtx];
             vertexNormal = solid.vertexNormals[p.vtx];
-            float s = std::max(0.0f,(lux.dot(vertexNormal)));
-            ds = (int32_t) (s * 65536); //is float
+            ds = (int32_t) (std::max(0.0f,(lux.dot(vertexNormal))) * 65536);
         }        
 
         // Overload operator+

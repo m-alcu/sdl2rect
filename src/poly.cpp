@@ -81,28 +81,27 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
     p_z = p.p_z;
     vertexPoint = solid.vertices[p.vtx];
     vertexNormal = solid.vertexNormals[p.vtx];
-    float s = std::max(0.0f,lux.dot(vertexNormal));
-    ds = (int32_t) (s * 65536); //is float
+    ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
 void Triangle::drawTriSector(Pixel top, Pixel bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy) {
 
     for(int16_t hy=top.p_y; hy<bottom.p_y; hy++) {
         if (hy >= 0 && hy < screen.high) { //vertical clipping
-            Gradient gradientDx = Gradient::gradientDx(left, right);
-            Gradient initGradient = left;
+            Gradient gDx = Gradient::gradientDx(left, right);
+            Gradient gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
-                    if (zBuffer[hy * screen.width + hx] > initGradient.p_z) {
+                    if (zBuffer[hy * screen.width + hx] > gRaster.p_z) {
                         if (shading == Shading::Flat) {
                             pixels[hy * screen.width + hx] = Triangle::color;
                         } else {
-                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, initGradient.ds).bgra_value;
+                            pixels[hy * screen.width + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
                         }
-                        zBuffer[hy * screen.width + hx] = initGradient.p_z;
+                        zBuffer[hy * screen.width + hx] = gRaster.p_z;
                     }
                 }
-                initGradient = initGradient + gradientDx;
+                gRaster = gRaster + gDx;
             }
         }
         left = left + leftDy;
@@ -119,13 +118,11 @@ Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
     int16_t dx = (right.p_x - left.p_x) >> 16;
 
     if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
-
     Vertex v = (right.vertexPoint - left.vertexPoint) / dx;
     Vertex n = (right.vertexNormal - left.vertexNormal) / dx;
-    int64_t stepDz = (right.p_z - left.p_z) / dx;
-    int32_t stepDs = (right.ds - left.ds) / dx;
-    // For phong normals, you might calculate du and dv similarly if needed.
-    return { dx, stepDz, v, n, stepDs };
+    int64_t dz = (right.p_z - left.p_z) / dx;
+    int32_t ds = (right.ds - left.ds) / dx;
+    return { dx, dz, v, n, ds };
 }
 
 
