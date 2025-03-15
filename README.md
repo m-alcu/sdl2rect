@@ -23,16 +23,16 @@ Demo results:
 
 Flat Shading:
 
-![Flat shading](src/Flat.PNG)
+![Flat shading](resources/Flat.PNG)
 
 Gouraud Shading:
 
-![Gouraud shading](src/Gouraud.PNG)
+![Gouraud shading](resources/Gouraud.PNG)
 
 Blinn Phong Shading:
 
-![Gouraud shading](src/BlinnPhong.PNG)
+![Gouraud shading](resources/BlinnPhong.PNG)
 
 Phong Shading:
 
-![Gouraud shading](src/Phong.PNG)
+![Gouraud shading](resources/Phong.PNG)
