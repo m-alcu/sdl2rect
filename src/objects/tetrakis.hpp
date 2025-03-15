@@ -1,5 +1,5 @@
-#ifndef TETRAKIS_HPP
-#define TETRAKIS_HPP
+#pragma once
+
 
 #include "solid.hpp"
 
@@ -16,4 +16,4 @@ class Tetrakis : public Solid {
         void loadFaces() override;
     };
 
-#endif
+

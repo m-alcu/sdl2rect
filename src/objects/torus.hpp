@@ -1,5 +1,5 @@
-#ifndef TORUS_HPP
-#define TORUS_HPP
+#pragma once
+
 
 #include "solid.hpp"
 
@@ -23,4 +23,4 @@ class Torus : public Solid {
         void loadFaces() override;
     };
 
-#endif
+

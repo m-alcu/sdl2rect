@@ -1,5 +1,5 @@
-#ifndef POLY_HPP
-#define POLY_HPP
+#pragma once
+
 
 #include <iostream>
 #include <cstdint>
@@ -153,4 +153,3 @@ class Triangle {
     };
     
 
-#endif

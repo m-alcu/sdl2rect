@@ -1,6 +1,4 @@
-// solid.hpp
-#ifndef SOLID_HPP
-#define SOLID_HPP
+#pragma once
 
 #include "../space3d.hpp"
 
@@ -51,4 +49,4 @@ protected:
     virtual void loadFaces() = 0;
 };
 
-#endif
+

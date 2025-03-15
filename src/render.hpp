@@ -1,5 +1,5 @@
-#ifndef RENDER_HPP
-#define RENDER_HPP
+#pragma once
+
 
 #include <iostream>
 #include <cstdint>
@@ -16,4 +16,4 @@ class Render {
         void drawFaces(Pixel *projectedPoints, Screen screen, uint32_t *pixels,  int64_t *zBuffer, Vec3 lux, Shading shading, const Solid& solid, Matrix inverseMatrix);
 };
 
-#endif
+

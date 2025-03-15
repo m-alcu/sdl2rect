@@ -1,5 +1,5 @@
-#ifndef TEST_HPP
-#define TEST_HPP
+#pragma once
+
 
 #include "solid.hpp"
 
@@ -16,4 +16,3 @@ class Test : public Solid {
         void loadFaces() override;
     };
 
-#endif

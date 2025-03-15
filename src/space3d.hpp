@@ -1,5 +1,5 @@
-#ifndef SPACE3D_HPP
-#define SPACE3D_HPP
+#pragma once
+
 
 #include <cstdint>
 #include <cmath>
@@ -177,4 +177,3 @@ class Matrix {
 
 };
 
-#endif
