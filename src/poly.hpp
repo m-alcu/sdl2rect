@@ -8,20 +8,6 @@
 #include "objects/torus.hpp"
 #include "objects/test.hpp"
 
-typedef struct Screen
-{
-    uint16_t high;
-    uint16_t width;
-} Screen;
-
-typedef struct Pixel
-{
-    int16_t p_x;
-    int16_t p_y;
-    int64_t p_z; 
-    int16_t vtx;
-} Pixel;
-
 class Gradient {
 
     public:

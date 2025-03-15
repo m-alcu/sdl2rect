@@ -12,24 +12,27 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Screen screen = {768, 1024};
+    Scene scene;
+    scene.screen = {768, 1024};
+    scene.lux = {0, 0, 1};
+    scene.shading = Shading::Flat;
 
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                                          screen.width, screen.high, 0);
+                                          scene.screen.width, scene.screen.high, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     // Use streaming texture for direct pixel access.
     SDL_Texture* texture = SDL_CreateTexture(renderer,
-        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screen.width, screen.high);
+        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.high);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
     // Allocate pixel buffers.
-    Uint32* pixels       = new Uint32[screen.width * screen.high];
-    int64_t* zBufferInit = new int64_t[screen.width * screen.high];
-    int64_t* zBuffer     = new int64_t[screen.width * screen.high];
-    Uint32* background   = new Uint32[screen.width * screen.high];
+    Uint32* pixels       = new Uint32[scene.screen.width * scene.screen.high];
+    int64_t* zBufferInit = new int64_t[scene.screen.width * scene.screen.high];
+    int64_t* zBuffer     = new int64_t[scene.screen.width * scene.screen.high];
+    Uint32* background   = new Uint32[scene.screen.width * scene.screen.high];
 
     bool isRunning = true;
     SDL_Event event;
@@ -54,21 +57,18 @@ int main(int argc, char** argv)
     poly->position.xAngle = 24.79f;
     poly->position.yAngle = 49.99f;    
 
-    Vec3 lux = {0, 0, 1};
-
-    Shading shading = Shading::Flat;
 
     // Backgroud
-    Desert().draw(background, screen);
-    std::fill(zBufferInit, zBufferInit + (screen.width * screen.high), INT64_MAX);
+    Desert().draw(background, scene.screen);
+    std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
 
     // Render engine
     Render render;
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
-    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screen.width, screen.high);
-	SDL_UpdateTexture(backgroundTexture, NULL, background, screen.width * sizeof(Uint32));
+    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.high);
+	SDL_UpdateTexture(backgroundTexture, NULL, background, scene.screen.width * sizeof(Uint32));
 
     // Main loop.
     while (isRunning)
@@ -93,22 +93,22 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
                 poly->position.zoom = poly->position.zoom - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
-                shading = Shading::Gouraud;
+                scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
-                shading = Shading::Flat;
+                scene.shading = Shading::Flat;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
-                shading = Shading::BlinnPhong;                 
+                scene.shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
-                shading = Shading::Phong;                
+                scene.shading = Shading::Phong;                
             }
         }
 
         // Calculate frame time.
         from = SDL_GetTicks();
         //draw figure into pixels memory
-        memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
-        std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*poly, pixels, screen, zBuffer, lux, shading);
+        memset(pixels, 0, scene.screen.width * scene.screen.high * sizeof(Uint32));
+        std::copy(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), zBuffer);
+        render.drawObject(*poly, pixels, zBuffer, scene);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
         void* texturePixels = nullptr;
         int pitch = 0;
         if (SDL_LockTexture(texture, NULL, &texturePixels, &pitch) == 0) {
-			memcpy(texturePixels, pixels, screen.width * screen.high * sizeof(Uint32));
+			memcpy(texturePixels, pixels, scene.screen.width * scene.screen.high * sizeof(Uint32));
 			SDL_UnlockTexture(texture);
         } else {
             std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;
