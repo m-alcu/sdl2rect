@@ -139,8 +139,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        position.xAngle += 0.01f;
-        position.yAngle += 0.02f;
+        position.xAngle += 0.005f;
+        position.yAngle += 0.010f;
     }
 
     // Free resources.

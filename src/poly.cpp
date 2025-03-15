@@ -142,8 +142,8 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vertex lux, Face face) {
 
     // Normalize vectors
     Vertex N = gRaster.vertexNormal.normalize(); // Normal at the fragment
-    Vertex L = lux.normalize();                  // Light direction
-    Vertex V = lux.normalize();                  // Viewer direction (you may want to define this differently later)
+    Vertex L = lux;                  // Light direction
+    Vertex V = lux;                  // Viewer direction (you may want to define this differently later)
 
     // Diffuse component
     float diff = std::max(0.0f, N.dot(L));
@@ -153,7 +153,7 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vertex lux, Face face) {
 
     // Specular component: spec = (N · H)^shininess
     float specAngle = std::max(0.0f, N.dot(H));
-    float spec = std::pow(specAngle, face.material.properties.shininess);
+    float spec = std::pow(specAngle, face.material.properties.shininess * 4);
 
     // Calculate brightness
     float bright = face.material.properties.k_a + 
