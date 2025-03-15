@@ -7,7 +7,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
-    Pixel * projectedPoints = projectRotateAllPoints(solid, scene, solid.position);
+    Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     drawFaces(projectedPoints, pixels, zBuffer, solid, scene);
     delete[] projectedPoints;
 }
@@ -22,12 +22,12 @@ Pixel Render::proj3to2D(Vec3 vertex, Screen screen, Position position, int16_t i
     return pixel;
 }
 
-Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene, Position position) {
+Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
     Pixel* projectedPoints = new Pixel[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(scene.rotate * solid.vertices[i], scene.screen, position, i);
+        projectedPoints[i] = proj3to2D(scene.rotate * solid.vertices[i], scene.screen, solid.position, i);
     }
     // Return the pointer to the array
     return projectedPoints;
