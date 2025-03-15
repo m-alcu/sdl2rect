@@ -129,12 +129,11 @@ uint32_t Triangle::phongShading(Gradient gRaster, Vec3 lux, Face face) {
     Vec3 R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
     //float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
     float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
-    int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536);
     float spec = std::pow(specAngle, face.material.properties.shininess);
     //RGBValue I_specular = RGBValue(face.material.Specular, (int32_t) face.material.properties.k_s * spec * 65536);
 
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
-    return RGBValue(face.material.Ambient, (int32_t) (bright * 65536)).bgra_value;
+    return RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 0.98)).bgra_value;
 
 }
 
@@ -161,7 +160,7 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vec3 lux, Face face) {
                    face.material.properties.k_s * spec;
 
     // Final color composition (ambient color scaled by total brightness)
-    return RGBValue(face.material.Ambient, (int32_t)(bright * 65536)).bgra_value;
+    return RGBValue(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
 
