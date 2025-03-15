@@ -151,7 +151,7 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene scene, Face face) {
 
     // Specular component: spec = (N · H)^shininess
     float specAngle = std::max(0.0f, N.dot(H));
-    float spec = std::pow(specAngle, face.material.properties.shininess * 4);
+    float spec = std::pow(specAngle, face.material.properties.shininess * 4); // Blinn Phong shininess needs *4 to be like Phong
 
     // Calculate brightness
     float bright = face.material.properties.k_a + 
