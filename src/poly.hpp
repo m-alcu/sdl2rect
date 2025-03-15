@@ -127,13 +127,13 @@ class Triangle {
         Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux), screen(screenAux) {}
     
-        void draw(const Solid& solid, Vec3 lux, const Face& face);
+        void draw(const Solid& solid, Scene scene, const Face& face);
         bool visible();
         bool outside();
         bool behind();
     
     private:
-        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge, Vec3 lux, const Face& face);
+        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftEdge, Gradient rightEdge, Scene scene, const Face& face);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vec3 lux);
         void swapPixel(Pixel *p1, Pixel *p2);

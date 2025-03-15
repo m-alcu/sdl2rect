@@ -194,7 +194,9 @@ typedef struct Scene
     Screen screen;
     Shading shading;
     Vec3 lux;
+    Vec3 luxInversePrecomputed;
     Vec3 eye;
+    Vec3 eveInversePrecomputed;
     Matrix rotate;
     Matrix inverseRotate;
 } Scene;

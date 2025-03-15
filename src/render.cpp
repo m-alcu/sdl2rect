@@ -7,6 +7,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     drawFaces(projectedPoints, pixels, zBuffer, solid, scene);
     delete[] projectedPoints;
@@ -45,12 +46,12 @@ void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffe
 
         if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
             if (scene.shading == Shading::Flat) {
-                int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(scene.inverseRotate * scene.lux)) * 65536);
+                int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(scene.luxInversePrecomputed)) * 65536);
                 triangle.color = RGBValue(solid.faces[i].material.Ambient, bright).bgra_value;
             } else {
                 triangle.color = solid.faces[i].material.Ambient;
             }
-            triangle.draw(solid, scene.inverseRotate * scene.lux, solid.faces[i]);
+            triangle.draw(solid, scene, solid.faces[i]);
         }
     }                        
 }

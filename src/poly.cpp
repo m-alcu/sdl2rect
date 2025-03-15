@@ -20,22 +20,22 @@ bool Triangle::outside() {
             );
 };
 
-void Triangle::draw(const Solid& solid, Vec3 lux, const Face& face) {
+void Triangle::draw(const Solid& solid, Scene scene, const Face& face) {
 
     orderPixels(&p1, &p2, &p3);
-    Triangle::edge12 = gradientDy(p1, p2, solid, lux);
-    Triangle::edge23 = gradientDy(p2, p3, solid, lux);
-    Triangle::edge13 = gradientDy(p1, p3, solid, lux);
+    Triangle::edge12 = gradientDy(p1, p2, solid, scene.luxInversePrecomputed);
+    Triangle::edge23 = gradientDy(p2, p3, solid, scene.luxInversePrecomputed);
+    Triangle::edge13 = gradientDy(p1, p3, solid, scene.luxInversePrecomputed);
 
-    Gradient left = Gradient(p1, solid, lux), right = left;
+    Gradient left = Gradient(p1, solid, scene.luxInversePrecomputed), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12, lux, face);
-        right.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23, lux, face);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face);
+        right.updateFromPixel(p2, solid, scene.luxInversePrecomputed);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face);
     } else {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13, lux, face);
-        left.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13, lux, face);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face);
+        left.updateFromPixel(p2, solid, scene.luxInversePrecomputed);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face);
     }
 };
 
@@ -84,14 +84,14 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vec3 lux) {
     ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy, Vec3 lux, const Face& face) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene scene, const Face& face) {
 
-    for(int hy=(top * screen.width); hy<(bottom * screen.width); hy+=screen.width) {
-        if (hy >= 0 && hy < (screen.width * screen.high)) { //vertical clipping
+    for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
+        if (hy >= 0 && hy < (scene.screen.width * scene.screen.high)) { //vertical clipping
             Gradient gDx = Gradient::gradientDx(left, right);
             Gradient gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
-                if (hx >= 0 && hx < screen.width) { //horizontal clipping
+                if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
                     if (zBuffer[hy + hx] > gRaster.p_z) {
                         switch (shading) {
                             case Shading::Flat: 
@@ -101,10 +101,10 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                                 pixels[hy + hx] = RGBValue(face.material.Ambient, gRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
-                                pixels[hy + hx] = blinnPhongShading(gRaster, lux, face);
+                                pixels[hy + hx] = blinnPhongShading(gRaster, scene.luxInversePrecomputed, face);
                                 break;                                
                             case Shading::Phong:
-                                pixels[hy + hx] = phongShading(gRaster, lux, face);
+                                pixels[hy + hx] = phongShading(gRaster, scene.luxInversePrecomputed, face);
                                 break;
                             default: pixels[hy + hx] = Triangle::color;
                         }
