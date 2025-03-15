@@ -119,7 +119,6 @@ typedef struct Face
     int16_t vertex1;
     int16_t vertex2;
     int16_t vertex3;
-    int32_t color;
     Material material;
 } Face;
 

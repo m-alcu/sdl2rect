@@ -43,7 +43,8 @@ void Tetrakis::loadFaces() {
         for (int j = 0; j < 4; j++) {
             int faceIndex = i * 4 + j;
             // Directly assign values to the face.
-            Tetrakis::faces[faceIndex].color   = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
+            uint32_t color = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
+            Tetrakis::faces[faceIndex].material = { color, color, color, getMaterialProperties(MaterialType::Metal)};
             Tetrakis::faces[faceIndex].vertex1 = quads[i][j];
             Tetrakis::faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
             Tetrakis::faces[faceIndex].vertex3 = centers[i];

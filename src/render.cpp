@@ -48,9 +48,9 @@ void Render::drawFaces(Pixel *projectedPoints, Screen screen,
         if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
             if (shading == Shading::Flat) {
                 int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(inverseMatrix * lux)) * 65536);
-                triangle.color = RGBValue(solid.faces[i].color, bright).bgra_value;
+                triangle.color = RGBValue(solid.faces[i].material.Ambient, bright).bgra_value;
             } else {
-                triangle.color = solid.faces[i].color;
+                triangle.color = solid.faces[i].material.Ambient;
             }
             triangle.draw(solid, inverseMatrix * lux, solid.faces[i]);
         }

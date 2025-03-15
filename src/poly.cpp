@@ -98,7 +98,7 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                                 pixels[hy + hx] = Triangle::color;
                                 break;      
                             case Shading::Gouraud: 
-                                pixels[hy + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
+                                pixels[hy + hx] = RGBValue(face.material.Ambient, gRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
                                 pixels[hy + hx] = blinnPhongShading(gRaster, lux, face);
