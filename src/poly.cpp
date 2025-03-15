@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "poly.hpp"
 
 bool Triangle::visible() {
@@ -43,9 +44,9 @@ bool Triangle::outside(Scene scene) {
 void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal) {
 
     orderPixels(&p1, &p2, &p3);
-    Triangle::edge12 = gradientDy(p1, p2, solid, scene.luxInversePrecomputed);
-    Triangle::edge23 = gradientDy(p2, p3, solid, scene.luxInversePrecomputed);
-    Triangle::edge13 = gradientDy(p1, p3, solid, scene.luxInversePrecomputed);
+    Triangle::edge12 = gradientDy(p1, p2, solid, scene, face);
+    Triangle::edge23 = gradientDy(p2, p3, solid, scene, face);
+    Triangle::edge13 = gradientDy(p1, p3, solid, scene, face);
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -54,14 +55,15 @@ void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 face
         flatColor = RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
 
-    Gradient left = Gradient(p1, solid, scene), right = left;
+    Gradient left = Gradient(p1, solid, scene, face);
+    Gradient right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face, flatColor);
-        right.updateFromPixel(p2, solid, scene);
+        right.updateFromPixel(p2, solid, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face, flatColor);
     } else {
         drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face, flatColor);
-        left.updateFromPixel(p2, solid, scene);
+        left.updateFromPixel(p2, solid, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face, flatColor);
     }
 };
@@ -81,19 +83,22 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->vtx, p2->vtx);
 }
 
-Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vec3 lux) {
+Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Scene scene, Face face) {
 
     int16_t dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
 
-    float s1 = std::max(0.0f,(lux.dot(solid.vertexNormals[p1.vtx])));
-    float s2 = std::max(0.0f,(lux.dot(solid.vertexNormals[p2.vtx])));
-    int32_t ds = (int32_t) ((s2 - s1) * 65536); 
+    float diff1 = std::max(0.0f,(scene.luxInversePrecomputed.dot(solid.vertexNormals[p1.vtx])));
+    float bright1 = face.material.properties.k_a+face.material.properties.k_d * diff1;
+    float diff2 = std::max(0.0f,(scene.luxInversePrecomputed.dot(solid.vertexNormals[p2.vtx])));
+    float bright2 = face.material.properties.k_a+face.material.properties.k_d * diff2;
+    int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
     if (dy > 0) {
         Vec3 v = (solid.vertices[p2.vtx] - solid.vertices[p1.vtx]) / dy;
         Vec3 n = (solid.vertexNormals[p2.vtx] - solid.vertexNormals[p1.vtx]) / dy;
-        return  { dx / dy , dz / dy, v, n, ds / dy };
+        int32_t result = ds / dy;
+        return  { dx / dy , dz / dy, v, n, result };
     } else {
         if (dx > 0) {
             return { INT32_MAX , 0, {0,0,0}, {0,0,0}, 0};
@@ -103,12 +108,14 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vec3 lux) 
     }
 };
 
-void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Scene scene) {
+void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Scene scene, Face face) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
     vertexPoint = solid.vertices[p.vtx];
     vertexNormal = solid.vertexNormals[p.vtx];
-    ds = (int32_t) (std::max(0.0f,scene.luxInversePrecomputed.dot(vertexNormal)) * 65536);
+    float diff = std::max(0.0f, scene.luxInversePrecomputed.dot(vertexNormal));
+    float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
+    ds = (int32_t) (bright * 65536 * 4);
 }
 
 void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene scene, const Face& face, uint32_t flatColor) {

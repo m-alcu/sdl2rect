@@ -58,7 +58,6 @@ int main(int argc, char** argv)
     poly->position.xAngle = 24.79f;
     poly->position.yAngle = 49.99f;    
 
-
     // Backgroud
     Desert().draw(background, scene.screen);
     std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
