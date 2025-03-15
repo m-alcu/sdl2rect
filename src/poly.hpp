@@ -114,8 +114,6 @@ class Desert {
 class Triangle {
     public:
         Pixel p1, p2, p3;
-        Face face;
-        uint32_t color;  // RGBA
         Gradient edge12, edge23, edge13;
         uint32_t *pixels;
         int64_t *zBuffer;
@@ -125,13 +123,13 @@ class Triangle {
         Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
-        void draw(const Solid& solid, Scene scene, const Face& face);
+        void draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal);
         bool visible();
         bool outside(Scene scene);
         bool behind();
     
     private:
-        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftEdge, Gradient rightEdge, Scene scene, const Face& face);
+        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftEdge, Gradient rightEdge, Scene scene, const Face& face, uint32_t flatColor);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vec3 lux);
         void swapPixel(Pixel *p1, Pixel *p2);

@@ -20,22 +20,28 @@ bool Triangle::outside(Scene scene) {
             );
 };
 
-void Triangle::draw(const Solid& solid, Scene scene, const Face& face) {
+void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid, scene.luxInversePrecomputed);
     Triangle::edge23 = gradientDy(p2, p3, solid, scene.luxInversePrecomputed);
     Triangle::edge13 = gradientDy(p1, p3, solid, scene.luxInversePrecomputed);
 
+    uint32_t flatColor = 0x00000000;
+    if (scene.shading == Shading::Flat) {
+        int32_t bright = (int32_t) (std::max(0.0f, faceNormal.dot(scene.luxInversePrecomputed)) * 65536);
+        flatColor = RGBValue(face.material.Ambient, bright).bgra_value;        
+    }
+
     Gradient left = Gradient(p1, solid, scene.luxInversePrecomputed), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face, flatColor);
         right.updateFromPixel(p2, solid, scene.luxInversePrecomputed);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face, flatColor);
     } else {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face, flatColor);
         left.updateFromPixel(p2, solid, scene.luxInversePrecomputed);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face, flatColor);
     }
 };
 
@@ -84,7 +90,7 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vec3 lux) {
     ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene scene, const Face& face) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene scene, const Face& face, uint32_t flatColor) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         if (hy >= 0 && hy < (scene.screen.width * scene.screen.high)) { //vertical clipping
@@ -95,7 +101,7 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                     if (zBuffer[hy + hx] > gRaster.p_z) {
                         switch (scene.shading) {
                             case Shading::Flat: 
-                                pixels[hy + hx] = Triangle::color;
+                                pixels[hy + hx] = flatColor;
                                 break;      
                             case Shading::Gouraud: 
                                 pixels[hy + hx] = RGBValue(face.material.Ambient, gRaster.ds).bgra_value;
@@ -106,7 +112,7 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                             case Shading::Phong:
                                 pixels[hy + hx] = phongShading(gRaster, scene, face);
                                 break;
-                            default: pixels[hy + hx] = Triangle::color;
+                            default: pixels[hy + hx] = flatColor;
                         }
                         zBuffer[hy + hx] = gRaster.p_z;
                     }

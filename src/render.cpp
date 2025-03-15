@@ -45,13 +45,7 @@ void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffe
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
         if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
-            if (scene.shading == Shading::Flat) {
-                int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(scene.luxInversePrecomputed)) * 65536);
-                triangle.color = RGBValue(solid.faces[i].material.Ambient, bright).bgra_value;
-            } else {
-                triangle.color = solid.faces[i].material.Ambient;
-            }
-            triangle.draw(solid, scene, solid.faces[i]);
+            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i]);
         }
     }                        
 }
