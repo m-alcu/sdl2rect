@@ -52,7 +52,7 @@ void Render::drawFaces(Pixel *projectedPoints, Screen screen,
             } else {
                 triangle.color = solid.faces[i].color;
             }
-            triangle.draw(solid, inverseMatrix * lux);
+            triangle.draw(solid, inverseMatrix * lux, solid.faces[i]);
         }
     }                        
 }

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     position.xAngle = 24.79f;
     position.yAngle = 49.99f;    
 
-    Vertex lux = {0, 0.7071, 0.7071};
+    Vertex lux = {0, 0, 1};
 
     Shading shading = Shading::Flat;
 

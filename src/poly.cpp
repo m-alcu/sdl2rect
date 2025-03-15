@@ -20,7 +20,7 @@ bool Triangle::outside() {
             );
 };
 
-void Triangle::draw(const Solid& solid, Vertex lux) {
+void Triangle::draw(const Solid& solid, Vertex lux, const Face& face) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid, lux);
@@ -29,13 +29,13 @@ void Triangle::draw(const Solid& solid, Vertex lux) {
 
     Gradient left = Gradient(p1, solid, lux), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12, lux);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge12, lux, face);
         right.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23, lux);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge13, Triangle::edge23, lux, face);
     } else {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13, lux);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge12, Triangle::edge13, lux, face);
         left.updateFromPixel(p2, solid, lux);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13, lux);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::screen, Triangle::edge23, Triangle::edge13, lux, face);
     }
 };
 
@@ -84,7 +84,7 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
     ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy, Vertex lux) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy, Vertex lux, const Face& face) {
 
     for(int hy=(top * screen.width); hy<(bottom * screen.width); hy+=screen.width) {
         if (hy >= 0 && hy < (screen.width * screen.high)) { //vertical clipping
@@ -98,12 +98,29 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                         } else {
 //                          pixels[hy + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
 
+                            //RGBValue I_ambient = RGBValue(face.material.Ambient, (int32_t) face.material.properties.k_a * 65536);
+
                             Vertex normal = gRaster.vertexNormal.normalize();
+                            float diff = std::max(0.0f, normal.dot(lux));
+                            //RGBValue I_diffuse = RGBValue(face.material.Diffuse, (int32_t) face.material.properties.k_d * diff * 65536);
+
+                            Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
+//                          float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
+                            float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
+                            int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536);
+                            float spec = std::pow(specAngle, face.material.properties.shininess);
+                            //RGBValue I_specular = RGBValue(face.material.Specular, (int32_t) face.material.properties.k_s * spec * 65536);
+
+                            float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
+                            pixels[hy + hx] = RGBValue(face.material.Ambient, (int32_t) (bright * 65536)).bgra_value;
+
+                            /*
                             float diff = std::max(0.0f, normal.dot(lux));
                             Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
                             float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
                             int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536 + diff * 65536);
                             pixels[hy + hx] = RGBValue(Triangle::color, ds).bgra_value;
+                            */
                         }
                         zBuffer[hy + hx] = gRaster.p_z;
                     }
