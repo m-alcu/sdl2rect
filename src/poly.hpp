@@ -32,12 +32,12 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const Pixel &p, const Solid& solid, Vec3 lux) {
+        Gradient(const Pixel &p, const Solid& solid, Scene scene) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
             vertexPoint = solid.vertices[p.vtx];
             vertexNormal = solid.vertexNormals[p.vtx];
-            ds = (int32_t) (std::max(0.0f,(lux.dot(vertexNormal))) * 65536);
+            ds = (int32_t) (std::max(0.0f,(scene.luxInversePrecomputed.dot(vertexNormal))) * 65536);
         }        
 
         // Overload operator+
@@ -58,7 +58,7 @@ class Gradient {
 
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(const Pixel &p, const Solid& solid, Vec3 lux);
+        void updateFromPixel(const Pixel &p, const Solid& solid, Scene scene);
 };
 
 class RGBValue {
