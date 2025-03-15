@@ -8,6 +8,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
+    scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     drawFaces(projectedPoints, pixels, zBuffer, solid, scene);
     delete[] projectedPoints;

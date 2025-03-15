@@ -15,6 +15,7 @@ int main(int argc, char** argv)
     Scene scene;
     scene.screen = {768, 1024};
     scene.lux = {0, 0, 1};
+    scene.eye = {0, 0, 1};
     scene.shading = Shading::Flat;
 
     SDL_Window* window = SDL_CreateWindow("Poly3d", 

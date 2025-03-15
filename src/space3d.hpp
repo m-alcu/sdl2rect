@@ -196,7 +196,7 @@ typedef struct Scene
     Vec3 lux;
     Vec3 luxInversePrecomputed;
     Vec3 eye;
-    Vec3 eveInversePrecomputed;
+    Vec3 eyeInversePrecomputed;
     Matrix rotate;
     Matrix inverseRotate;
 } Scene;

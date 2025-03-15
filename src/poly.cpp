@@ -101,10 +101,10 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
                                 pixels[hy + hx] = RGBValue(face.material.Ambient, gRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
-                                pixels[hy + hx] = blinnPhongShading(gRaster, scene.luxInversePrecomputed, face);
+                                pixels[hy + hx] = blinnPhongShading(gRaster, scene, face);
                                 break;                                
                             case Shading::Phong:
-                                pixels[hy + hx] = phongShading(gRaster, scene.luxInversePrecomputed, face);
+                                pixels[hy + hx] = phongShading(gRaster, scene, face);
                                 break;
                             default: pixels[hy + hx] = Triangle::color;
                         }
@@ -120,29 +120,26 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
 };
 
 
-uint32_t Triangle::phongShading(Gradient gRaster, Vec3 lux, Face face) {
+uint32_t Triangle::phongShading(Gradient gRaster, Scene scene, Face face) {
 
     Vec3 normal = gRaster.vertexNormal.normalize();
-    float diff = std::max(0.0f, normal.dot(lux));
-    //RGBValue I_diffuse = RGBValue(face.material.Diffuse, (int32_t) face.material.properties.k_d * diff * 65536);
+    float diff = std::max(0.0f, normal.dot(scene.luxInversePrecomputed));
 
-    Vec3 R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
-    //float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
-    float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
+    Vec3 R = (gRaster.vertexNormal * 2.0f * normal.dot(scene.luxInversePrecomputed) - scene.luxInversePrecomputed).normalize();
+    float specAngle = std::max(0.0f, R.dot(scene.eyeInversePrecomputed)); // viewer
     float spec = std::pow(specAngle, face.material.properties.shininess);
-    //RGBValue I_specular = RGBValue(face.material.Specular, (int32_t) face.material.properties.k_s * spec * 65536);
 
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
     return RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 0.98)).bgra_value;
 
 }
 
-uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vec3 lux, Face face) {
+uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene scene, Face face) {
 
     // Normalize vectors
     Vec3 N = gRaster.vertexNormal.normalize(); // Normal at the fragment
-    Vec3 L = lux;                  // Light direction
-    Vec3 V = lux;                  // Viewer direction (you may want to define this differently later)
+    Vec3 L = scene.luxInversePrecomputed; // Light direction
+    Vec3 V = scene.eyeInversePrecomputed; // Viewer direction (you may want to define this differently later)
 
     // Diffuse component
     float diff = std::max(0.0f, N.dot(L));
