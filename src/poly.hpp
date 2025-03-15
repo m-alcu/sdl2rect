@@ -97,6 +97,7 @@ class RGBValue {
 
         RGBValue(uint32_t value, int32_t shining) {
             bgra_value = value;
+            if (shining > 65536) { shining = 65536; rgba.red = 0xff; rgba.green = 0xff; rgba.blue = 0xff; }
             rgba.red = (uint8_t) ((rgba.red * shining) >> 16);
             rgba.green = (uint8_t) ((rgba.green * shining) >> 16);
             rgba.blue = (uint8_t) ((rgba.blue * shining) >> 16);             
@@ -142,7 +143,7 @@ class Triangle {
         bool behind();
     
     private:
-        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge);
+        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftEdge, Gradient rightEdge, Vertex lux);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
         void swapPixel(Pixel *p1, Pixel *p2);

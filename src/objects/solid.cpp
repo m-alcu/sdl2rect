@@ -32,3 +32,17 @@ void Solid::calculateVertexNormals() {
         Solid::vertexNormals[i] = vertexNormal.normalize();
     }
 }
+
+// Function returning MaterialProperties struct
+MaterialProperties Solid::getMaterialProperties(MaterialType type) {
+    switch (type) {
+        case MaterialType::Rubber:   return {0.1f, 0.2f, 0.5f};  // Low specular, moderate ambient, high diffuse
+        case MaterialType::Plastic:  return {0.3f, 0.2f, 0.6f};
+        case MaterialType::Wood:     return {0.2f, 0.3f, 0.7f};
+        case MaterialType::Marble:   return {0.4f, 0.4f, 0.8f};
+        case MaterialType::Glass:    return {0.6f, 0.1f, 0.2f};  // High specular, low ambient, low diffuse
+        case MaterialType::Metal:    return {0.9f, 0.05f, 0.1f}; // Almost no diffuse, very reflective
+        case MaterialType::Mirror:   return {1.0f, 0.0f, 0.0f};  // Perfect specular reflection, no ambient or diffuse
+        default: return {0.0f, 0.0f, 0.0f};
+    }
+}

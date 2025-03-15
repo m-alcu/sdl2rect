@@ -37,6 +37,7 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
 void Torus::loadFaces(int uSteps, int vSteps) {
     // Each quad gives rise to 2 triangles.
     // Total faces = uSteps * vSteps * 2
+
     int faceIndex = 0;
     for (int i = 0; i < uSteps; i++) {
         int nextI = (i + 1) % uSteps;
@@ -48,11 +49,15 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             int idx2 = nextI * vSteps + nextJ;
             int idx3 = i * vSteps + nextJ;
             Torus::faces[faceIndex].color   = 0xff0058fc;
+            Torus::faces[faceIndex].material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
+
             Torus::faces[faceIndex].vertex1 = idx2;
             Torus::faces[faceIndex].vertex2 = idx1; // wrap-around for the quad
             Torus::faces[faceIndex].vertex3 = idx0;
             faceIndex++;
-            Torus::faces[faceIndex].color   = 0Xffffffff;
+            Torus::faces[faceIndex].color   = 0xffffffff;
+            Torus::faces[faceIndex].material = { 0xffffffff, 0xffffffff, 0xffffffff, getMaterialProperties(MaterialType::Metal)};
+
             Torus::faces[faceIndex].vertex1 = idx3;
             Torus::faces[faceIndex].vertex2 = idx2; // wrap-around for the quad
             Torus::faces[faceIndex].vertex3 = idx0;

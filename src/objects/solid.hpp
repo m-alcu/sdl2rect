@@ -43,6 +43,8 @@ public:
 
     virtual void calculateVertexNormals();
 
+    virtual MaterialProperties getMaterialProperties(MaterialType type);
+
 protected:
     // Protected virtual methods to be implemented by derived classes.
     virtual void loadVertices() = 0;

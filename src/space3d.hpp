@@ -88,12 +88,39 @@ typedef struct Vertex
 
 } Vertex;
 
+enum class MaterialType {
+    Rubber,
+    Plastic,
+    Wood,
+    Marble,
+    Glass,
+    Metal,
+    Mirror 
+};
+
+// Struct to hold k_s, k_a, and k_d values
+typedef struct MaterialProperties {
+    float k_s; // Specular reflection coefficient
+    float k_a; // Ambient reflection coefficient
+    float k_d; // Diffuse reflection coefficient
+    float shininess;
+} MaterialProperties;
+
+typedef struct Material
+{
+    uint32_t Ambient;
+    uint32_t Diffuse;
+    uint32_t Specular;
+    MaterialProperties properties;
+} Material;
+
 typedef struct Face
 {
     int16_t vertex1;
     int16_t vertex2;
     int16_t vertex3;
     int32_t color;
+    Material material;
 } Face;
 
 enum class Shading {
