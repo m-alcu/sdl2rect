@@ -20,6 +20,26 @@ bool Triangle::outside(Scene scene) {
             );
 };
 
+/*
+     edge13.p_x > edge12.p_x    edge13.p_x < edge12.p_x
+              p1                     p1
+             /|                      |\
+            / |                      | \
+   edge12  /  |                      |  \  edge12
+          /   |                      |   \
+         /    |  edge13     edge13   |    \
+        /     |                      |     \
+     p2/______|                      |______\ p2
+       \      |                      |      /
+        \     |                      |     /
+         \    |                      |    /
+          \   |                      |   /
+           \  |                      |  /
+   edge23   \ |                      | /  edge23
+             \|                      |/
+              p3                    p3
+*/
+
 void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal) {
 
     orderPixels(&p1, &p2, &p3);
