@@ -6,21 +6,21 @@
 
 class Solid {
 public:
-    Vertex* vertices;
+    Vec3* vertices;
     Face* faces;
-    Vertex* faceNormals;
+    Vec3* faceNormals;
     int numVertices;
     int numFaces;
-    Vertex* vertexNormals;
+    Vec3* vertexNormals;
 
 public:
     // Base constructor that allocates memory for common data members.
     Solid(int verticesCount, int facesCount)
         : numVertices(verticesCount), numFaces(facesCount),
-          vertices(new Vertex[verticesCount]),
+          vertices(new Vec3[verticesCount]),
           faces(new Face[facesCount]),
-          faceNormals(new Vertex[facesCount]),
-          vertexNormals(new Vertex[verticesCount]) 
+          faceNormals(new Vec3[facesCount]),
+          vertexNormals(new Vec3[verticesCount]) 
     {
     }
 
@@ -41,7 +41,7 @@ public:
 
     virtual void calculateNormals();
 
-    virtual void calculateVertexNormals();
+    virtual void calculateVec3Normals();
 
     virtual MaterialProperties getMaterialProperties(MaterialType type);
 

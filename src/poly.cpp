@@ -20,7 +20,7 @@ bool Triangle::outside() {
             );
 };
 
-void Triangle::draw(const Solid& solid, Vertex lux, const Face& face) {
+void Triangle::draw(const Solid& solid, Vec3 lux, const Face& face) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid, lux);
@@ -54,7 +54,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->vtx, p2->vtx);
 }
 
-Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux) {
+Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vec3 lux) {
 
     int16_t dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
@@ -64,8 +64,8 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
     float s2 = std::max(0.0f,(lux.dot(solid.vertexNormals[p2.vtx])));
     int32_t ds = (int32_t) ((s2 - s1) * 65536); 
     if (dy > 0) {
-        Vertex v = (solid.vertices[p2.vtx] - solid.vertices[p1.vtx]) / dy;
-        Vertex n = (solid.vertexNormals[p2.vtx] - solid.vertexNormals[p1.vtx]) / dy;
+        Vec3 v = (solid.vertices[p2.vtx] - solid.vertices[p1.vtx]) / dy;
+        Vec3 n = (solid.vertexNormals[p2.vtx] - solid.vertexNormals[p1.vtx]) / dy;
         return  { dx / dy , dz / dy, v, n, ds / dy };
     } else {
         if (dx > 0) {
@@ -76,7 +76,7 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux
     }
 };
 
-void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
+void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vec3 lux) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
     vertexPoint = solid.vertices[p.vtx];
@@ -84,7 +84,7 @@ void Gradient::updateFromPixel(const Pixel &p, const Solid& solid, Vertex lux) {
     ds = (int32_t) (std::max(0.0f,lux.dot(vertexNormal)) * 65536);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy, Vertex lux, const Face& face) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Screen screen, Gradient leftDy, Gradient rightDy, Vec3 lux, const Face& face) {
 
     for(int hy=(top * screen.width); hy<(bottom * screen.width); hy+=screen.width) {
         if (hy >= 0 && hy < (screen.width * screen.high)) { //vertical clipping
@@ -120,13 +120,13 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
 };
 
 
-uint32_t Triangle::phongShading(Gradient gRaster, Vertex lux, Face face) {
+uint32_t Triangle::phongShading(Gradient gRaster, Vec3 lux, Face face) {
 
-    Vertex normal = gRaster.vertexNormal.normalize();
+    Vec3 normal = gRaster.vertexNormal.normalize();
     float diff = std::max(0.0f, normal.dot(lux));
     //RGBValue I_diffuse = RGBValue(face.material.Diffuse, (int32_t) face.material.properties.k_d * diff * 65536);
 
-    Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
+    Vec3 R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
     //float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
     float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
     int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536);
@@ -138,18 +138,18 @@ uint32_t Triangle::phongShading(Gradient gRaster, Vertex lux, Face face) {
 
 }
 
-uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vertex lux, Face face) {
+uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vec3 lux, Face face) {
 
     // Normalize vectors
-    Vertex N = gRaster.vertexNormal.normalize(); // Normal at the fragment
-    Vertex L = lux;                  // Light direction
-    Vertex V = lux;                  // Viewer direction (you may want to define this differently later)
+    Vec3 N = gRaster.vertexNormal.normalize(); // Normal at the fragment
+    Vec3 L = lux;                  // Light direction
+    Vec3 V = lux;                  // Viewer direction (you may want to define this differently later)
 
     // Diffuse component
     float diff = std::max(0.0f, N.dot(L));
 
     // Halfway vector H = normalize(L + V)
-    Vertex H = (L + V).normalize();
+    Vec3 H = (L + V).normalize();
 
     // Specular component: spec = (N · H)^shininess
     float specAngle = std::max(0.0f, N.dot(H));
@@ -174,8 +174,8 @@ Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
     int16_t dx = (right.p_x - left.p_x) >> 16;
 
     if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
-    Vertex v = (right.vertexPoint - left.vertexPoint) / dx;
-    Vertex n = (right.vertexNormal - left.vertexNormal) / dx;
+    Vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
+    Vec3 n = (right.vertexNormal - left.vertexNormal) / dx;
     int64_t dz = (right.p_z - left.p_z) / dx;
     int32_t ds = (right.ds - left.ds) / dx;
     return { dx, dz, v, n, ds };

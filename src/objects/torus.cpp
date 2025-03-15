@@ -13,7 +13,7 @@ void Torus::setup(int uSteps, int vSteps, float R, float r) {
     loadVertices(uSteps, vSteps, R, r);
     loadFaces(uSteps, vSteps);
     calculateNormals();
-    calculateVertexNormals();
+    calculateVec3Normals();
 }
 
 void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {

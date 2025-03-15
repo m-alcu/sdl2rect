@@ -3,7 +3,7 @@
 #include "poly.hpp"
 #include "render.hpp"
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vertex lux, Shading shading) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vec3 lux, Shading shading) {
 
     Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
     Matrix inverseMatrix = inverseMatrix.initInverse(position.xAngle, position.yAngle, position.zAngle);
@@ -12,7 +12,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int
     delete[] projectedPoints;
 }
 
-Pixel Render::proj3to2D(Vertex vertex, Screen screen, Position position, int16_t i) {
+Pixel Render::proj3to2D(Vec3 vertex, Screen screen, Position position, int16_t i) {
 
     Pixel pixel;
     pixel.p_x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
@@ -34,7 +34,7 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Screen& screen, 
 }
 
 void Render::drawFaces(Pixel *projectedPoints, Screen screen, 
-                        uint32_t *pixels, int64_t *zBuffer, Vertex lux, 
+                        uint32_t *pixels, int64_t *zBuffer, Vec3 lux, 
                         Shading shading, const Solid& solid, Matrix inverseMatrix) {
 
     for (int i=0; i<solid.numFaces; i++) {
