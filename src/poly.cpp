@@ -27,11 +27,7 @@ void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 face
     Triangle::edge23 = gradientDy(p2, p3, solid, scene.luxInversePrecomputed);
     Triangle::edge13 = gradientDy(p1, p3, solid, scene.luxInversePrecomputed);
 
-    uint32_t flatColor = 0x00000000;
-    if (scene.shading == Shading::Flat) {
-        int32_t bright = (int32_t) (std::max(0.0f, faceNormal.dot(scene.luxInversePrecomputed)) * 65536);
-        flatColor = RGBValue(face.material.Ambient, bright).bgra_value;        
-    }
+    uint32_t flatColor = scene.shading == Shading::Flat ? RGBValue(face.material.Ambient, (int32_t) (std::max(0.0f, faceNormal.dot(scene.luxInversePrecomputed)) * 65536)).bgra_value : 0x00000000;
 
     Gradient left = Gradient(p1, solid, scene.luxInversePrecomputed), right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {

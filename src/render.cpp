@@ -14,12 +14,12 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
     delete[] projectedPoints;
 }
 
-Pixel Render::proj3to2D(Vec3 vertex, Screen screen, Position position, int16_t i) {
+Pixel Render::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i) {
 
     Pixel pixel;
-    pixel.p_x = (int16_t) ((position.zoom * (vertex.x + position.x)) / (vertex.z + position.z)) + screen.width / 2;
-    pixel.p_y = (int16_t) ((position.zoom * (vertex.y + position.y)) / (vertex.z + position.z)) + screen.high / 2;
-    pixel.p_z = (int64_t) (vertex.z + position.z) << 32;
+    pixel.p_x = (int16_t) ((position.zoom * (point.x + position.x)) / (point.z + position.z)) + screen.width / 2;
+    pixel.p_y = (int16_t) ((position.zoom * (point.y + position.y)) / (point.z + position.z)) + screen.high / 2;
+    pixel.p_z = (int64_t) (point.z + position.z) << 32;
     pixel.vtx = i;
     return pixel;
 }
