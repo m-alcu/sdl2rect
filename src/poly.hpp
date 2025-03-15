@@ -116,20 +116,18 @@ class Triangle {
         Pixel p1, p2, p3;
         Face face;
         uint32_t color;  // RGBA
-        Shading shading;
         Gradient edge12, edge23, edge13;
-        Screen screen;
         uint32_t *pixels;
         int64_t *zBuffer;
         const Solid* solid;  // Pointer to the abstract Solid
     
         // Updated constructor that also accepts a Solid pointer.
-        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux, Screen screenAux)
-          : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux), screen(screenAux) {}
+        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux)
+          : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
         void draw(const Solid& solid, Scene scene, const Face& face);
         bool visible();
-        bool outside();
+        bool outside(Scene scene);
         bool behind();
     
     private:

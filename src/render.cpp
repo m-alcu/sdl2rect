@@ -39,13 +39,12 @@ void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffe
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
-        Triangle triangle(&solid, pixels, zBuffer, scene.screen);
+        Triangle triangle(&solid, pixels, zBuffer);
         triangle.p1 = projectedPoints[solid.faces[i].vertex1];
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
-        triangle.shading = scene.shading;
 
-        if (triangle.visible() && !triangle.outside() && !triangle.behind()) {
+        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
             if (scene.shading == Shading::Flat) {
                 int32_t bright = (int32_t) (std::max(0.0f, solid.faceNormals[i].dot(scene.luxInversePrecomputed)) * 65536);
                 triangle.color = RGBValue(solid.faces[i].material.Ambient, bright).bgra_value;

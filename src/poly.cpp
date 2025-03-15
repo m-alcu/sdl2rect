@@ -11,12 +11,12 @@ bool Triangle::behind() {
     return (p1.p_z < 0 && p2.p_z < 0 && p3.p_z < 0);
 };
 
-bool Triangle::outside() {
+bool Triangle::outside(Scene scene) {
 
     return ((p1.p_x < 0 && p2.p_x < 0 && p3.p_x < 0) || 
-            (p1.p_x >= screen.width && p2.p_x >= screen.width && p3.p_x >= screen.width) ||
+            (p1.p_x >= scene.screen.width && p2.p_x >= scene.screen.width && p3.p_x >= scene.screen.width) ||
             (p1.p_y < 0 && p2.p_y < 0 && p3.p_y < 0) ||
-            (p1.p_y >= screen.high && p2.p_y >= screen.high && p3.p_y >= screen.high)
+            (p1.p_y >= scene.screen.high && p2.p_y >= scene.screen.high && p3.p_y >= scene.screen.high)
             );
 };
 
@@ -93,7 +93,7 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
                     if (zBuffer[hy + hx] > gRaster.p_z) {
-                        switch (shading) {
+                        switch (scene.shading) {
                             case Shading::Flat: 
                                 pixels[hy + hx] = Triangle::color;
                                 break;      
