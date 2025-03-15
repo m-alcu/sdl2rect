@@ -47,13 +47,12 @@ int main(int argc, char** argv)
     Torus* poly = new Torus(20*10, 20*10*2);
     poly->setup(20, 10, 500, 250);
 
-    Position position;
-    position.z = 2000;
-    position.x = 0;
-    position.y = 0;
-    position.zoom = 500;
-    position.xAngle = 24.79f;
-    position.yAngle = 49.99f;    
+    poly->position.z = 2000;
+    poly->position.x = 0;
+    poly->position.y = 0;
+    poly->position.zoom = 500;
+    poly->position.xAngle = 24.79f;
+    poly->position.yAngle = 49.99f;    
 
     Vec3 lux = {0, 0, 1};
 
@@ -82,17 +81,17 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                position.y = position.y - 10;
+                poly->position.y = poly->position.y - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                position.y = position.y + 10;
+                poly->position.y = poly->position.y + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                position.x = position.x - 10;
+                poly->position.x = poly->position.x - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                position.x = position.x + 10;
+                poly->position.x = poly->position.x + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                position.zoom = position.zoom + 10;
+                poly->position.zoom = poly->position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                position.zoom = position.zoom - 10;
+                poly->position.zoom = poly->position.zoom - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
@@ -109,15 +108,15 @@ int main(int argc, char** argv)
         //draw figure into pixels memory
         memset(pixels, 0, screen.width * screen.high * sizeof(Uint32));
         std::copy(zBufferInit, zBufferInit + (screen.width * screen.high), zBuffer);
-        render.drawObject(*poly, pixels, screen, zBuffer, position, lux, shading);
+        render.drawObject(*poly, pixels, screen, zBuffer, lux, shading);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
-        oss << "xAngle: " << std::fixed << std::setprecision(2) << position.xAngle
-            << " yAngle: " << std::fixed << std::setprecision(2) << position.yAngle
-            << " xPos: " << std::fixed << std::setprecision(2) << position.x
-            << " yPos: " << std::fixed << std::setprecision(2) << position.y
-            << " zoom: " << position.zoom
+        oss << "xAngle: " << std::fixed << std::setprecision(2) << poly->position.xAngle
+            << " yAngle: " << std::fixed << std::setprecision(2) << poly->position.yAngle
+            << " xPos: " << std::fixed << std::setprecision(2) << poly->position.x
+            << " yPos: " << std::fixed << std::setprecision(2) << poly->position.y
+            << " zoom: " << poly->position.zoom
             << " frames (ms): " << (to - from);
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        
@@ -139,8 +138,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(renderer);
 
         // Update rotation angles.
-        position.xAngle += 0.005f;
-        position.yAngle += 0.010f;
+        poly->position.xAngle += 0.005f;
+        poly->position.yAngle += 0.010f;
     }
 
     // Free resources.

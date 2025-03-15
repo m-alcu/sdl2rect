@@ -3,11 +3,11 @@
 #include "poly.hpp"
 #include "render.hpp"
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Position position, Vec3 lux, Shading shading) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, Screen screen, int64_t *zBuffer, Vec3 lux, Shading shading) {
 
-    Matrix matrix = matrix.init(position.xAngle, position.yAngle, position.zAngle);
-    Matrix inverseMatrix = inverseMatrix.initInverse(position.xAngle, position.yAngle, position.zAngle);
-    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, position);
+    Matrix matrix = matrix.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    Matrix inverseMatrix = inverseMatrix.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    Pixel * projectedPoints = projectRotateAllPoints(solid, screen, matrix, solid.position);
     drawFaces(projectedPoints, screen, pixels, zBuffer, lux, shading, solid, inverseMatrix);
     delete[] projectedPoints;
 }

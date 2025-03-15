@@ -10,6 +10,7 @@ public:
     int numVertices;
     int numFaces;
     Vec3* vertexNormals;
+    Position position;
 
 public:
     // Base constructor that allocates memory for common data members.
