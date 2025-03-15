@@ -148,6 +148,8 @@ class Triangle {
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
         Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Vertex lux);
         void swapPixel(Pixel *p1, Pixel *p2);
+        uint32_t phongShading(Gradient gRaster, Vertex lux, Face face);
+        uint32_t blinnPhongShading(Gradient gRaster, Vertex lux, Face face);
     };
     
 

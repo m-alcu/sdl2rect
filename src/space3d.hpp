@@ -126,6 +126,7 @@ typedef struct Face
 enum class Shading {
     Flat,
     Gouraud,
+    BlinnPhong,
     Phong
 };
 

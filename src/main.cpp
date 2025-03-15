@@ -97,6 +97,10 @@ int main(int argc, char** argv)
                 shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
                 shading = Shading::Flat;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
+                shading = Shading::BlinnPhong;                 
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
+                shading = Shading::Phong;                
             }
         }
 

@@ -93,34 +93,20 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < screen.width) { //horizontal clipping
                     if (zBuffer[hy + hx] > gRaster.p_z) {
-                        if (shading == Shading::Flat) {
-                            pixels[hy + hx] = Triangle::color;
-                        } else {
-//                          pixels[hy + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
-
-                            //RGBValue I_ambient = RGBValue(face.material.Ambient, (int32_t) face.material.properties.k_a * 65536);
-
-                            Vertex normal = gRaster.vertexNormal.normalize();
-                            float diff = std::max(0.0f, normal.dot(lux));
-                            //RGBValue I_diffuse = RGBValue(face.material.Diffuse, (int32_t) face.material.properties.k_d * diff * 65536);
-
-                            Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
-//                          float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
-                            float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
-                            int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536);
-                            float spec = std::pow(specAngle, face.material.properties.shininess);
-                            //RGBValue I_specular = RGBValue(face.material.Specular, (int32_t) face.material.properties.k_s * spec * 65536);
-
-                            float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
-                            pixels[hy + hx] = RGBValue(face.material.Ambient, (int32_t) (bright * 65536)).bgra_value;
-
-                            /*
-                            float diff = std::max(0.0f, normal.dot(lux));
-                            Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
-                            float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
-                            int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536 + diff * 65536);
-                            pixels[hy + hx] = RGBValue(Triangle::color, ds).bgra_value;
-                            */
+                        switch (shading) {
+                            case Shading::Flat: 
+                                pixels[hy + hx] = Triangle::color;
+                                break;      
+                            case Shading::Gouraud: 
+                                pixels[hy + hx] = RGBValue(Triangle::color, gRaster.ds).bgra_value;
+                                break;
+                            case Shading::BlinnPhong:
+                                pixels[hy + hx] = blinnPhongShading(gRaster, lux, face);
+                                break;                                
+                            case Shading::Phong:
+                                pixels[hy + hx] = phongShading(gRaster, lux, face);
+                                break;
+                            default: pixels[hy + hx] = Triangle::color;
                         }
                         zBuffer[hy + hx] = gRaster.p_z;
                     }
@@ -132,6 +118,52 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
         right += rightDy;
     }
 };
+
+
+uint32_t Triangle::phongShading(Gradient gRaster, Vertex lux, Face face) {
+
+    Vertex normal = gRaster.vertexNormal.normalize();
+    float diff = std::max(0.0f, normal.dot(lux));
+    //RGBValue I_diffuse = RGBValue(face.material.Diffuse, (int32_t) face.material.properties.k_d * diff * 65536);
+
+    Vertex R = (gRaster.vertexNormal * 2.0f * normal.dot(lux) - lux).normalize();
+    //float specAngle = std::max(0.0f, R.dot({0, 0, 1}));
+    float specAngle = std::max(0.0f, R.dot(lux)); // viewer = lux at the moment
+    int32_t ds = (int32_t) (std::pow(specAngle, 16) * 65536);
+    float spec = std::pow(specAngle, face.material.properties.shininess);
+    //RGBValue I_specular = RGBValue(face.material.Specular, (int32_t) face.material.properties.k_s * spec * 65536);
+
+    float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
+    return RGBValue(face.material.Ambient, (int32_t) (bright * 65536)).bgra_value;
+
+}
+
+uint32_t Triangle::blinnPhongShading(Gradient gRaster, Vertex lux, Face face) {
+
+    // Normalize vectors
+    Vertex N = gRaster.vertexNormal.normalize(); // Normal at the fragment
+    Vertex L = lux.normalize();                  // Light direction
+    Vertex V = lux.normalize();                  // Viewer direction (you may want to define this differently later)
+
+    // Diffuse component
+    float diff = std::max(0.0f, N.dot(L));
+
+    // Halfway vector H = normalize(L + V)
+    Vertex H = (L + V).normalize();
+
+    // Specular component: spec = (N · H)^shininess
+    float specAngle = std::max(0.0f, N.dot(H));
+    float spec = std::pow(specAngle, face.material.properties.shininess);
+
+    // Calculate brightness
+    float bright = face.material.properties.k_a + 
+                   face.material.properties.k_d * diff + 
+                   face.material.properties.k_s * spec;
+
+    // Final color composition (ambient color scaled by total brightness)
+    return RGBValue(face.material.Ambient, (int32_t)(bright * 65536)).bgra_value;
+}
+
 
 // Computes the pixel step gradient from left and right gradients.
 // left: starting gradient
