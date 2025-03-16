@@ -139,7 +139,8 @@ enum class Shading {
     Flat,
     Gouraud,
     BlinnPhong,
-    Phong
+    Phong,
+    Precomputed
 };
 
 class Matrix {

@@ -11,6 +11,7 @@ public:
     int numFaces;
     Vec3* vertexNormals;
     Position position;
+    uint32_t* precomputedShading;
 
 public:
     // Base constructor that allocates memory for common data members.
@@ -19,7 +20,8 @@ public:
           vertices(new Vec3[verticesCount]),
           faces(new Face[facesCount]),
           faceNormals(new Vec3[facesCount]),
-          vertexNormals(new Vec3[verticesCount]) 
+          vertexNormals(new Vec3[verticesCount]),
+          precomputedShading(new uint32_t[1024*1024])
     {
     }
 
@@ -29,6 +31,7 @@ public:
         delete[] faces;
         delete[] faceNormals;
         delete[] vertexNormals;
+        delete[] precomputedShading;
     }
 
     // A common setup method that calls the helper functions.
@@ -43,6 +46,8 @@ public:
     virtual void calculateVec3Normals();
 
     virtual MaterialProperties getMaterialProperties(MaterialType type);
+
+    virtual void calculatePrecomputedShading(Scene scene);
 
 protected:
     // Protected virtual methods to be implemented by derived classes.

@@ -4,8 +4,8 @@
 
 
 void Tetrakis::loadVertices() {
-    const float half = 32768.f;
-    const float axisDist = half * std::sqrt(3.f);  // ≈ 56755
+    const float half = 50.f;
+    const float axisDist = half * std::sqrt(3.f);  
 
     int index = 0;
     // Generate the 8 cube vertices with explicit sign choices

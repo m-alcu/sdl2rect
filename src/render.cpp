@@ -10,7 +10,8 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
     scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
     scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
-    drawFaces(projectedPoints, pixels, zBuffer, solid, scene);
+    Vec3 * rotatedNormals = rotateNormals(solid, scene);
+    drawFaces(projectedPoints, pixels, zBuffer, solid, scene, rotatedNormals);
     delete[] projectedPoints;
 }
 
@@ -24,6 +25,16 @@ Pixel Render::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i)
     return pixel;
 }
 
+Vec3* Render::rotateNormals(const Solid& solid, const Scene& scene) {
+
+    Vec3* rNormals = new Vec3[solid.numVertices];
+    for (int i = 0; i < solid.numVertices; i++) {
+        rNormals[i] = scene.rotate * solid.vertexNormals[i];
+    }
+    return rNormals;
+}
+
+
 Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
     Pixel* projectedPoints = new Pixel[solid.numVertices];
@@ -35,7 +46,7 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
     return projectedPoints;
 }
 
-void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffer, const Solid& solid, Scene scene) {
+void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffer, const Solid& solid, Scene scene, Vec3 *rotatedNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
@@ -45,7 +56,7 @@ void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffe
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
         if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
-            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i]);
+            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i], rotatedNormals);
         }
     }                        
 }

@@ -41,7 +41,7 @@ bool Triangle::outside(Scene scene) {
               p3                    p3
 */
 
-void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal) {
+void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid, scene, face);

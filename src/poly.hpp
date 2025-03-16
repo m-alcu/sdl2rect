@@ -125,7 +125,7 @@ class Triangle {
         Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
-        void draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal);
+        void draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals);
         bool visible();
         bool outside(Scene scene);
         bool behind();
