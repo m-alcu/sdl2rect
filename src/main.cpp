@@ -62,6 +62,8 @@ int main(int argc, char** argv)
     Desert().draw(background, scene.screen);
     std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
 
+    poly->calculatePrecomputedShading(scene);
+
     // Render engine
     Render render;
 
@@ -99,7 +101,9 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
                 scene.shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
-                scene.shading = Shading::Phong;                
+                scene.shading = Shading::Phong;     
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_k) {
+                scene.shading = Shading::Precomputed;                               
             }
         }
 

@@ -13,6 +13,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, 
     Vec3 * rotatedNormals = rotateNormals(solid, scene);
     drawFaces(projectedPoints, pixels, zBuffer, solid, scene, rotatedNormals);
     delete[] projectedPoints;
+    delete[] rotatedNormals;
 }
 
 Pixel Render::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i) {
@@ -26,6 +27,10 @@ Pixel Render::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i)
 }
 
 Vec3* Render::rotateNormals(const Solid& solid, const Scene& scene) {
+
+    if (scene.shading != Shading::Precomputed) {
+        return nullptr;
+    }
 
     Vec3* rNormals = new Vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {

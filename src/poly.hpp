@@ -32,11 +32,11 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const Pixel &p, const Solid& solid, Scene scene, Face face) {
+        Gradient(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
-            vertexPoint = solid.vertices[p.vtx];
-            vertexNormal = solid.vertexNormals[p.vtx];
+            vertexPoint = rotatedVertices[p.vtx];
+            vertexNormal = normals[p.vtx];
             float diff = std::max(0.0f, scene.luxInversePrecomputed.dot(vertexNormal));
             float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
             ds = (int32_t) (bright * 65536 * 4);
@@ -60,7 +60,7 @@ class Gradient {
 
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(const Pixel &p, const Solid& solid, Scene scene, Face face);
+        void updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face);
 };
 
 class RGBValue {
@@ -131,12 +131,13 @@ class Triangle {
         bool behind();
     
     private:
-        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftEdge, Gradient rightEdge, Scene scene, const Face& face, uint32_t flatColor);
+        void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftEdge, Gradient rightEdge, Scene scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        Gradient gradientDy(Pixel p1, Pixel p2, const Solid& solid, Scene scene, Face face);
+        Gradient gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face);
         void swapPixel(Pixel *p1, Pixel *p2);
         uint32_t phongShading(Gradient gRaster, Scene scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene scene, Face face);
+        uint32_t precomputedPhongShading(Gradient gRaster, Scene scene, Face face, uint32_t* precomputedShading);
     };
     
 
