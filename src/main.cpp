@@ -3,7 +3,7 @@
 #include <iomanip>
 #include "poly.hpp"
 #include "render.hpp"
-#include "desert.hpp"
+#include "backgrounds/desert.hpp"
 
 int main(int argc, char** argv)
 {
