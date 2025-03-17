@@ -100,19 +100,6 @@ class RGBValue {
 
     };
 
-class Desert {
-
-    public:
-        uint16_t seed1;
-        uint16_t seed2;
-
-    public:
-        void draw(uint32_t *pixels, Screen screen);
-
-    private:
-        void calcPalette(uint32_t *palette);
-};
-
 class Triangle {
     public:
         Pixel p1, p2, p3;
