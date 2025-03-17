@@ -162,7 +162,7 @@ uint32_t Triangle::phongShading(Gradient gRaster, Scene scene, Face face) {
     Vec3 normal = gRaster.vertexNormal.normalize();
     float diff = std::max(0.0f, normal.dot(scene.luxInversePrecomputed));
 
-    Vec3 R = (gRaster.vertexNormal * 2.0f * normal.dot(scene.luxInversePrecomputed) - scene.luxInversePrecomputed).normalize();
+    Vec3 R = (normal * 2.0f * normal.dot(scene.luxInversePrecomputed) - scene.luxInversePrecomputed).normalize();
     float specAngle = std::max(0.0f, R.dot(scene.eyeInversePrecomputed)); // viewer
     float spec = std::pow(specAngle, face.material.properties.shininess);
 

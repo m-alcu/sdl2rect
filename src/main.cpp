@@ -4,6 +4,7 @@
 #include "poly.hpp"
 #include "render.hpp"
 #include "backgrounds/desert.hpp"
+#include "backgrounds/imagepng.hpp"
 
 int main(int argc, char** argv)
 {
@@ -60,7 +61,7 @@ int main(int argc, char** argv)
     poly->position.yAngle = 49.99f;    
 
     // Backgroud
-    Desert().draw(background, scene.screen.high, scene.screen.width);
+    Imagepng().draw(background, scene.screen.high, scene.screen.width);
     std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
 
     poly->calculatePrecomputedShading(scene);
