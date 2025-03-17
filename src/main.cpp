@@ -3,8 +3,8 @@
 #include <iomanip>
 #include "poly.hpp"
 #include "render.hpp"
-#include "backgrounds/desert.hpp"
-#include "backgrounds/imagepng.hpp"
+#include "backgrounds/background.hpp"
+#include "backgrounds/backgroundFactory.hpp"
 
 int main(int argc, char** argv)
 {
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     Uint32* pixels       = new Uint32[scene.screen.width * scene.screen.high];
     int64_t* zBufferInit = new int64_t[scene.screen.width * scene.screen.high];
     int64_t* zBuffer     = new int64_t[scene.screen.width * scene.screen.high];
-    Uint32* background   = new Uint32[scene.screen.width * scene.screen.high];
+    Uint32* back         = new Uint32[scene.screen.width * scene.screen.high];
 
     bool isRunning = true;
     SDL_Event event;
@@ -61,7 +61,9 @@ int main(int argc, char** argv)
     poly->position.yAngle = 49.99f;    
 
     // Backgroud
-    Imagepng().draw(background, scene.screen.high, scene.screen.width);
+    auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
+    background->draw(back, scene.screen.high, scene.screen.width);
+
     std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
 
     poly->calculatePrecomputedShading(scene);
@@ -72,7 +74,7 @@ int main(int argc, char** argv)
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
     SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.high);
-	SDL_UpdateTexture(backgroundTexture, NULL, background, scene.screen.width * sizeof(Uint32));
+	SDL_UpdateTexture(backgroundTexture, NULL, back, scene.screen.width * sizeof(Uint32));
 
     // Main loop.
     while (isRunning)
@@ -152,7 +154,7 @@ int main(int argc, char** argv)
     delete[] pixels;
     delete[] zBuffer;
     delete[] zBufferInit;
-    delete[] background;
+    delete[] back;
 
     SDL_DestroyTexture(texture);
     SDL_DestroyTexture(backgroundTexture);

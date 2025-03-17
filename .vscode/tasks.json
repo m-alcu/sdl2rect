@@ -10,6 +10,7 @@
                 "src\\main.cpp",
                 "src\\render.cpp",
                 "src\\backgrounds\\background.cpp",
+                "src\\backgrounds\\backgroundFactory.cpp",
                 "src\\backgrounds\\desert.cpp",
                 "src\\backgrounds\\imagepng.cpp",
                 "src\\objects\\solid.cpp",
