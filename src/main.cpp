@@ -50,8 +50,11 @@ int main(int argc, char** argv)
     //Test * poly = new Test(8, 4);
     //poly->setup();
     
-    Torus* poly = new Torus(20*10, 20*10*2);
-    poly->setup(20, 10, 500, 250);
+    //Torus* poly = new Torus(20*10, 20*10*2);
+    //poly->setup(20, 10, 500, 250);
+
+    Star* poly = new Star(128, 256);
+    poly->setup();
 
     poly->position.z = 2000;
     poly->position.x = 0;
@@ -59,6 +62,9 @@ int main(int argc, char** argv)
     poly->position.zoom = 500;
     poly->position.xAngle = 24.79f;
     poly->position.yAngle = 49.99f;    
+
+    poly->position.zoom = 100;
+    poly->position.z = 200;
 
     // Backgroud
     auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
@@ -98,6 +104,10 @@ int main(int argc, char** argv)
                 poly->position.zoom = poly->position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
                 poly->position.zoom = poly->position.zoom - 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
+                poly->position.z = poly->position.z + 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
+                poly->position.z = poly->position.z - 10;                
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {

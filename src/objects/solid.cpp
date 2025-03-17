@@ -18,7 +18,7 @@ void Solid::calculateNormals() {
     }
 }
 
-void Solid::calculateVec3Normals() {
+void Solid::calculateVertexNormals() {
 
     for (int i = 0; i < numVertices; i++) { 
         Vec3 vertexNormal = { 0, 0, 0 };

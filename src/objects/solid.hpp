@@ -43,7 +43,7 @@ public:
 
     virtual void calculateNormals();
 
-    virtual void calculateVec3Normals();
+    virtual void calculateVertexNormals();
 
     virtual MaterialProperties getMaterialProperties(MaterialType type);
 

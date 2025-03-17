@@ -54,6 +54,11 @@
         "variant": "cpp",
         "iomanip": "cpp",
         "sstream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "regex": "cpp",
+        "bitset": "cpp",
+        "cstring": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     }
 }

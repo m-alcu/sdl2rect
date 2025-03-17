@@ -7,6 +7,7 @@
 #include "objects/tetrakis.hpp"
 #include "objects/torus.hpp"
 #include "objects/test.hpp"
+#include "objects/star.hpp"
 
 class Gradient {
 
