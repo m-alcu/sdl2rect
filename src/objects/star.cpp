@@ -11,7 +11,7 @@
 
 void Star::loadVertices() {
 
-    std::ifstream file("resources/star.asc");
+    std::ifstream file("resources/knot.asc");
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file.\n";

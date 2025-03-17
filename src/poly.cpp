@@ -85,9 +85,9 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
 
 Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face) {
 
-    int16_t dy = p2.p_y - p1.p_y;
+    int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
-    int64_t dz = ((int64_t) (p2.p_z - p1.p_z)) << 32;
+    float dz = p2.p_z - p1.p_z;
 
     float diff1 = std::max(0.0f,(scene.luxInversePrecomputed.dot(normals[p1.vtx])));
     float bright1 = face.material.properties.k_a+face.material.properties.k_d * diff1;
@@ -219,7 +219,7 @@ Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
     if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
     Vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
     Vec3 n = (right.vertexNormal - left.vertexNormal) / dx;
-    int64_t dz = (right.p_z - left.p_z) / dx;
+    float dz = (right.p_z - left.p_z) / dx;
     int32_t ds = (right.ds - left.ds) / dx;
     return { dx, dz, v, n, ds };
 }

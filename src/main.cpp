@@ -33,8 +33,8 @@ int main(int argc, char** argv)
 
     // Allocate pixel buffers.
     Uint32* pixels       = new Uint32[scene.screen.width * scene.screen.high];
-    int64_t* zBufferInit = new int64_t[scene.screen.width * scene.screen.high];
-    int64_t* zBuffer     = new int64_t[scene.screen.width * scene.screen.high];
+    float* zBufferInit   = new float[scene.screen.width * scene.screen.high];
+    float* zBuffer       = new float[scene.screen.width * scene.screen.high];
     Uint32* back         = new Uint32[scene.screen.width * scene.screen.high];
 
     bool isRunning = true;
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     //Torus* poly = new Torus(20*10, 20*10*2);
     //poly->setup(20, 10, 500, 250);
 
-    Star* poly = new Star(128, 256);
+    Star* poly = new Star(2093, 3840);
     poly->setup();
 
     poly->position.z = 2000;
@@ -67,10 +67,10 @@ int main(int argc, char** argv)
     poly->position.z = 200;
 
     // Backgroud
-    auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
+    auto background = BackgroundFactory::createBackground(BackgroundType::IMAGE_PNG);
     background->draw(back, scene.screen.high, scene.screen.width);
 
-    std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), INT64_MAX);
+    std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), 3.40282e+38);
 
     poly->calculatePrecomputedShading(scene);
 

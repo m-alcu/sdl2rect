@@ -13,7 +13,7 @@ class Gradient {
 
     public:
         int32_t p_x; // for draw triangles
-        int64_t p_z; // for z-Buffer
+        float p_z; // for z-Buffer
 
         Vec3 vertexPoint;  // for distances light to surface (light near)
         Vec3 vertexNormal; // for normal interpolation
@@ -24,7 +24,7 @@ class Gradient {
         }
 
         // Prime constructor
-        Gradient(int32_t p_x_in, int64_t p_z_in, Vec3 p, Vec3 n, int32_t s) {
+        Gradient(int32_t p_x_in, float p_z_in, Vec3 p, Vec3 n, int32_t s) {
             p_x = p_x_in;
             p_z = p_z_in;
             vertexPoint = p;
@@ -106,11 +106,11 @@ class Triangle {
         Pixel p1, p2, p3;
         Gradient edge12, edge23, edge13;
         uint32_t *pixels;
-        int64_t *zBuffer;
+        float *zBuffer;
         const Solid* solid;  // Pointer to the abstract Solid
     
         // Updated constructor that also accepts a Solid pointer.
-        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, int64_t *zBufferAux)
+        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
         void draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals);

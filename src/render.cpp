@@ -3,7 +3,7 @@
 #include "poly.hpp"
 #include "render.hpp"
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, int64_t *zBuffer, Scene scene) {
+void Render::drawObject(const Solid& solid, uint32_t *pixels, float *zBuffer, Scene scene) {
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
@@ -51,7 +51,7 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
     return projectedPoints;
 }
 
-void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, int64_t *zBuffer, const Solid& solid, Scene scene, Vec3 *rotatedNormals) {
+void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, float *zBuffer, const Solid& solid, Scene scene, Vec3 *rotatedNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.

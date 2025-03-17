@@ -13,7 +13,7 @@ typedef struct Pixel
 {
     int16_t p_x;
     int16_t p_y;
-    int64_t p_z; 
+    float p_z; 
     int16_t vtx;
 } Pixel;
 
