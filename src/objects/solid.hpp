@@ -47,7 +47,7 @@ public:
 
     virtual MaterialProperties getMaterialProperties(MaterialType type);
 
-    virtual void calculatePrecomputedShading(Scene scene);
+    virtual void calculatePrecomputedShading(Scene& scene);
 
 protected:
     // Protected virtual methods to be implemented by derived classes.

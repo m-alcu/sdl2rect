@@ -1,9 +1,13 @@
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <math.h>
 #include "poly.hpp"
 #include "render.hpp"
 
-void Render::drawObject(const Solid& solid, uint32_t *pixels, float *zBuffer, Scene scene) {
+void Render::drawObject(const Solid& solid, Scene& scene) {
+
+    memset(scene.pixels, 0, scene.screen.width * scene.screen.high * sizeof(uint32_t));
+    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
@@ -11,7 +15,7 @@ void Render::drawObject(const Solid& solid, uint32_t *pixels, float *zBuffer, Sc
     scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     Vec3 * rotatedNormals = rotateNormals(solid, scene);
-    drawFaces(projectedPoints, pixels, zBuffer, solid, scene, rotatedNormals);
+    drawFaces(projectedPoints, solid, scene, rotatedNormals);
     delete[] projectedPoints;
     delete[] rotatedNormals;
 }
@@ -51,11 +55,11 @@ Pixel* Render::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
     return projectedPoints;
 }
 
-void Render::drawFaces(Pixel *projectedPoints, uint32_t *pixels, float *zBuffer, const Solid& solid, Scene scene, Vec3 *rotatedNormals) {
+void Render::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, Vec3 *rotatedNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
-        Triangle triangle(&solid, pixels, zBuffer);
+        Triangle triangle(&solid, scene.pixels, scene.zBuffer);
         triangle.p1 = projectedPoints[solid.faces[i].vertex1];
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];

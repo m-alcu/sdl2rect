@@ -14,8 +14,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Scene scene;
-    scene.screen = {768, 1024};
+    Scene scene({768, 1024});
     scene.lux = {0, 0, 1};
     scene.eye = {0, 0, 1};
     scene.shading = Shading::Flat;
@@ -32,10 +31,7 @@ int main(int argc, char** argv)
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
     // Allocate pixel buffers.
-    Uint32* pixels       = new Uint32[scene.screen.width * scene.screen.high];
-    float* zBufferInit   = new float[scene.screen.width * scene.screen.high];
-    float* zBuffer       = new float[scene.screen.width * scene.screen.high];
-    Uint32* back         = new Uint32[scene.screen.width * scene.screen.high];
+    
 
     bool isRunning = true;
     SDL_Event event;
@@ -67,10 +63,9 @@ int main(int argc, char** argv)
     poly->position.z = 200;
 
     // Backgroud
+    Uint32* back = new Uint32[scene.screen.width * scene.screen.high];
     auto background = BackgroundFactory::createBackground(BackgroundType::IMAGE_PNG);
     background->draw(back, scene.screen.high, scene.screen.width);
-
-    std::fill(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), 3.40282e+38);
 
     poly->calculatePrecomputedShading(scene);
 
@@ -124,9 +119,8 @@ int main(int argc, char** argv)
         // Calculate frame time.
         from = SDL_GetTicks();
         //draw figure into pixels memory
-        memset(pixels, 0, scene.screen.width * scene.screen.high * sizeof(Uint32));
-        std::copy(zBufferInit, zBufferInit + (scene.screen.width * scene.screen.high), zBuffer);
-        render.drawObject(*poly, pixels, zBuffer, scene);
+
+        render.drawObject(*poly, scene);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
@@ -143,7 +137,7 @@ int main(int argc, char** argv)
         void* texturePixels = nullptr;
         int pitch = 0;
         if (SDL_LockTexture(texture, NULL, &texturePixels, &pitch) == 0) {
-			memcpy(texturePixels, pixels, scene.screen.width * scene.screen.high * sizeof(Uint32));
+			memcpy(texturePixels, scene.pixels, scene.screen.width * scene.screen.high * sizeof(Uint32));
 			SDL_UnlockTexture(texture);
         } else {
             std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;
@@ -161,9 +155,6 @@ int main(int argc, char** argv)
     }
 
     // Free resources.
-    delete[] pixels;
-    delete[] zBuffer;
-    delete[] zBufferInit;
     delete[] back;
 
     SDL_DestroyTexture(texture);

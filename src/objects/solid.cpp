@@ -47,7 +47,7 @@ MaterialProperties Solid::getMaterialProperties(MaterialType type) {
     }
 }
 
-void Solid::calculatePrecomputedShading(Scene scene) {
+void Solid::calculatePrecomputedShading(Scene& scene) {
 
     MaterialProperties material = Solid::getMaterialProperties(MaterialType::Metal);
 

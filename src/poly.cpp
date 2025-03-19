@@ -12,7 +12,7 @@ bool Triangle::behind() {
     return (p1.p_z < 0 && p2.p_z < 0 && p3.p_z < 0);
 };
 
-bool Triangle::outside(Scene scene) {
+bool Triangle::outside(Scene& scene) {
 
     return ((p1.p_x < 0 && p2.p_x < 0 && p3.p_x < 0) || 
             (p1.p_x >= scene.screen.width && p2.p_x >= scene.screen.width && p3.p_x >= scene.screen.width) ||
@@ -41,7 +41,7 @@ bool Triangle::outside(Scene scene) {
               p3                    p3
 */
 
-void Triangle::draw(const Solid& solid, Scene scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals) {
+void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
@@ -83,7 +83,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->vtx, p2->vtx);
 }
 
-Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face) {
+Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face) {
 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
@@ -108,7 +108,7 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *n
     }
 };
 
-void Gradient::updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene scene, Face face) {
+void Gradient::updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
     vertexPoint = rotatedVertices[p.vtx];
@@ -118,7 +118,7 @@ void Gradient::updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *norm
     ds = (int32_t) (bright * 65536 * 4);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         if (hy >= 0 && hy < (scene.screen.width * scene.screen.high)) { //vertical clipping
@@ -157,7 +157,7 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
 };
 
 
-uint32_t Triangle::phongShading(Gradient gRaster, Scene scene, Face face) {
+uint32_t Triangle::phongShading(Gradient gRaster, Scene& scene, Face face) {
 
     Vec3 normal = gRaster.vertexNormal.normalize();
     float diff = std::max(0.0f, normal.dot(scene.luxInversePrecomputed));
@@ -171,7 +171,7 @@ uint32_t Triangle::phongShading(Gradient gRaster, Scene scene, Face face) {
 
 }
 
-uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene scene, Face face) {
+uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene& scene, Face face) {
 
     // Normalize vectors
     Vec3 N = gRaster.vertexNormal.normalize(); // Normal at the fragment
@@ -197,7 +197,7 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene scene, Face face) {
     return RGBValue(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
-uint32_t Triangle::precomputedPhongShading(Gradient gRaster, Scene scene, Face face, uint32_t* precomputedShading) {
+uint32_t Triangle::precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
 
     Vec3 normal = gRaster.vertexNormal.normalize();
 
