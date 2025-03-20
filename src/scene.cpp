@@ -8,7 +8,7 @@ void Scene::setup() {
     torus->setup(20, 10, 500, 250);
 
     torus->position.z = 2000;
-    torus->position.x = 0;
+    torus->position.x = -500;
     torus->position.y = 0;
     torus->position.zoom = 500;
     torus->position.xAngle = 24.79f;
@@ -17,6 +17,21 @@ void Scene::setup() {
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
+
+    auto torus2 = std::make_unique<Torus>(20*10, 20*10*2);
+    torus2->setup(20, 10, 500, 250);
+
+    torus2->position.z = 2000;
+    torus2->position.x = 500;
+    torus2->position.y = 0;
+    torus2->position.zoom = 500;
+    torus2->position.xAngle = 24.79f;
+    torus2->position.yAngle = 49.99f;
+    
+    calculatePrecomputedShading(*torus2);
+
+    addSolid(std::move(torus2));
+
 
 }
 

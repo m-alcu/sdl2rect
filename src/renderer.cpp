@@ -6,6 +6,9 @@
 
 void Renderer::drawScene(Scene& scene) {
 
+    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
+    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
+
     for (auto& solidPtr : scene.solids) {
         drawObject(*solidPtr, scene);
     }
@@ -23,8 +26,6 @@ void Renderer::drawObject(const Solid& solid, Scene& scene) {
 
 void Renderer::prepareScene(const Solid& solid, Scene& scene) {
 
-    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
-    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
