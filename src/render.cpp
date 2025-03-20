@@ -6,18 +6,23 @@
 
 void Render::drawObject(const Solid& solid, Scene& scene) {
 
-    memset(scene.pixels, 0, scene.screen.width * scene.screen.high * sizeof(uint32_t));
-    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
-
-    scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
-    scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
-    scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
-    scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
+    prepareScene(solid, scene);
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     Vec3 * rotatedNormals = rotateNormals(solid, scene);
     drawFaces(projectedPoints, solid, scene, rotatedNormals);
     delete[] projectedPoints;
     delete[] rotatedNormals;
+}
+
+void Render::prepareScene(const Solid& solid, Scene& scene) {
+
+    memset(scene.pixels, 0, scene.screen.width * scene.screen.high * sizeof(uint32_t));
+    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
+    scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
+    scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
+
 }
 
 Pixel Render::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i) {
