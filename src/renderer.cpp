@@ -1,4 +1,3 @@
-#include <SDL2/SDL.h>
 #include <iostream>
 #include <math.h>
 #include "poly.hpp"
@@ -17,7 +16,7 @@ void Renderer::drawObject(const Solid& solid, Scene& scene) {
 
 void Renderer::prepareScene(const Solid& solid, Scene& scene) {
 
-    memset(scene.pixels, 0, scene.screen.width * scene.screen.high * sizeof(uint32_t));
+    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
     std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
