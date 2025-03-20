@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../space3d.hpp"
-#include "../scene.hpp"
 
 class Solid {
 public:
@@ -47,8 +46,6 @@ public:
     virtual void calculateVertexNormals();
 
     virtual MaterialProperties getMaterialProperties(MaterialType type);
-
-    virtual void calculatePrecomputedShading(Scene& scene);
 
 protected:
     // Protected virtual methods to be implemented by derived classes.

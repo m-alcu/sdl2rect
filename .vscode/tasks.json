@@ -20,6 +20,7 @@
                 "src\\objects\\star.cpp",                            
                 "src\\space3d.cpp",
                 "src\\poly.cpp",
+                "src\\scene.cpp",
                 "src\\vendor\\lodepng.cpp",                
                 "-o",
                 "build\\game.exe",

@@ -10,6 +10,7 @@
 class Renderer {
 
     public:
+        void drawScene(Scene& scene);
         Pixel proj3to2D(Vec3 vertex, Screen screen, Position position, int16_t i);
         void prepareScene(const Solid& solid, Scene& scene);
         Pixel* projectRotateAllPoints(const Solid& solid, const Scene& scene);     

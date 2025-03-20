@@ -4,6 +4,13 @@
 #include "renderer.hpp"
 #include "scene.hpp"
 
+void Renderer::drawScene(Scene& scene) {
+
+    for (auto& solidPtr : scene.solids) {
+        drawObject(*solidPtr, scene);
+    }
+}
+
 void Renderer::drawObject(const Solid& solid, Scene& scene) {
 
     prepareScene(solid, scene);

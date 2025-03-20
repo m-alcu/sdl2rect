@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <iostream>
 #include <cstdint>
 #include "space3d.hpp"
@@ -8,6 +7,7 @@
 #include "objects/torus.hpp"
 #include "objects/test.hpp"
 #include "objects/star.hpp"
+#include "scene.hpp"
 
 class Gradient {
 
