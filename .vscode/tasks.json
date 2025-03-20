@@ -8,7 +8,7 @@
             "args": [
                 "-g",
                 "src\\main.cpp",
-                "src\\render.cpp",
+                "src\\renderer.cpp",
                 "src\\backgrounds\\background.cpp",
                 "src\\backgrounds\\backgroundFactory.cpp",
                 "src\\backgrounds\\desert.cpp",

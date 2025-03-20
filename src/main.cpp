@@ -2,9 +2,10 @@
 #include <sstream>
 #include <iomanip>
 #include "poly.hpp"
-#include "render.hpp"
+#include "renderer.hpp"
 #include "backgrounds/background.hpp"
 #include "backgrounds/backgroundFactory.hpp"
+#include "scene.hpp"
 
 int main(int argc, char** argv)
 {
@@ -22,11 +23,11 @@ int main(int argc, char** argv)
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
                                           scene.screen.width, scene.screen.high, 0);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
+    SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     // Use streaming texture for direct pixel access.
-    SDL_Texture* texture = SDL_CreateTexture(renderer,
+    SDL_Texture* texture = SDL_CreateTexture(sdlRenderer,
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.high);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
@@ -46,11 +47,11 @@ int main(int argc, char** argv)
     //Test * poly = new Test(8, 4);
     //poly->setup();
     
-    //Torus* poly = new Torus(20*10, 20*10*2);
-    //poly->setup(20, 10, 500, 250);
+    Torus* poly = new Torus(20*10, 20*10*2);
+    poly->setup(20, 10, 500, 250);
 
-    Star* poly = new Star(2093, 3840);
-    poly->setup();
+    //Star* poly = new Star(2093, 3840);
+    //poly->setup();
 
     poly->position.z = 2000;
     poly->position.x = 0;
@@ -59,8 +60,8 @@ int main(int argc, char** argv)
     poly->position.xAngle = 24.79f;
     poly->position.yAngle = 49.99f;    
 
-    poly->position.zoom = 100;
-    poly->position.z = 200;
+    //poly->position.zoom = 100;
+    //poly->position.z = 200;
 
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.high];
@@ -69,11 +70,11 @@ int main(int argc, char** argv)
 
     poly->calculatePrecomputedShading(scene);
 
-    // Render engine
-    Render render;
+    // Renderer engine
+    Renderer renderer;
 
 	// Create a texture for the background.
-	SDL_Texture* backgroundTexture = SDL_CreateTexture(renderer,
+	SDL_Texture* backgroundTexture = SDL_CreateTexture(sdlRenderer,
     SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.high);
 	SDL_UpdateTexture(backgroundTexture, NULL, back, scene.screen.width * sizeof(Uint32));
 
@@ -120,7 +121,7 @@ int main(int argc, char** argv)
         from = SDL_GetTicks();
         //draw figure into pixels memory
 
-        render.drawObject(*poly, scene);
+        renderer.drawObject(*poly, scene);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
@@ -143,11 +144,11 @@ int main(int argc, char** argv)
             std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;
         }
 
-        // Render the updated texture.
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
+        // Renderer the updated texture.
+        SDL_RenderClear(sdlRenderer);
+        SDL_RenderCopy(sdlRenderer, backgroundTexture, NULL, NULL);
+        SDL_RenderCopy(sdlRenderer, texture, NULL, NULL);
+        SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
         poly->position.xAngle += 0.005f;
@@ -159,7 +160,7 @@ int main(int argc, char** argv)
 
     SDL_DestroyTexture(texture);
     SDL_DestroyTexture(backgroundTexture);
-    SDL_DestroyRenderer(renderer);
+    SDL_DestroyRenderer(sdlRenderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 

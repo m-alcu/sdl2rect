@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "poly.hpp"
+#include "scene.hpp"
 
 bool Triangle::visible() {
 

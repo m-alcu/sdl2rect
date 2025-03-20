@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../space3d.hpp"
+#include "../scene.hpp"
 
 class Solid {
 public:
