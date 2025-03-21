@@ -6,17 +6,21 @@
 
 void Renderer::drawScene(Scene& scene) {
 
-    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
-    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
-
+    prepareScene(scene);
     for (auto& solidPtr : scene.solids) {
-        drawObject(*solidPtr, scene);
+        drawRenderable(*solidPtr, scene);
     }
 }
 
-void Renderer::drawObject(const Solid& solid, Scene& scene) {
+void Renderer::prepareScene(Scene& scene) {
 
-    prepareScene(solid, scene);
+    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
+    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
+}
+
+void Renderer::drawRenderable(const Solid& solid, Scene& scene) {
+
+    prepareRenderable(solid, scene);
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
     Vec3 * rotatedNormals = rotateNormals(solid, scene);
     drawFaces(projectedPoints, solid, scene, rotatedNormals);
@@ -24,7 +28,7 @@ void Renderer::drawObject(const Solid& solid, Scene& scene) {
     delete[] rotatedNormals;
 }
 
-void Renderer::prepareScene(const Solid& solid, Scene& scene) {
+void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
     scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
