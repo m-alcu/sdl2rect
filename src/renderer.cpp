@@ -42,7 +42,7 @@ Pixel Renderer::proj3to2D(Vec3 point, Screen screen, Position position, int16_t 
     Pixel pixel;
     pixel.p_x = (int16_t) ((position.zoom * (point.x + position.x)) / (point.z + position.z)) + screen.width / 2;
     pixel.p_y = (int16_t) ((position.zoom * (point.y + position.y)) / (point.z + position.z)) + screen.high / 2;
-    pixel.p_z = (int64_t) (point.z + position.z) << 32;
+    pixel.p_z = point.z + position.z;
     pixel.vtx = i;
     return pixel;
 }
