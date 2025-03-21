@@ -1,27 +1,27 @@
 #include <iostream>
 #include <math.h>
 #include "../poly.hpp"
+#include "../smath.hpp"
 
 void Solid::calculateNormals() {
     for (int i = 0; i < numFaces; i++) {
         const Face &face = Solid::faces[i];
-        Vec3 v1 = Solid::vertices[face.vertex1];
-        Vec3 v2 = Solid::vertices[face.vertex2];
-        Vec3 v3 = Solid::vertices[face.vertex3];
+        slib::vec3 v1 = Solid::vertices[face.vertex1];
+        slib::vec3 v2 = Solid::vertices[face.vertex2];
+        slib::vec3 v3 = Solid::vertices[face.vertex3];
 
         // Calculate the edge vectors.
-        Vec3 v21 = v2 - v1;
-        Vec3 v32 = v3 - v2;
+        slib::vec3 v21 = v2 - v1;
+        slib::vec3 v32 = v3 - v2;
 
-        // Compute the face normal via the cross product and normalize it.
-        Solid::faceNormals[i] = v21.cross(v32).normalize();
+        Solid::faceNormals[i] = smath::normalize(smath::cross(v21, v32));
     }
 }
 
 void Solid::calculateVertexNormals() {
 
     for (int i = 0; i < numVertices; i++) { 
-        Vec3 vertexNormal = { 0, 0, 0 };
+        slib::vec3 vertexNormal = { 0, 0, 0 };
         for(int j = 0; j < numFaces; j++) {
             if (Solid::faces[j].vertex1 == i || 
                 Solid::faces[j].vertex2 == i || 
@@ -29,7 +29,7 @@ void Solid::calculateVertexNormals() {
                     vertexNormal += Solid::faceNormals[j];
             }
         }
-        Solid::vertexNormals[i] = vertexNormal.normalize();
+        Solid::vertexNormals[i] = smath::normalize(vertexNormal);
     }
 }
 

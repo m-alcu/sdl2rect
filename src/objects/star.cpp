@@ -17,7 +17,7 @@ void Star::loadVertices() {
         std::cerr << "Failed to open file.\n";
     }
 
-    //std::vector<Vec3> vertices;
+    //std::vector<slib::vec3> vertices;
     //std::vector<Face> faces;
 
     std::string line;
@@ -54,7 +54,7 @@ void Star::loadVertices() {
         if (readingVertices) {
             if (line.find("Vertex") != std::string::npos) {
                 // Example line: Vertex 0:  X: -95     Y: 0     Z: 0
-                Vec3 vertex;
+                slib::vec3 vertex;
                 std::regex vertexRegex(R"(Vertex\s+\d+:\s+X:\s+([-.\dEe]+)\s+Y:\s+([-.\dEe]+)\s+Z:\s+([-.\dEe]+))");
                 std::smatch match;
 

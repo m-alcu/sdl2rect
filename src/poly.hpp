@@ -8,6 +8,8 @@
 #include "objects/test.hpp"
 #include "objects/star.hpp"
 #include "scene.hpp"
+#include "slib.hpp"
+#include "smath.hpp"
 
 class Gradient {
 
@@ -15,8 +17,8 @@ class Gradient {
         int32_t p_x; // for draw triangles
         float p_z; // for z-Buffer
 
-        Vec3 vertexPoint;  // for distances light to surface (light near)
-        Vec3 vertexNormal; // for normal interpolation
+        slib::vec3 vertexPoint;  // for distances light to surface (light near)
+        slib::vec3 vertexNormal; // for normal interpolation
 
         int32_t ds; //shining gradient (gouraud)
 
@@ -24,7 +26,7 @@ class Gradient {
         }
 
         // Prime constructor
-        Gradient(int32_t p_x_in, float p_z_in, Vec3 p, Vec3 n, int32_t s) {
+        Gradient(int32_t p_x_in, float p_z_in, slib::vec3 p, slib::vec3 n, int32_t s) {
             p_x = p_x_in;
             p_z = p_z_in;
             vertexPoint = p;
@@ -33,20 +35,20 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face) {
+        Gradient(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
             vertexPoint = rotatedVertices[p.vtx];
             vertexNormal = normals[p.vtx];
-            float diff = std::max(0.0f, scene.luxInversePrecomputed.dot(vertexNormal));
+            float diff = std::max(0.0f, smath::dot(scene.luxInversePrecomputed,vertexNormal));
             float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
             ds = (int32_t) (bright * 65536 * 4);
         }        
 
         // Overload operator+
         Gradient operator+(const Gradient &g) const {
-            Vec3 p = vertexPoint + g.vertexPoint; 
-            Vec3 n = vertexNormal + g.vertexNormal;
+            slib::vec3 p = vertexPoint + g.vertexPoint; 
+            slib::vec3 n = vertexNormal + g.vertexNormal;
             return { p_x + g.p_x, p_z + g.p_z, p, n, ds + g.ds };
         }
 
@@ -61,7 +63,7 @@ class Gradient {
 
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face);
+        void updateFromPixel(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
 };
 
 class RGBValue {
@@ -113,7 +115,7 @@ class Triangle {
         Triangle(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
-        void draw(const Solid& solid, Scene& scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals);
+        void draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal, slib::vec3 *rotatedNormals);
         bool visible();
         bool outside(Scene& scene);
         bool behind();
@@ -121,7 +123,7 @@ class Triangle {
     private:
         void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftEdge, Gradient rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        Gradient gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face);
+        Gradient gradientDy(Pixel p1, Pixel p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
         void swapPixel(Pixel *p1, Pixel *p2);
         uint32_t phongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene& scene, Face face);

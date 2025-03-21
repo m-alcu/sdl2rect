@@ -50,11 +50,11 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
             if (f_xy_sq <= 1.0f) {
                 float f_z = sqrt(1.0f - f_xy_sq);
 
-                Vec3 normal = Vec3(f_x, f_y, f_z).normalize();
-                float diff = std::max(0.0f, normal.dot(lux));
+                slib::vec3 normal = smath::normalize(slib::vec3({f_x, f_y, f_z}));
+                float diff = std::max(0.0f, smath::dot(normal,lux));
             
-                Vec3 R = (normal * 2.0f * normal.dot(lux) - lux).normalize();
-                float specAngle = std::max(0.0f, R.dot(lux)); // viewer
+                slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,lux) - lux);
+                float specAngle = std::max(0.0f, smath::dot(R,lux)); // viewer
                 float spec = std::pow(specAngle, material.shininess);
             
                 float bright = material.k_a+material.k_d * diff+ material.k_s * spec;

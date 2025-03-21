@@ -2,6 +2,8 @@
 #include <fstream>
 #include "poly.hpp"
 #include "scene.hpp"
+#include "slib.hpp"
+#include "smath.hpp"
 
 bool Triangle::visible() {
 
@@ -42,7 +44,7 @@ bool Triangle::outside(Scene& scene) {
               p3                    p3
 */
 
-void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedVertexNormals) {
+void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal, slib::vec3 *rotatedVertexNormals) {
 
     orderPixels(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
@@ -51,7 +53,7 @@ void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 fac
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
-        float diff = std::max(0.0f, faceNormal.dot(scene.luxInversePrecomputed));
+        float diff = std::max(0.0f, smath::dot(faceNormal,scene.luxInversePrecomputed));
         float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
         flatColor = RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
@@ -84,20 +86,20 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->vtx, p2->vtx);
 }
 
-Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face) {
+Gradient Triangle::gradientDy(Pixel p1, Pixel p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     float dz = p2.p_z - p1.p_z;
 
-    float diff1 = std::max(0.0f,(scene.luxInversePrecomputed.dot(normals[p1.vtx])));
+    float diff1 = std::max(0.0f, smath::dot(scene.luxInversePrecomputed,normals[p1.vtx]));
     float bright1 = face.material.properties.k_a+face.material.properties.k_d * diff1;
-    float diff2 = std::max(0.0f,(scene.luxInversePrecomputed.dot(normals[p2.vtx])));
+    float diff2 = std::max(0.0f, smath::dot(scene.luxInversePrecomputed,normals[p2.vtx]));
     float bright2 = face.material.properties.k_a+face.material.properties.k_d * diff2;
     int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
     if (dy > 0) {
-        Vec3 v = (rotatedVertices[p2.vtx] - rotatedVertices[p1.vtx]) / dy;
-        Vec3 n = (normals[p2.vtx] - normals[p1.vtx]) / dy;
+        slib::vec3 v = (rotatedVertices[p2.vtx] - rotatedVertices[p1.vtx]) / dy;
+        slib::vec3 n = (normals[p2.vtx] - normals[p1.vtx]) / dy;
         int32_t result = ds / dy;
         return  { dx / dy , dz / dy, v, n, result };
     } else {
@@ -109,12 +111,12 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, Vec3* rotatedVertices, Vec3 *n
     }
 };
 
-void Gradient::updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *normals, Scene& scene, Face face) {
+void Gradient::updateFromPixel(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
     vertexPoint = rotatedVertices[p.vtx];
     vertexNormal = normals[p.vtx];
-    float diff = std::max(0.0f, scene.luxInversePrecomputed.dot(vertexNormal));
+    float diff = std::max(0.0f, smath::dot(scene.luxInversePrecomputed, vertexNormal));
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
     ds = (int32_t) (bright * 65536 * 4);
 }
@@ -160,11 +162,11 @@ void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradie
 
 uint32_t Triangle::phongShading(Gradient gRaster, Scene& scene, Face face) {
 
-    Vec3 normal = gRaster.vertexNormal.normalize();
-    float diff = std::max(0.0f, normal.dot(scene.luxInversePrecomputed));
+    slib::vec3 normal = smath::normalize(gRaster.vertexNormal);
+    float diff = std::max(0.0f, smath::dot(normal,scene.luxInversePrecomputed));
 
-    Vec3 R = (normal * 2.0f * normal.dot(scene.luxInversePrecomputed) - scene.luxInversePrecomputed).normalize();
-    float specAngle = std::max(0.0f, R.dot(scene.eyeInversePrecomputed)); // viewer
+    slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.luxInversePrecomputed) - scene.luxInversePrecomputed);
+    float specAngle = std::max(0.0f, smath::dot(R,scene.eyeInversePrecomputed)); // viewer
     float spec = std::pow(specAngle, face.material.properties.shininess);
 
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
@@ -175,18 +177,18 @@ uint32_t Triangle::phongShading(Gradient gRaster, Scene& scene, Face face) {
 uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene& scene, Face face) {
 
     // Normalize vectors
-    Vec3 N = gRaster.vertexNormal.normalize(); // Normal at the fragment
-    Vec3 L = scene.luxInversePrecomputed; // Light direction
-    Vec3 V = scene.eyeInversePrecomputed; // Viewer direction (you may want to define this differently later)
+    slib::vec3 N = smath::normalize(gRaster.vertexNormal); // Normal at the fragment
+    slib::vec3 L = scene.luxInversePrecomputed; // Light direction
+    slib::vec3 V = scene.eyeInversePrecomputed; // Viewer direction (you may want to define this differently later)
 
     // Diffuse component
-    float diff = std::max(0.0f, N.dot(L));
+    float diff = std::max(0.0f, smath::dot(N,L));
 
     // Halfway vector H = normalize(L + V)
-    Vec3 H = (L + V).normalize();
+    slib::vec3 H = smath::normalize(L + V);
 
     // Specular component: spec = (N · H)^shininess
-    float specAngle = std::max(0.0f, N.dot(H));
+    float specAngle = std::max(0.0f, smath::dot(N,H));
     float spec = std::pow(specAngle, face.material.properties.shininess * 4); // Blinn Phong shininess needs *4 to be like Phong
 
     // Calculate brightness
@@ -200,7 +202,7 @@ uint32_t Triangle::blinnPhongShading(Gradient gRaster, Scene& scene, Face face) 
 
 uint32_t Triangle::precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
 
-    Vec3 normal = gRaster.vertexNormal.normalize();
+    slib::vec3 normal = smath::normalize(gRaster.vertexNormal);
 
     int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) 1023,(int16_t) (normal.x * 512 + 512)));
     int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) 1023,(int16_t) (normal.y * 512 + 512)));
@@ -218,8 +220,8 @@ Gradient Gradient::gradientDx(const Gradient &left, const Gradient &right) {
     int16_t dx = (right.p_x - left.p_x) >> 16;
 
     if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
-    Vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
-    Vec3 n = (right.vertexNormal - left.vertexNormal) / dx;
+    slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
+    slib::vec3 n = (right.vertexNormal - left.vertexNormal) / dx;
     float dz = (right.p_z - left.p_z) / dx;
     int32_t ds = (right.ds - left.ds) / dx;
     return { dx, dz, v, n, ds };

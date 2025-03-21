@@ -46,10 +46,10 @@ public:
 
     Screen screen;
     Shading shading;
-    Vec3 lux;
-    Vec3 luxInversePrecomputed;
-    Vec3 eye;
-    Vec3 eyeInversePrecomputed;
+    slib::vec3 lux;
+    slib::vec3 luxInversePrecomputed;
+    slib::vec3 eye;
+    slib::vec3 eyeInversePrecomputed;
     Matrix rotate;
     Matrix inverseRotate;
     float* zBufferInit;

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "../poly.hpp"
-#define M_PI 3.14159265358979323846
+#include "../constants.hpp"
 
 void Torus::loadVertices() {
 }
@@ -19,11 +19,11 @@ void Torus::setup(int uSteps, int vSteps, float R, float r) {
 void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
 
     for (int i = 0; i < uSteps; i++) {
-        float u = i * 2 * M_PI / uSteps;
+        float u = i * 2 * PI / uSteps;
         float cosU = cos(u);
         float sinU = sin(u);
         for (int j = 0; j < vSteps; j++) {
-            float v = j * 2 * M_PI / vSteps;
+            float v = j * 2 * PI / vSteps;
             float cosV = cos(v);
             float sinV = sin(v);
             float x = (R + r * cosV) * cosU;

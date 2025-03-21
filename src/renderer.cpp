@@ -22,7 +22,7 @@ void Renderer::drawRenderable(const Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
-    Vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
+    slib::vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
     drawFaces(projectedPoints, solid, scene, rotatedVertexNormals);
     delete[] projectedPoints;
     delete[] rotatedVertexNormals;
@@ -37,7 +37,7 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
 }
 
-Pixel Renderer::proj3to2D(Vec3 point, Screen screen, Position position, int16_t i) {
+Pixel Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
 
     Pixel pixel;
     pixel.p_x = (int16_t) ((position.zoom * (point.x + position.x)) / (point.z + position.z)) + screen.width / 2;
@@ -47,13 +47,13 @@ Pixel Renderer::proj3to2D(Vec3 point, Screen screen, Position position, int16_t 
     return pixel;
 }
 
-Vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene) {
+slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene) {
 
     if (scene.shading != Shading::Precomputed) {
         return nullptr;
     }
 
-    Vec3* rNormals = new Vec3[solid.numVertices];
+    slib::vec3* rNormals = new slib::vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {
         rNormals[i] = scene.rotate * solid.vertexNormals[i];
     }
@@ -72,7 +72,7 @@ Pixel* Renderer::projectRotateAllPoints(const Solid& solid, const Scene& scene) 
     return projectedPoints;
 }
 
-void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, Vec3 *rotatedVertexNormals) {
+void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.

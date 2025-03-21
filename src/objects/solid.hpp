@@ -1,15 +1,16 @@
 #pragma once
 
 #include "../space3d.hpp"
+#include "../slib.hpp"
 
 class Solid {
 public:
-    Vec3* vertices;
+    slib::vec3* vertices;
     Face* faces;
-    Vec3* faceNormals;
+    slib::vec3* faceNormals;
     int numVertices;
     int numFaces;
-    Vec3* vertexNormals;
+    slib::vec3* vertexNormals;
     Position position;
     uint32_t* precomputedShading;
 
@@ -17,10 +18,10 @@ public:
     // Base constructor that allocates memory for common data members.
     Solid(int verticesCount, int facesCount)
         : numVertices(verticesCount), numFaces(facesCount),
-          vertices(new Vec3[verticesCount]),
+          vertices(new slib::vec3[verticesCount]),
           faces(new Face[facesCount]),
-          faceNormals(new Vec3[facesCount]),
-          vertexNormals(new Vec3[verticesCount]),
+          faceNormals(new slib::vec3[facesCount]),
+          vertexNormals(new slib::vec3[verticesCount]),
           precomputedShading(new uint32_t[1024*1024])
     {
     }

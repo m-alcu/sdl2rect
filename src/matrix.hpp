@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cmath>
 #include "space3d.hpp"
+#include "slib.hpp"
 
 class Matrix {
 
@@ -18,9 +19,9 @@ class Matrix {
         float r21;
         float r22;
 
-        // Overload operator* to apply the matrix transformation to a Vec3.
-        Vec3 operator*(const Vec3 &v) const {
-            Vec3 result;
+        // Overload operator* to apply the matrix transformation to a slib::vec3.
+        slib::vec3 operator*(const slib::vec3 &v) const {
+            slib::vec3 result;
             result.x = r00 * v.x + r01 * v.y + r02 * v.z;
             result.y = r10 * v.x + r11 * v.y + r12 * v.z;
             result.z = r20 * v.x + r21 * v.y + r22 * v.z;
