@@ -18,7 +18,7 @@
                 "src\\objects\\torus.cpp",
                 "src\\objects\\test.cpp",      
                 "src\\objects\\star.cpp",                            
-                "src\\space3d.cpp",
+                "src\\matrix.cpp",
                 "src\\poly.cpp",
                 "src\\scene.cpp",
                 "src\\vendor\\lodepng.cpp",                

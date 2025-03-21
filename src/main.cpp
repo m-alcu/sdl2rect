@@ -62,22 +62,22 @@ int main(int argc, char** argv)
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
-            /*} else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                poly->position.y = poly->position.y - 10;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
+                scene.solids[0]->position.y = scene.solids[0]->position.y - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                poly->position.y = poly->position.y + 10;
+                scene.solids[0]->position.y = scene.solids[0]->position.y + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                poly->position.x = poly->position.x - 10;
+                scene.solids[0]->position.x = scene.solids[0]->position.x - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                poly->position.x = poly->position.x + 10;
+                scene.solids[0]->position.x = scene.solids[0]->position.x + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                poly->position.zoom = poly->position.zoom + 10;
+                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                poly->position.zoom = poly->position.zoom - 10;
+                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
-                poly->position.z = poly->position.z + 10;
+                scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
-                poly->position.z = poly->position.z - 10;  */               
+                scene.solids[0]->position.z = scene.solids[0]->position.z - 10;               
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
@@ -125,8 +125,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
-        /*poly->position.xAngle += 0.005f;
-        poly->position.yAngle += 0.010f;*/
+        scene.solids[0]->position.xAngle += 0.005f;
+        scene.solids[0]->position.yAngle += 0.010f;
     }
 
     // Free resources.

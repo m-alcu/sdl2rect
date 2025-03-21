@@ -6,6 +6,7 @@
 #include <cstdint>   // for uint32_t
 
 #include "space3d.hpp"
+#include "matrix.hpp"
 #include "objects/solid.hpp"
 
 class Scene
