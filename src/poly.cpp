@@ -42,12 +42,12 @@ bool Triangle::outside(Scene& scene) {
               p3                    p3
 */
 
-void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedNormals) {
+void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 faceNormal, Vec3 *rotatedVertexNormals) {
 
     orderPixels(&p1, &p2, &p3);
-    Triangle::edge12 = gradientDy(p1, p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
-    Triangle::edge23 = gradientDy(p2, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
-    Triangle::edge13 = gradientDy(p1, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
+    Triangle::edge12 = gradientDy(p1, p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
+    Triangle::edge23 = gradientDy(p2, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
+    Triangle::edge13 = gradientDy(p1, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -56,15 +56,15 @@ void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 fac
         flatColor = RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
 
-    Gradient left = Gradient(p1, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
+    Gradient left = Gradient(p1, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
     Gradient right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
         drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face, flatColor, solid.precomputedShading);
-        right.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
+        right.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face, flatColor, solid.precomputedShading);
     } else {
         drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
-        left.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedNormals : solid.vertexNormals, scene, face);
+        left.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
     }
 };

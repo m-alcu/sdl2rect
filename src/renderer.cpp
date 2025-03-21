@@ -22,10 +22,10 @@ void Renderer::drawRenderable(const Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
     Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
-    Vec3 * rotatedNormals = rotateNormals(solid, scene);
-    drawFaces(projectedPoints, solid, scene, rotatedNormals);
+    Vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
+    drawFaces(projectedPoints, solid, scene, rotatedVertexNormals);
     delete[] projectedPoints;
-    delete[] rotatedNormals;
+    delete[] rotatedVertexNormals;
 }
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
@@ -47,7 +47,7 @@ Pixel Renderer::proj3to2D(Vec3 point, Screen screen, Position position, int16_t 
     return pixel;
 }
 
-Vec3* Renderer::rotateNormals(const Solid& solid, const Scene& scene) {
+Vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene) {
 
     if (scene.shading != Shading::Precomputed) {
         return nullptr;
@@ -72,7 +72,7 @@ Pixel* Renderer::projectRotateAllPoints(const Solid& solid, const Scene& scene) 
     return projectedPoints;
 }
 
-void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, Vec3 *rotatedNormals) {
+void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, Vec3 *rotatedVertexNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
@@ -82,7 +82,7 @@ void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scen
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
         if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
-            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i], rotatedNormals);
+            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i], rotatedVertexNormals);
         }
     }                        
 }
