@@ -59,13 +59,13 @@ void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, Vec3 fac
     Gradient left = Gradient(p1, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
     Gradient right = left;
     if(Triangle::edge13.p_x < Triangle::edge12.p_x) {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge12, scene, face, flatColor, solid.precomputedShading);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::edge13, Triangle::edge12, scene, face, flatColor, solid.precomputedShading);
         right.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge13, Triangle::edge23, scene, face, flatColor, solid.precomputedShading);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::edge13, Triangle::edge23, scene, face, flatColor, solid.precomputedShading);
     } else {
-        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::pixels, Triangle::edge12, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
+        drawTriSector(p1.p_y, p2.p_y, left, right, Triangle::edge12, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
         left.updateFromPixel(p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
-        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::pixels, Triangle::edge23, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
+        drawTriSector(p2.p_y, p3.p_y, left, right, Triangle::edge23, Triangle::edge13, scene, face, flatColor, solid.precomputedShading);
     }
 };
 
@@ -119,7 +119,7 @@ void Gradient::updateFromPixel(const Pixel &p, Vec3* rotatedVertices, Vec3 *norm
     ds = (int32_t) (bright * 65536 * 4);
 }
 
-void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, uint32_t *pixels, Gradient leftDy, Gradient rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+void Triangle::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftDy, Gradient rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         if (hy >= 0 && hy < (scene.screen.width * scene.screen.high)) { //vertical clipping
