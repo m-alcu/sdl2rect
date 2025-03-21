@@ -9,6 +9,12 @@
 
 int main(int argc, char** argv)
 {
+
+    bool isRunning = true;
+    SDL_Event event;
+    Uint32 from;
+    Uint32 to;
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
@@ -21,6 +27,9 @@ int main(int argc, char** argv)
     scene.shading = Shading::Flat;
     scene.setup();
 
+    // Renderer engine
+    Renderer renderer;
+
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
                                           scene.screen.width, scene.screen.high, 0);
@@ -32,20 +41,10 @@ int main(int argc, char** argv)
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.high);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
-    // Allocate pixel buffers.
-    
-    bool isRunning = true;
-    SDL_Event event;
-    Uint32 from;
-    Uint32 to;
-
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.high];
     auto background = BackgroundFactory::createBackground(BackgroundType::IMAGE_PNG);
     background->draw(back, scene.screen.high, scene.screen.width);
-
-    // Renderer engine
-    Renderer renderer;
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(sdlRenderer,
@@ -91,20 +90,17 @@ int main(int argc, char** argv)
             }
         }
 
-        // Calculate frame time.
         from = SDL_GetTicks();
-        //draw figure into pixels memory
-
         renderer.drawScene(scene);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
-/*        oss << "xAngle: " << std::fixed << std::setprecision(2) << poly->position.xAngle
-            << " yAngle: " << std::fixed << std::setprecision(2) << poly->position.yAngle
-            << " xPos: " << std::fixed << std::setprecision(2) << poly->position.x
-            << " yPos: " << std::fixed << std::setprecision(2) << poly->position.y
-            << " zoom: " << poly->position.zoom
-            << " frames (ms): " << (to - from);*/
+        oss << "xAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.xAngle
+            << " yAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.yAngle
+            << " xPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.x
+            << " yPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.y
+            << " zoom: " << scene.solids[0]->position.zoom
+            << " frames (ms): " << (to - from);
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        
 
