@@ -39,11 +39,11 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
 
     MaterialProperties material = solid.getMaterialProperties(MaterialType::Metal);
 
-    for(int x = 0; x < 1024; x++) {
-        for (int y = 0; y < 1024; y++) {
+    for(int x = 0; x < PRECOMPUTE_SIZE; x++) {
+        for (int y = 0; y < PRECOMPUTE_SIZE; y++) {
 
-            float f_x = (float)(x - 512) / 512.0f;
-            float f_y = (float)(y - 512) / 512.0f;
+            float f_x = (float)(x - PRECOMPUTE_SIZE/2) / (PRECOMPUTE_SIZE/2);
+            float f_y = (float)(y - PRECOMPUTE_SIZE/2) / (PRECOMPUTE_SIZE/2);
 
             float f_xy_sq = f_x * f_x + f_y * f_y;
 
@@ -58,9 +58,9 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
                 float spec = std::pow(specAngle, material.shininess);
             
                 float bright = material.k_a+material.k_d * diff+ material.k_s * spec;
-                solid.precomputedShading[y*1024+x] = (int32_t) (bright * 65536 * 0.98);
+                solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = (int32_t) (bright * 65536 * 0.98);
             } else {
-                solid.precomputedShading[y*1024+x] = 0;
+                solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = 0;
             }
         }
     }

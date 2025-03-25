@@ -8,13 +8,13 @@ typedef struct Screen
     uint16_t width;
 } Screen;
 
-typedef struct Pixel
+typedef struct vertex
 {
     int16_t p_x;
     int16_t p_y;
     float p_z; 
     int16_t vtx;
-} Pixel;
+} vertex;
 
 typedef struct Position
 {

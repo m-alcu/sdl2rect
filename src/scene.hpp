@@ -15,20 +15,16 @@ public:
     // Constructor that initializes the Screen and allocates zBuffer arrays.
     Scene(const Screen& scr)
         : screen(scr),
-          zBufferInit(nullptr),
           zBuffer(nullptr)
     {
         // Allocate memory for zBufferInit and zBuffer.
-        zBufferInit = new float[scr.high * scr.width];
         zBuffer     = new float[scr.high * scr.width];
         pixels      = new uint32_t[scr.width * scr.high];
-        std::fill(zBufferInit, zBufferInit + (scr.width * scr.high), 3.40282e+38f);
     }
 
     // Destructor to free the allocated memory.
     ~Scene()
     {
-        delete[] zBufferInit;
         delete[] zBuffer;
         delete[] pixels;
     }

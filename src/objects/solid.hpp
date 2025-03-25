@@ -2,6 +2,7 @@
 
 #include "../space3d.hpp"
 #include "../slib.hpp"
+#include "../constants.hpp"
 
 class Solid {
 public:
@@ -22,7 +23,7 @@ public:
           faces(new Face[facesCount]),
           faceNormals(new slib::vec3[facesCount]),
           vertexNormals(new slib::vec3[verticesCount]),
-          precomputedShading(new uint32_t[1024*1024])
+          precomputedShading(new uint32_t[PRECOMPUTE_SIZE*PRECOMPUTE_SIZE])
     {
     }
 

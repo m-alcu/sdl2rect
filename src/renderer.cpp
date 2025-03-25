@@ -15,13 +15,17 @@ void Renderer::drawScene(Scene& scene) {
 void Renderer::prepareScene(Scene& scene) {
 
     std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
-    std::copy(scene.zBufferInit, scene.zBufferInit + (scene.screen.width * scene.screen.high), scene.zBuffer);
+    std::fill_n(
+        scene.zBuffer,
+        scene.screen.width * scene.screen.high,
+        std::numeric_limits<float>::max()
+    );
 }
 
-void Renderer::drawRenderable(const Solid& solid, Scene& scene) {
+void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
-    Pixel * projectedPoints = projectRotateAllPoints(solid, scene);
+    vertex * projectedPoints = projectRotateAllPoints(solid, scene);
     slib::vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
     drawFaces(projectedPoints, solid, scene, rotatedVertexNormals);
     delete[] projectedPoints;
@@ -37,9 +41,9 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
 }
 
-Pixel Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
+vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
 
-    Pixel pixel;
+    vertex pixel;
     pixel.p_x = (int16_t) ((position.zoom * (point.x + position.x)) / (point.z + position.z)) + screen.width / 2;
     pixel.p_y = (int16_t) ((position.zoom * (point.y + position.y)) / (point.z + position.z)) + screen.high / 2;
     pixel.p_z = point.z + position.z;
@@ -61,9 +65,9 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
 }
 
 
-Pixel* Renderer::projectRotateAllPoints(const Solid& solid, const Scene& scene) {
+vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
-    Pixel* projectedPoints = new Pixel[solid.numVertices];
+    vertex* projectedPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
         projectedPoints[i] = proj3to2D(scene.rotate * solid.vertices[i], scene.screen, solid.position, i);
@@ -72,7 +76,7 @@ Pixel* Renderer::projectRotateAllPoints(const Solid& solid, const Scene& scene) 
     return projectedPoints;
 }
 
-void Renderer::drawFaces(Pixel *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {
+void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.

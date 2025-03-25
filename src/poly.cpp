@@ -46,7 +46,7 @@ bool Triangle::outside(Scene& scene) {
 
 void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal, slib::vec3 *rotatedVertexNormals) {
 
-    orderPixels(&p1, &p2, &p3);
+    orderVertices(&p1, &p2, &p3);
     Triangle::edge12 = gradientDy(p1, p2, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
     Triangle::edge23 = gradientDy(p2, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
     Triangle::edge13 = gradientDy(p1, p3, solid.vertices, scene.shading == Shading::Precomputed ? rotatedVertexNormals : solid.vertexNormals, scene, face);
@@ -71,14 +71,14 @@ void Triangle::draw(const Solid& solid, Scene& scene, const Face& face, slib::ve
     }
 };
 
-void Triangle::orderPixels(Pixel *p1, Pixel *p2, Pixel *p3) {
+void Triangle::orderVertices(vertex *p1, vertex *p2, vertex *p3) {
 
-    if (p1->p_y > p2->p_y) swapPixel(p1,p2);
-    if (p2->p_y > p3->p_y) swapPixel(p2,p3);
-    if (p1->p_y > p2->p_y) swapPixel(p1,p2);
+    if (p1->p_y > p2->p_y) swapVertex(p1,p2);
+    if (p2->p_y > p3->p_y) swapVertex(p2,p3);
+    if (p1->p_y > p2->p_y) swapVertex(p1,p2);
 }
 
-void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
+void Triangle::swapVertex(vertex *p1, vertex *p2) {
 
     std::swap(p1->p_x, p2->p_x);
     std::swap(p1->p_y, p2->p_y);
@@ -86,7 +86,7 @@ void Triangle::swapPixel(Pixel *p1, Pixel *p2) {
     std::swap(p1->vtx, p2->vtx);
 }
 
-Gradient Triangle::gradientDy(Pixel p1, Pixel p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
+Gradient Triangle::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
@@ -111,7 +111,7 @@ Gradient Triangle::gradientDy(Pixel p1, Pixel p2, slib::vec3* rotatedVertices, s
     }
 };
 
-void Gradient::updateFromPixel(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
+void Gradient::updateFromPixel(const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
     p_x = ( p.p_x << 16 ) + 0x8000;
     p_z = p.p_z;
     vertexPoint = rotatedVertices[p.vtx];
@@ -204,9 +204,9 @@ uint32_t Triangle::precomputedPhongShading(Gradient gRaster, Scene& scene, Face 
 
     slib::vec3 normal = smath::normalize(gRaster.vertexNormal);
 
-    int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) 1023,(int16_t) (normal.x * 512 + 512)));
-    int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) 1023,(int16_t) (normal.y * 512 + 512)));
-    return RGBValue(face.material.Ambient, precomputedShading[normal_y*1024+normal_x]).bgra_value;
+    int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.x * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
+    int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.y * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
+    return RGBValue(face.material.Ambient, precomputedShading[normal_y*PRECOMPUTE_SIZE+normal_x]).bgra_value;
 
 }
 

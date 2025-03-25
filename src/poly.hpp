@@ -35,7 +35,7 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
+        Gradient(const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
             vertexPoint = rotatedVertices[p.vtx];
@@ -63,7 +63,7 @@ class Gradient {
 
     public:
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(const Pixel &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
+        void updateFromPixel(const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
 };
 
 class RGBValue {
@@ -105,7 +105,7 @@ class RGBValue {
 
 class Triangle {
     public:
-        Pixel p1, p2, p3;
+        vertex p1, p2, p3;
         Gradient edge12, edge23, edge13;
         uint32_t *pixels;
         float *zBuffer;
@@ -122,9 +122,9 @@ class Triangle {
     
     private:
         void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftEdge, Gradient rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
-        void orderPixels(Pixel *p1, Pixel *p2, Pixel *p3);
-        Gradient gradientDy(Pixel p1, Pixel p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
-        void swapPixel(Pixel *p1, Pixel *p2);
+        void orderVertices(vertex *p1, vertex *p2, vertex *p3);
+        Gradient gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
+        void swapVertex(vertex *p1, vertex *p2);
         uint32_t phongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
