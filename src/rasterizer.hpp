@@ -62,7 +62,7 @@ class Gradient {
         }       
 };
 
-class RGBValue {
+class RGBAColor {
     public:
         union {
             struct {
@@ -75,14 +75,14 @@ class RGBValue {
         };
     
         // Optionally, you can add constructors or member functions if needed.
-        RGBValue(unsigned char blue, unsigned char green, unsigned char red, unsigned char alpha) {
+        RGBAColor(unsigned char blue, unsigned char green, unsigned char red, unsigned char alpha) {
             rgba.blue = blue;
             rgba.green = green;
             rgba.red = red;
             rgba.alpha = alpha;
         }
 
-        RGBValue(uint32_t value, int32_t shining) {
+        RGBAColor(uint32_t value, int32_t shining) {
             bgra_value = value;
             if (shining > 0x0000ffff) { 
                 bgra_value|= 0x00FFFFFF;
@@ -93,7 +93,7 @@ class RGBValue {
             }
         }
 
-        RGBValue(uint32_t value) {
+        RGBAColor(uint32_t value) {
             bgra_value = value;
         }
 

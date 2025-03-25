@@ -55,7 +55,7 @@ void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::
     if (scene.shading == Shading::Flat) {
         float diff = std::max(0.0f, smath::dot(faceNormal,scene.lux));
         float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
-        flatColor = RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
+        flatColor = RGBAColor(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
 
     Gradient left = Gradient(p1, solid.vertices, rotatedVertexNormals, scene, face);
@@ -135,7 +135,7 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Grad
                                 pixels[hy + hx] = flatColor;
                                 break;      
                             case Shading::Gouraud: 
-                                pixels[hy + hx] = RGBValue(face.material.Ambient, gRaster.ds).bgra_value;
+                                pixels[hy + hx] = RGBAColor(face.material.Ambient, gRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
                                 pixels[hy + hx] = blinnPhongShading(gRaster, scene, face);
@@ -170,7 +170,7 @@ uint32_t Rasterizer::phongShading(Gradient gRaster, Scene& scene, Face face) {
     float spec = std::pow(specAngle, face.material.properties.shininess);
 
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
-    return RGBValue(face.material.Ambient, (int32_t) (bright * 65536 * 0.98)).bgra_value;
+    return RGBAColor(face.material.Ambient, (int32_t) (bright * 65536 * 0.98)).bgra_value;
 
 }
 
@@ -197,7 +197,7 @@ uint32_t Rasterizer::blinnPhongShading(Gradient gRaster, Scene& scene, Face face
                    face.material.properties.k_s * spec;
 
     // Final color composition (ambient color scaled by total brightness)
-    return RGBValue(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
+    return RGBAColor(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
 uint32_t Rasterizer::precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
@@ -206,7 +206,7 @@ uint32_t Rasterizer::precomputedPhongShading(Gradient gRaster, Scene& scene, Fac
 
     int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.x * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
     int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.y * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
-    return RGBValue(face.material.Ambient, precomputedShading[normal_y*PRECOMPUTE_SIZE+normal_x]).bgra_value;
+    return RGBAColor(face.material.Ambient, precomputedShading[normal_y*PRECOMPUTE_SIZE+normal_x]).bgra_value;
 
 }
 
