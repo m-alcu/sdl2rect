@@ -43,11 +43,8 @@ public:
     Screen screen;
     Shading shading;
     slib::vec3 lux;
-    slib::vec3 luxInversePrecomputed;
     slib::vec3 eye;
-    slib::vec3 eyeInversePrecomputed;
     Matrix rotate;
-    Matrix inverseRotate;
     float* zBufferInit;
     float* zBuffer;
     uint32_t* pixels;

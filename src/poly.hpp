@@ -40,7 +40,7 @@ class Gradient {
             p_z = p.p_z;
             vertexPoint = rotatedVertices[p.vtx];
             vertexNormal = normals[p.vtx];
-            float diff = std::max(0.0f, smath::dot(scene.luxInversePrecomputed,vertexNormal));
+            float diff = std::max(0.0f, smath::dot(scene.lux,vertexNormal));
             float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
             ds = (int32_t) (bright * 65536 * 4);
         }        
@@ -59,11 +59,7 @@ class Gradient {
             vertexNormal += g.vertexNormal;
             ds += g.ds;
             return *this;
-        }        
-
-    public:
-        static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
+        }       
 };
 
 class RGBValue {
@@ -103,7 +99,7 @@ class RGBValue {
 
     };
 
-class Triangle {
+class Rasterizer {
     public:
         vertex p1, p2, p3;
         Gradient edge12, edge23, edge13;
@@ -112,7 +108,7 @@ class Triangle {
         const Solid* solid;  // Pointer to the abstract Solid
     
         // Updated constructor that also accepts a Solid pointer.
-        Triangle(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
+        Rasterizer(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
         void draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal, slib::vec3 *rotatedNormals);
@@ -128,6 +124,8 @@ class Triangle {
         uint32_t phongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
+        static Gradient gradientDx(const Gradient &left, const Gradient &right);
+        void updateFromPixel(Gradient &updated, const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
     };
     
 

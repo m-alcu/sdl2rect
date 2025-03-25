@@ -35,10 +35,6 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
     scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
-    scene.inverseRotate = scene.inverseRotate.initInverse(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
-    scene.luxInversePrecomputed = scene.inverseRotate * scene.lux;
-    scene.eyeInversePrecomputed = scene.inverseRotate * scene.eye;
-
 }
 
 vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
@@ -52,10 +48,6 @@ vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, i
 }
 
 slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene) {
-
-    if (scene.shading != Shading::Precomputed) {
-        return nullptr;
-    }
 
     slib::vec3* rNormals = new slib::vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {
@@ -80,7 +72,7 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
-        Triangle triangle(&solid, scene.pixels, scene.zBuffer);
+        Rasterizer triangle(&solid, scene.pixels, scene.zBuffer);
         triangle.p1 = projectedPoints[solid.faces[i].vertex1];
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
