@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <regex>
-#include "../poly.hpp"
+#include "../rasterizer.hpp"
 
 
 void Star::loadVertices() {

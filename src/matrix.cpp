@@ -1,5 +1,5 @@
 #include <math.h>
-#include "poly.hpp"
+#include "rasterizer.hpp"
 
 
 Matrix Matrix::init(float xAngle, float yAngle, float zAngle) {

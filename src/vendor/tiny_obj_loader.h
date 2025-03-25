@@ -372,7 +372,7 @@ struct mesh_t {
 
 struct lines_t {
   // Linear flattened indices.
-  std::vector<index_t> indices;        // indices for vertices(poly lines)
+  std::vector<index_t> indices;        // indices for vertices(rasterizer lines)
   std::vector<int> num_line_vertices;  // The number of vertices per line.
 };
 

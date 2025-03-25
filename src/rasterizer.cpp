@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "poly.hpp"
+#include "rasterizer.hpp"
 #include "scene.hpp"
 #include "slib.hpp"
 #include "smath.hpp"

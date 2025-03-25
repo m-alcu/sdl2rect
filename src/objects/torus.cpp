@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "../poly.hpp"
+#include "../rasterizer.hpp"
 #include "../constants.hpp"
 
 void Torus::loadVertices() {

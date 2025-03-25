@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "space3d.hpp"
 #include "objects/solid.hpp"
-#include "poly.hpp"
+#include "rasterizer.hpp"
 
 class Renderer {
 

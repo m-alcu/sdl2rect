@@ -19,7 +19,7 @@
                 "src\\objects\\test.cpp",      
                 "src\\objects\\star.cpp",                            
                 "src\\matrix.cpp",
-                "src\\poly.cpp",
+                "src\\rasterizer.cpp",
                 "src\\slib.cpp",
                 "src\\smath.cpp",
                 "src\\scene.cpp",

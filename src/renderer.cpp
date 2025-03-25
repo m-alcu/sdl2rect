@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "poly.hpp"
+#include "rasterizer.hpp"
 #include "renderer.hpp"
 #include "scene.hpp"
 

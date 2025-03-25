@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include <sstream>
 #include <iomanip>
-#include "poly.hpp"
+#include "rasterizer.hpp"
 #include "renderer.hpp"
 #include "backgrounds/background.hpp"
 #include "backgrounds/backgroundFactory.hpp"
