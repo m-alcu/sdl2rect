@@ -34,7 +34,7 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
-    scene.rotate = scene.rotate.init(solid.position.xAngle, solid.position.yAngle, solid.position.zAngle);
+    scene.rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
 }
 
 vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
@@ -51,7 +51,9 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
 
     slib::vec3* rNormals = new slib::vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {
-        rNormals[i] = scene.rotate * solid.vertexNormals[i];
+
+        slib::vec4 normal = scene.rotate * slib::vec4(solid.vertexNormals[i], 0);
+        rNormals[i] = {normal.x, normal.y, normal.z};
     }
     return rNormals;
 }
@@ -62,7 +64,9 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     vertex* projectedPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-        projectedPoints[i] = proj3to2D(scene.rotate * solid.vertices[i], scene.screen, solid.position, i);
+
+        slib::vec4 point = scene.rotate * slib::vec4(solid.vertices[i], 0);
+        projectedPoints[i] = proj3to2D({point.x, point.y, point.z}, scene.screen, solid.position, i);
     }
     // Return the pointer to the array
     return projectedPoints;

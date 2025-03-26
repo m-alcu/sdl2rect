@@ -6,8 +6,8 @@
 #include <cstdint>   // for uint32_t
 
 #include "space3d.hpp"
-#include "matrix.hpp"
 #include "objects/solid.hpp"
+#include "smath.hpp"
 
 class Scene
 {
@@ -15,7 +15,8 @@ public:
     // Constructor that initializes the Screen and allocates zBuffer arrays.
     Scene(const Screen& scr)
         : screen(scr),
-          zBuffer(nullptr)
+          zBuffer(nullptr),
+          rotate(smath::identity())
     {
         // Allocate memory for zBufferInit and zBuffer.
         zBuffer     = new float[scr.high * scr.width];
@@ -44,7 +45,7 @@ public:
     Shading shading;
     slib::vec3 lux;
     slib::vec3 eye;
-    Matrix rotate;
+    slib::mat4 rotate;
     float* zBufferInit;
     float* zBuffer;
     uint32_t* pixels;

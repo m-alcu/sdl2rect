@@ -18,7 +18,6 @@
                 "src\\objects\\torus.cpp",
                 "src\\objects\\test.cpp",      
                 "src\\objects\\star.cpp",                            
-                "src\\matrix.cpp",
                 "src\\rasterizer.cpp",
                 "src\\slib.cpp",
                 "src\\smath.cpp",
