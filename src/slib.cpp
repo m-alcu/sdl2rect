@@ -205,35 +205,24 @@ namespace slib
 
     mat4& mat4::operator*=(const mat4& rhs)
     {
-        const auto rhsrows = rhs.data.size();
-        const auto rhscols = rhs.data[0].size();
-        const auto lhsrows = data.size();
-        const auto lhscols = data[0].size();
-
-        if (lhscols != rhsrows)
+        mat4 result({{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}});
+    
+        for (size_t i = 0; i < 4; ++i)
         {
-            std::cout << "Error: mat-size mismatch." << std::endl;
-            exit(1);
-        }
-
-        std::vector<std::vector<float>> result(lhscols, std::vector<float>(rhsrows, 0));
-
-        for (size_t i = 0; i < lhscols; ++i)
-        {
-            for (size_t j = 0; j < rhsrows; ++j)
+            for (size_t j = 0; j < 4; ++j)
             {
-                float cellValue = 0;
-                for (size_t k = 0; k < lhsrows; ++k)
+                result.data[i][j] = 0;
+                for (size_t k = 0; k < 4; ++k)
                 {
-                    cellValue += data[k][i] * rhs.data[j][k];
+                    result.data[i][j] += data[i][k] * rhs.data[k][j];
                 }
-                result[i][j] = cellValue;
             }
         }
-
-        data = result;
+    
+        data = result.data;
         return *this;
     }
+    
 
     mat4 mat4::operator*(const mat4& rhs) const
     {

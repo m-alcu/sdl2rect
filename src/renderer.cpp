@@ -34,15 +34,17 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
-    scene.rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
+    slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
+    slib::mat4 translate = smath::translation(slib::vec3({solid.position.x, solid.position.y, solid.position.z}));
+    scene.rotate = translate * rotate;
 }
 
 vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
 
     vertex pixel;
-    pixel.p_x = (int16_t) ((position.zoom * (point.x + position.x)) / (point.z + position.z)) + screen.width / 2;
-    pixel.p_y = (int16_t) ((position.zoom * (point.y + position.y)) / (point.z + position.z)) + screen.high / 2;
-    pixel.p_z = point.z + position.z;
+    pixel.p_x = (int16_t) ((position.zoom * (point.x)) / (point.z)) + screen.width / 2;
+    pixel.p_y = (int16_t) ((position.zoom * (point.y)) / (point.z)) + screen.high / 2;
+    pixel.p_z = point.z;
     pixel.vtx = i;
     return pixel;
 }
@@ -65,7 +67,7 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
-        slib::vec4 point = scene.rotate * slib::vec4(solid.vertices[i], 0);
+        slib::vec4 point = scene.rotate * slib::vec4(solid.vertices[i], 1);
         projectedPoints[i] = proj3to2D({point.x, point.y, point.z}, scene.screen, solid.position, i);
     }
     // Return the pointer to the array
@@ -81,8 +83,34 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
-        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
-            triangle.draw(solid, scene, solid.faces[i], solid.faceNormals[i], rotatedVertexNormals);
+        //if (triangle.visible() && !triangle.outside(scene) && !triangle.behind() && triangleNearCenter(triangle.p1, triangle.p2, triangle.p3, scene)) {
+        if (i == 101) {
+
+            slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
+
+            slib::vec4 facenormal = slib::vec4(solid.faceNormals[i], 0);
+
+            slib::vec4 rotatedFacenormal = rotate * slib::vec4(solid.faceNormals[i], 0);
+
+            slib::vec3 faceNormal3 = {rotatedFacenormal.x, rotatedFacenormal.y, rotatedFacenormal.z};
+
+            uint32_t flatColor = 0x00000000;
+            float diff = std::max(0.0f, smath::dot(faceNormal3,scene.lux));
+            float bright = solid.faces[i].material.properties.k_a+solid.faces[i].material.properties.k_d * diff;
+            flatColor = RGBAColor(solid.faces[i].material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
+
+            triangle.draw(solid, scene, solid.faces[i], {rotatedFacenormal.x, rotatedFacenormal.y, rotatedFacenormal.z}, rotatedVertexNormals);
         }
     }                        
+}
+
+bool Renderer::triangleNearCenter(vertex p1, vertex p2, vertex p3, Scene& scene) {
+
+    return pointNearCenter(p1.p_x, p1.p_y, scene) || pointNearCenter(p2.p_x, p2.p_y, scene) || pointNearCenter(p3.p_x, p3.p_y, scene);
+    }
+
+bool Renderer::pointNearCenter(int16_t x, int16_t y,  Scene& scene) {
+
+    return (x > (-10 +(scene.screen.width / 2)) && x < (10 +(scene.screen.width / 2)) && y > (-10 +(scene.screen.high / 2)) && y < (10 +(scene.screen.high / 2)));
+
 }

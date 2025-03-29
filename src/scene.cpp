@@ -4,20 +4,41 @@
 
 void Scene::setup() {
 
+
+    
     auto torus = std::make_unique<Torus>(20*10, 20*10*2);
     torus->setup(20, 10, 500, 250);
 
     torus->position.z = 2000;
-    torus->position.x = -500;
+    torus->position.x = 0;
     torus->position.y = 0;
     torus->position.zoom = 500;
-    torus->position.xAngle = 24.79f;
-    torus->position.yAngle = 49.99f;
+    torus->position.xAngle = 90.0f;
+    torus->position.yAngle = 0.0f;
+    torus->position.zAngle = 0.0f;
     
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
+    
 
+    /*
+    auto torus = std::make_unique<Test>(8, 4);
+    torus->setup();
+    torus->position.z = 1000000;
+    torus->position.x = 0;
+    torus->position.y = 0;
+    torus->position.zoom = 1620;
+    torus->position.xAngle = 0.0f;
+    torus->position.yAngle = 0.0f;
+    torus->position.zAngle = 0.0f;
+
+    calculatePrecomputedShading(*torus);
+
+    addSolid(std::move(torus));
+    */
+
+    /*
     auto torus2 = std::make_unique<Torus>(20*10, 20*10*2);
     torus2->setup(20, 10, 500, 250);
 
@@ -25,13 +46,13 @@ void Scene::setup() {
     torus2->position.x = 500;
     torus2->position.y = 0;
     torus2->position.zoom = 500;
-    torus2->position.xAngle = 24.79f;
+    torus2->position.xAngle = 90f;
     torus2->position.yAngle = 49.99f;
     
     calculatePrecomputedShading(*torus2);
 
     addSolid(std::move(torus2));
-
+    */
 
 }
 

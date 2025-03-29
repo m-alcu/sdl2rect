@@ -11,7 +11,6 @@ namespace smath
     float distance(const slib::vec3& vec);
     slib::vec3 normalize(slib::vec3 vec);
     slib::vec3 centroid(const std::vector<slib::vec3>& points);
-    slib::vec3 normal(const slib::vec3& v1, const slib::vec3& v2, const slib::vec3& v3);
     float dot(const slib::vec3& v1, const slib::vec3& v2);
     slib::vec3 cross(const slib::vec3& v1, const slib::vec3& v2);
     slib::mat4 perspective(float zFar, float zNear, float aspect, float fov);

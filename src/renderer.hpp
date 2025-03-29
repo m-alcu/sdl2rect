@@ -16,6 +16,8 @@ class Renderer {
         slib::vec3* rotateVertexNormals(const Solid& solid, const Scene& scene);          
         void drawRenderable(Solid& solid, Scene& scene);
         void drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedNormals);
+        bool pointNearCenter(int16_t x, int16_t y,  Scene& scene);
+        bool triangleNearCenter(vertex p1, vertex p2, vertex p3, Scene& scene);
 };
 
 

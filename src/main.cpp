@@ -62,13 +62,13 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.solids[0]->position.y = scene.solids[0]->position.y - 10;
+                scene.solids[0]->position.yAngle = scene.solids[0]->position.yAngle - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.y = scene.solids[0]->position.y + 10;
+                scene.solids[0]->position.yAngle = scene.solids[0]->position.yAngle + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                scene.solids[0]->position.x = scene.solids[0]->position.x - 10;
+                scene.solids[0]->position.xAngle = scene.solids[0]->position.xAngle - 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                scene.solids[0]->position.x = scene.solids[0]->position.x + 10;
+                scene.solids[0]->position.xAngle = scene.solids[0]->position.xAngle + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
                 scene.solids[0]->position.zoom = scene.solids[0]->position.zoom + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
@@ -121,8 +121,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
-        scene.solids[0]->position.xAngle += 0.5f;
-        scene.solids[0]->position.yAngle += 1.0f;
+        //scene.solids[0]->position.xAngle += 0.5f;
+        //scene.solids[0]->position.yAngle += 1.0f;
     }
 
     // Free resources.
