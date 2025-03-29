@@ -12,7 +12,7 @@ bool Rasterizer::visible() {
 
 bool Rasterizer::behind() {
 
-    return (p1.p_z < 0 && p2.p_z < 0 && p3.p_z < 0);
+    return (p1.p_z < 2 || p2.p_z < 2 || p3.p_z < 2);
 };
 
 bool Rasterizer::outside(Scene& scene) {
@@ -33,7 +33,7 @@ bool Rasterizer::outside(Scene& scene) {
           /   |                      |   \
          /    |  edge13     edge13   |    \
         /     |                      |     \
-     p2/______|                      |______\ p2
+     p2/______|                      |______\ p2 <--- here we update middle vertex
        \      |                      |      /
         \     |                      |     /
          \    |                      |    /
@@ -62,11 +62,11 @@ void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::
     vertex right = left;
     if(edge13.p_x < edge12.p_x) {
         drawTriSector(p1.p_y, p2.p_y, left, right, edge13, edge12, scene, face, flatColor, solid.precomputedShading);
-        updateFromPixel(right, p2, scene, face);
+        updateMiddleVertex(right, p2, scene.lux, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, edge13, edge23, scene, face, flatColor, solid.precomputedShading);
     } else {
         drawTriSector(p1.p_y, p2.p_y, left, right, edge12, edge13, scene, face, flatColor, solid.precomputedShading);
-        updateFromPixel(left, p2, scene, face);
+        updateMiddleVertex(left, p2, scene.lux, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, edge23, edge13, scene, face, flatColor, solid.precomputedShading);
     }
 };
@@ -106,12 +106,12 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices,
     }
 };
 
-void Rasterizer::updateFromPixel(vertex& updated, const vertex &p, Scene& scene, Face face) {
-    updated.p_x = ( p.p_x << 16 ) + 0x8000;
+void Rasterizer::updateMiddleVertex(vertex& updated, const vertex &p, slib::vec3& lux, Face face) {
+    updated.p_x = ( p.p_x << 16 ) + 0x8000; // shift to pixel space
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
     updated.normal = p.normal;
-    float diff = std::max(0.0f, smath::dot(scene.lux, updated.normal));
+    float diff = std::max(0.0f, smath::dot(lux, updated.normal));
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
     updated.ds = (int32_t) (bright * 65536 * 4);
 }
@@ -133,13 +133,13 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex
                                 pixels[hy + hx] = RGBAColor(face.material.Ambient, gRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
-                                pixels[hy + hx] = blinnPhongShading(gRaster, scene, face);
+                                pixels[hy + hx] = blinnPhongShadingShader(gRaster, scene, face);
                                 break;                                
                             case Shading::Phong:
-                                pixels[hy + hx] = phongShading(gRaster, scene, face);
+                                pixels[hy + hx] = phongShadingShader(gRaster, scene, face);
                                 break;
                             case Shading::Precomputed:
-                                pixels[hy + hx] = precomputedPhongShading(gRaster, scene, face, precomputedShading);
+                                pixels[hy + hx] = precomputedPhongShadingShader(gRaster, scene, face, precomputedShading);
                                 break;                                
                             default: pixels[hy + hx] = flatColor;
                         }
@@ -155,7 +155,7 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex
 };
 
 
-uint32_t Rasterizer::phongShading(vertex gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::phongShadingShader(vertex gRaster, Scene& scene, Face face) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
@@ -169,7 +169,7 @@ uint32_t Rasterizer::phongShading(vertex gRaster, Scene& scene, Face face) {
 
 }
 
-uint32_t Rasterizer::blinnPhongShading(vertex gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::blinnPhongShadingShader(vertex gRaster, Scene& scene, Face face) {
 
     // Normalize vectors
     slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
@@ -195,7 +195,7 @@ uint32_t Rasterizer::blinnPhongShading(vertex gRaster, Scene& scene, Face face) 
     return RGBAColor(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
-uint32_t Rasterizer::precomputedPhongShading(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
+uint32_t Rasterizer::precomputedPhongShadingShader(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
 

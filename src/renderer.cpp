@@ -114,7 +114,7 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
-        if (triangle.visible() && !triangle.outside(scene)) {
+        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
 
             rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
             triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal);
