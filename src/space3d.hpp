@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cmath>
+#include "smath.hpp"
 #include "slib.hpp"
 
 typedef struct Screen
@@ -8,47 +9,6 @@ typedef struct Screen
     uint16_t height;
     uint16_t width;
 } Screen;
-
-struct vertex {
-    int32_t p_x;
-    int32_t p_y;
-    float p_z; 
-    int16_t vtx;
-    slib::vec3 normal;
-    slib::vec3 vertexPoint;
-    int32_t ds;
-
-    vertex() {}
-
-    vertex(int16_t px, int16_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, int32_t s) :
-    p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(s) {}
-
-    vertex operator+(const vertex &v) const {
-        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds);
-    }
-
-    vertex& operator+=(const vertex &v) {
-        p_x += v.p_x;
-        p_y += v.p_y;
-        p_z += v.p_z;
-        normal += v.normal;
-        vertexPoint += v.vertexPoint;
-        ds += v.ds;
-        return *this;
-    }
-};
-
-
-typedef struct Position
-{
-    float x;
-    float y;
-    float z;
-    float zoom;
-    float xAngle;
-    float yAngle;
-    float zAngle;    
-} Position;
 
 enum class MaterialType {
     Rubber,
@@ -83,6 +43,58 @@ typedef struct Face
     int16_t vertex3;
     Material material;
 } Face;
+
+struct vertex {
+    int32_t p_x;
+    int32_t p_y;
+    float p_z; 
+    int16_t vtx;
+    slib::vec3 normal;
+    slib::vec3 vertexPoint;
+    int32_t ds;
+
+    vertex() {}
+
+    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, int32_t s) :
+    p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(s) {}
+
+    vertex(const vertex &v, slib::vec3 lux, Face face) {
+        p_x = ( v.p_x << 16 ) + 0x8000;
+        p_z = v.p_z;
+        vertexPoint = v.vertexPoint;
+        normal = v.normal;
+        vtx = v.vtx;
+        float diff = std::max(0.0f, smath::dot(lux,v.normal));
+        float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
+        ds = (int32_t) (bright * 65536 * 4);
+    }     
+
+    vertex operator+(const vertex &v) const {
+        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds);
+    }
+
+    vertex& operator+=(const vertex &v) {
+        p_x += v.p_x;
+        p_y += v.p_y;
+        p_z += v.p_z;
+        normal += v.normal;
+        vertexPoint += v.vertexPoint;
+        ds += v.ds;
+        return *this;
+    }
+};
+
+
+typedef struct Position
+{
+    float x;
+    float y;
+    float z;
+    float zoom;
+    float xAngle;
+    float yAngle;
+    float zAngle;    
+} Position;
 
 enum class Shading {
     Flat,

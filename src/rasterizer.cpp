@@ -58,15 +58,15 @@ void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::
         flatColor = RGBAColor(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
 
-    Gradient left = Gradient(p1, solid.vertices, scene, face);
-    Gradient right = left;
+    vertex left = vertex(p1, scene.lux, face);
+    vertex right = left;
     if(edge13.p_x < edge12.p_x) {
         drawTriSector(p1.p_y, p2.p_y, left, right, edge13, edge12, scene, face, flatColor, solid.precomputedShading);
-        updateFromPixel(right, p2, solid.vertices, scene, face);
+        updateFromPixel(right, p2, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, edge13, edge23, scene, face, flatColor, solid.precomputedShading);
     } else {
         drawTriSector(p1.p_y, p2.p_y, left, right, edge12, edge13, scene, face, flatColor, solid.precomputedShading);
-        updateFromPixel(left, p2, solid.vertices, scene, face);
+        updateFromPixel(left, p2, scene, face);
         drawTriSector(p2.p_y, p3.p_y, left, right, edge23, edge13, scene, face, flatColor, solid.precomputedShading);
     }
 };
@@ -78,7 +78,7 @@ void Rasterizer::orderVertices(vertex *p1, vertex *p2, vertex *p3) {
     if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
 }
 
-Gradient Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face) {
+vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face) {
 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
@@ -90,35 +90,38 @@ Gradient Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertice
     float bright2 = face.material.properties.k_a+face.material.properties.k_d * diff2;
     int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
     if (dy > 0) {
-        slib::vec3 v = (rotatedVertices[p2.vtx] - rotatedVertices[p1.vtx]) / dy;
-        slib::vec3 n = (p2.normal - p1.normal) / dy;
-        int32_t result = ds / dy;
-        return  { dx / dy , dz / dy, v, n, result };
+        vertex vertex;
+        vertex.p_x = dx / dy;
+        vertex.p_z = dz / dy;
+        vertex.vertexPoint = (rotatedVertices[p2.vtx] - rotatedVertices[p1.vtx]) / dy;
+        vertex.normal = (p2.normal - p1.normal) / dy;
+        vertex.ds = ds / dy;
+        return vertex;
     } else {
         if (dx > 0) {
-            return { INT32_MAX , 0, {0,0,0}, {0,0,0}, 0};
+            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0}, 0);
         } else {
-            return { INT32_MIN , 0, {0,0,0}, {0,0,0}, 0};
+            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0}, 0);
         }
     }
 };
 
-void Rasterizer::updateFromPixel(Gradient& updated, const vertex &p, slib::vec3* rotatedVertices, Scene& scene, Face face) {
+void Rasterizer::updateFromPixel(vertex& updated, const vertex &p, Scene& scene, Face face) {
     updated.p_x = ( p.p_x << 16 ) + 0x8000;
     updated.p_z = p.p_z;
-    updated.vertexPoint = rotatedVertices[p.vtx];
-    updated.vertexNormal = p.normal;
-    float diff = std::max(0.0f, smath::dot(scene.lux, updated.vertexNormal));
+    updated.vertexPoint = p.vertexPoint;
+    updated.normal = p.normal;
+    float diff = std::max(0.0f, smath::dot(scene.lux, updated.normal));
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
     updated.ds = (int32_t) (bright * 65536 * 4);
 }
 
-void Rasterizer::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftDy, Gradient rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         if (hy >= 0 && hy < (scene.screen.width * scene.screen.height)) { //vertical clipping
-            Gradient gDx = Rasterizer::gradientDx(left, right);
-            Gradient gRaster = left;
+            vertex gDx = Rasterizer::gradientDx(left, right);
+            vertex gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
                     if (zBuffer[hy + hx] > gRaster.p_z) {
@@ -152,9 +155,9 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Grad
 };
 
 
-uint32_t Rasterizer::phongShading(Gradient gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::phongShading(vertex gRaster, Scene& scene, Face face) {
 
-    slib::vec3 normal = smath::normalize(gRaster.vertexNormal);
+    slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
 
     slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
@@ -166,10 +169,10 @@ uint32_t Rasterizer::phongShading(Gradient gRaster, Scene& scene, Face face) {
 
 }
 
-uint32_t Rasterizer::blinnPhongShading(Gradient gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::blinnPhongShading(vertex gRaster, Scene& scene, Face face) {
 
     // Normalize vectors
-    slib::vec3 N = smath::normalize(gRaster.vertexNormal); // Normal at the fragment
+    slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
     slib::vec3 L = scene.lux; // Light direction
     slib::vec3 V = scene.eye; // Viewer direction (you may want to define this differently later)
 
@@ -192,9 +195,9 @@ uint32_t Rasterizer::blinnPhongShading(Gradient gRaster, Scene& scene, Face face
     return RGBAColor(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
-uint32_t Rasterizer::precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
+uint32_t Rasterizer::precomputedPhongShading(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
 
-    slib::vec3 normal = smath::normalize(gRaster.vertexNormal);
+    slib::vec3 normal = smath::normalize(gRaster.normal);
 
     int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.x * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
     int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.y * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
@@ -206,17 +209,17 @@ uint32_t Rasterizer::precomputedPhongShading(Gradient gRaster, Scene& scene, Fac
 // Computes the pixel step gradient from left and right gradients.
 // left: starting gradient
 // right: ending gradient
-Gradient Rasterizer::gradientDx(const Gradient &left, const Gradient &right) {
+vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
 
     // Calculate the change in x, then shift right by 16 bits to get pixel steps.
     int16_t dx = (right.p_x - left.p_x) >> 16;
 
-    if (dx == 0) return {0, 0, {0, 0, 0}, {0, 0, 0}, 0};
+    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0); // Avoid division by zero
     slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
-    slib::vec3 n = (right.vertexNormal - left.vertexNormal) / dx;
+    slib::vec3 n = (right.normal - left.normal) / dx;
     float dz = (right.p_z - left.p_z) / dx;
     int32_t ds = (right.ds - left.ds) / dx;
-    return { dx, dz, v, n, ds };
+    return vertex(dx, 0, dz, 0, n, v, ds);
 }
 
 
