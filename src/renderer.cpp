@@ -78,8 +78,8 @@ vertex Renderer::screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 pro
     // Apply the viewport transformation to convert from NDC to screen coordinates
     projectedPoint.x = (projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f); // Convert from NDC to screen coordinates
     projectedPoint.y = (projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f); // Convert from NDC to screen coordinates
-    pixel.p_x = (int16_t) projectedPoint.x;
-    pixel.p_y = (int16_t) projectedPoint.y;
+    pixel.p_x = (int32_t) projectedPoint.x;
+    pixel.p_y = (int32_t) projectedPoint.y;
     pixel.p_z = projectedPoint.z;
     pixel.vtx = i;
     pixel.normal = normal;
