@@ -42,8 +42,8 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
 
     vertex pixel;
-    pixel.p_x = (int16_t) ((position.zoom * (point.x)) / (point.z)) + screen.width / 2;
-    pixel.p_y = (int16_t) ((position.zoom * (point.y)) / (point.z)) + screen.high / 2;
+    pixel.p_x = (int16_t) ((position.zoom * point.x) / point.z) + screen.width / 2;
+    pixel.p_y = (int16_t) ((position.zoom * point.y) / point.z) + screen.high / 2;
     pixel.p_z = point.z;
     pixel.vtx = i;
     return pixel;
@@ -54,8 +54,7 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
     slib::vec3* rNormals = new slib::vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {
 
-        slib::vec4 normal = scene.rotate * slib::vec4(solid.vertexNormals[i], 0);
-        rNormals[i] = {normal.x, normal.y, normal.z};
+        rNormals[i] = scene.rotate * slib::vec4(solid.vertexNormals[i], 0);
     }
     return rNormals;
 }
@@ -63,12 +62,13 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
 
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
+    slib::vec3 point;
     vertex* projectedPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
-        slib::vec4 point = scene.rotate * slib::vec4(solid.vertices[i], 1);
-        projectedPoints[i] = proj3to2D({point.x, point.y, point.z}, scene.screen, solid.position, i);
+        point = scene.rotate * slib::vec4(solid.vertices[i], 1);
+        projectedPoints[i] = proj3to2D(point, scene.screen, solid.position, i);
     }
     // Return the pointer to the array
     return projectedPoints;
@@ -76,6 +76,7 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
 
 void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {
 
+    slib::vec3 rotatedFacenormal;
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
         Rasterizer triangle(&solid, scene.pixels, scene.zBuffer);
@@ -85,10 +86,8 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
 
         if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
 
-            slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
-            slib::vec4 rotatedFacenormal = rotate * slib::vec4(solid.faceNormals[i], 0);
-
-            triangle.draw(solid, scene, solid.faces[i], {rotatedFacenormal.x, rotatedFacenormal.y, rotatedFacenormal.z}, rotatedVertexNormals);
+            rotatedFacenormal = scene.rotate * slib::vec4(solid.faceNormals[i], 0);
+            triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal, rotatedVertexNormals);
         }
     }                        
 }
