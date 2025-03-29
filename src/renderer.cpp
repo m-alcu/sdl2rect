@@ -83,21 +83,10 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
-        //if (triangle.visible() && !triangle.outside(scene) && !triangle.behind() && triangleNearCenter(triangle.p1, triangle.p2, triangle.p3, scene)) {
-        if (i == 101) {
+        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
 
             slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
-
-            slib::vec4 facenormal = slib::vec4(solid.faceNormals[i], 0);
-
             slib::vec4 rotatedFacenormal = rotate * slib::vec4(solid.faceNormals[i], 0);
-
-            slib::vec3 faceNormal3 = {rotatedFacenormal.x, rotatedFacenormal.y, rotatedFacenormal.z};
-
-            uint32_t flatColor = 0x00000000;
-            float diff = std::max(0.0f, smath::dot(faceNormal3,scene.lux));
-            float bright = solid.faces[i].material.properties.k_a+solid.faces[i].material.properties.k_d * diff;
-            flatColor = RGBAColor(solid.faces[i].material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
 
             triangle.draw(solid, scene, solid.faces[i], {rotatedFacenormal.x, rotatedFacenormal.y, rotatedFacenormal.z}, rotatedVertexNormals);
         }
