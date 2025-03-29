@@ -136,33 +136,33 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         if (hy >= 0 && hy < (scene.screen.width * scene.screen.height)) { //vertical clipping
-            vertex gDx = Rasterizer::gradientDx(left, right);
-            vertex gRaster = left;
+            vertex vDx = Rasterizer::gradientDx(left, right);
+            vertex vRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
-                    if (zBuffer[hy + hx] > gRaster.p_z) {
+                    if (zBuffer[hy + hx] > vRaster.p_z) {
                         switch (scene.shading) {
                             case Shading::Flat: 
                                 pixels[hy + hx] = flatColor;
                                 break;      
                             case Shading::Gouraud: 
-                                pixels[hy + hx] = RGBAColor(face.material.Ambient, gRaster.ds).bgra_value;
+                                pixels[hy + hx] = RGBAColor(face.material.Ambient, vRaster.ds).bgra_value;
                                 break;
                             case Shading::BlinnPhong:
-                                pixels[hy + hx] = blinnPhongShadingShader(gRaster, scene, face);
+                                pixels[hy + hx] = blinnPhongShadingShader(vRaster, scene, face);
                                 break;                                
                             case Shading::Phong:
-                                pixels[hy + hx] = phongShadingShader(gRaster, scene, face);
+                                pixels[hy + hx] = phongShadingShader(vRaster, scene, face);
                                 break;
                             case Shading::Precomputed:
-                                pixels[hy + hx] = precomputedPhongShadingShader(gRaster, scene, face, precomputedShading);
+                                pixels[hy + hx] = precomputedPhongShadingShader(vRaster, scene, face, precomputedShading);
                                 break;                                
                             default: pixels[hy + hx] = flatColor;
                         }
-                        zBuffer[hy + hx] = gRaster.p_z;
+                        zBuffer[hy + hx] = vRaster.p_z;
                     }
                 }
-                gRaster += gDx;
+                vRaster += vDx;
             }
         }
         left += leftDy;
