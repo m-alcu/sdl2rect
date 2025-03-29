@@ -73,18 +73,9 @@ void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::
 
 void Rasterizer::orderVertices(vertex *p1, vertex *p2, vertex *p3) {
 
-    if (p1->p_y > p2->p_y) swapVertex(p1,p2);
-    if (p2->p_y > p3->p_y) swapVertex(p2,p3);
-    if (p1->p_y > p2->p_y) swapVertex(p1,p2);
-}
-
-void Rasterizer::swapVertex(vertex *p1, vertex *p2) {
-
-    std::swap(p1->p_x, p2->p_x);
-    std::swap(p1->p_y, p2->p_y);
-    std::swap(p1->p_z, p2->p_z);
-    std::swap(p1->vtx, p2->vtx);
-    std::swap(p1->normal, p2->normal);
+    if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
+    if (p2->p_y > p3->p_y) std::swap(*p2,*p3);
+    if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
 }
 
 Gradient Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face) {

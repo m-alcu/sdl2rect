@@ -120,7 +120,6 @@ class Rasterizer {
         void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftEdge, Gradient rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
         Gradient gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face);
-        void swapVertex(vertex *p1, vertex *p2);
         uint32_t phongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading);

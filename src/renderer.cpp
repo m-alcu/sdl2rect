@@ -72,7 +72,7 @@ slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& sc
     return projectedPoint;
 }
 
-vertex Renderer::screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& scene) {
+vertex Renderer::screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 projectedPoint, int16_t i, const Scene& scene) {
 
     vertex pixel;
     // Apply the viewport transformation to convert from NDC to screen coordinates
@@ -82,21 +82,24 @@ vertex Renderer::screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& 
     pixel.p_y = (int16_t) projectedPoint.y;
     pixel.p_z = projectedPoint.z;
     pixel.vtx = i;
+    pixel.normal = normal;
+    pixel.vertexPoint = point;
     return pixel;
 }
 
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
     slib::vec3 point;
+    slib::vec3 normal;
     vertex* screenPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
         point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
+        normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
         slib::vec4 proyectedPoint = projectedPoint(point, i, scene);
-        screenPoints[i] = screenPoint(proyectedPoint, i, scene);
-        screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
-    }
+        screenPoints[i] = screenPoint(point, normal, proyectedPoint, i, scene);
+        }
     // Return the pointer to the array
     return screenPoints;
 }

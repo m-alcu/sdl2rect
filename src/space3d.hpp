@@ -16,6 +16,7 @@ typedef struct vertex
     float p_z; 
     int16_t vtx;
     slib::vec3 normal; // Normal vector for lighting calculations
+    slib::vec3 vertexPoint; // Vertex point for lighting calculations
     int32_t ds; // Shining gradient (for Gouraud shading)
 } vertex;
 
