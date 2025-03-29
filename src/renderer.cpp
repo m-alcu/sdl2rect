@@ -48,10 +48,8 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
     vertex * projectedPoints = projectRotateAllPoints(solid, scene);
-    slib::vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
     drawFaces(projectedPoints, solid, scene);
     delete[] projectedPoints;
-    delete[] rotatedVertexNormals;
 }
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
@@ -86,17 +84,6 @@ vertex Renderer::screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& 
     pixel.vtx = i;
     return pixel;
 }
-
-slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene) {
-
-    slib::vec3* rNormals = new slib::vec3[solid.numVertices];
-    for (int i = 0; i < solid.numVertices; i++) {
-
-        rNormals[i] = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
-    }
-    return rNormals;
-}
-
 
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
