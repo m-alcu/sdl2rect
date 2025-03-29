@@ -47,9 +47,9 @@ bool Rasterizer::outside(Scene& scene) {
 void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal) {
 
     orderVertices(&p1, &p2, &p3);
-    edge12 = gradientDy(p1, p2, solid.vertices, scene, face);
-    edge23 = gradientDy(p2, p3, solid.vertices, scene, face);
-    edge13 = gradientDy(p1, p3, solid.vertices, scene, face);
+    edge12 = gradientDy(p1, p2, scene.lux, face);
+    edge23 = gradientDy(p2, p3, scene.lux, face);
+    edge13 = gradientDy(p1, p3, scene.lux, face);
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -78,22 +78,38 @@ void Rasterizer::orderVertices(vertex *p1, vertex *p2, vertex *p3) {
     if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
 }
 
-vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face) {
+// Computes the pixel step gradient from left and right gradients.
+// left: starting gradient
+// right: ending gradient
+vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
+
+    // Calculate the change in x, then shift right by 16 bits to get pixel steps.
+    int16_t dx = (right.p_x - left.p_x) >> 16;
+
+    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0); // Avoid division by zero
+    slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
+    slib::vec3 n = (right.normal - left.normal) / dx;
+    float dz = (right.p_z - left.p_z) / dx;
+    int32_t ds = (right.ds - left.ds) / dx;
+    return vertex(dx, 0, dz, 0, n, v, ds);
+}
+
+vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) {
 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     float dz = p2.p_z - p1.p_z;
 
-    float diff1 = std::max(0.0f, smath::dot(scene.lux,p1.normal));
+    float diff1 = std::max(0.0f, smath::dot(lux,p1.normal));
     float bright1 = face.material.properties.k_a+face.material.properties.k_d * diff1;
-    float diff2 = std::max(0.0f, smath::dot(scene.lux,p2.normal));
+    float diff2 = std::max(0.0f, smath::dot(lux,p2.normal));
     float bright2 = face.material.properties.k_a+face.material.properties.k_d * diff2;
     int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
     if (dy > 0) {
         vertex vertex;
         vertex.p_x = dx / dy;
         vertex.p_z = dz / dy;
-        vertex.vertexPoint = (rotatedVertices[p2.vtx] - rotatedVertices[p1.vtx]) / dy;
+        vertex.vertexPoint = (p2.vertexPoint - p1.vertexPoint) / dy;
         vertex.normal = (p2.normal - p1.normal) / dy;
         vertex.ds = ds / dy;
         return vertex;
@@ -206,21 +222,7 @@ uint32_t Rasterizer::precomputedPhongShadingShader(vertex gRaster, Scene& scene,
 }
 
 
-// Computes the pixel step gradient from left and right gradients.
-// left: starting gradient
-// right: ending gradient
-vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
 
-    // Calculate the change in x, then shift right by 16 bits to get pixel steps.
-    int16_t dx = (right.p_x - left.p_x) >> 16;
-
-    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0); // Avoid division by zero
-    slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
-    slib::vec3 n = (right.normal - left.normal) / dx;
-    float dz = (right.p_z - left.p_z) / dx;
-    int32_t ds = (right.ds - left.ds) / dx;
-    return vertex(dx, 0, dz, 0, n, v, ds);
-}
 
 
 

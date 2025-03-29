@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.height];
-    auto background = BackgroundFactory::createBackground(BackgroundType::IMAGE_PNG);
+    auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
     background->draw(back, scene.screen.height, scene.screen.width);
 
 	// Create a texture for the background.
