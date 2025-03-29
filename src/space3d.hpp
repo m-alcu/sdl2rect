@@ -5,7 +5,7 @@
 
 typedef struct Screen
 {
-    uint16_t high;
+    uint16_t height;
     uint16_t width;
 } Screen;
 

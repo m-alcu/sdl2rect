@@ -21,8 +21,8 @@ public:
           projectionMatrix(smath::identity())
     {
         // Allocate memory for zBufferInit and zBuffer.
-        zBuffer     = new float[scr.high * scr.width];
-        pixels      = new uint32_t[scr.width * scr.high];
+        zBuffer     = new float[scr.height * scr.width];
+        pixels      = new uint32_t[scr.width * scr.height];
     }
 
     // Destructor to free the allocated memory.

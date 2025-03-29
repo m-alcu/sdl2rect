@@ -32,23 +32,23 @@ int main(int argc, char** argv)
 
     SDL_Window* window = SDL_CreateWindow("Poly3d", 
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                                          scene.screen.width, scene.screen.high, 0);
+                                          scene.screen.width, scene.screen.height, 0);
     SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     // Use streaming texture for direct pixel access.
     SDL_Texture* texture = SDL_CreateTexture(sdlRenderer,
-        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.high);
+        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.height);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
 
     // Backgroud
-    Uint32* back = new Uint32[scene.screen.width * scene.screen.high];
+    Uint32* back = new Uint32[scene.screen.width * scene.screen.height];
     auto background = BackgroundFactory::createBackground(BackgroundType::IMAGE_PNG);
-    background->draw(back, scene.screen.high, scene.screen.width);
+    background->draw(back, scene.screen.height, scene.screen.width);
 
 	// Create a texture for the background.
 	SDL_Texture* backgroundTexture = SDL_CreateTexture(sdlRenderer,
-    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.high);
+    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.height);
 	SDL_UpdateTexture(backgroundTexture, NULL, back, scene.screen.width * sizeof(Uint32));
 
     // Main loop.
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
         void* texturePixels = nullptr;
         int pitch = 0;
         if (SDL_LockTexture(texture, NULL, &texturePixels, &pitch) == 0) {
-			memcpy(texturePixels, scene.pixels, scene.screen.width * scene.screen.high * sizeof(Uint32));
+			memcpy(texturePixels, scene.pixels, scene.screen.width * scene.screen.height * sizeof(Uint32));
 			SDL_UnlockTexture(texture);
         } else {
             std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;

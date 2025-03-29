@@ -29,16 +29,16 @@ void Renderer::drawScene(Scene& scene) {
 
 void Renderer::prepareScene(Scene& scene) {
 
-    std::fill_n(scene.pixels, scene.screen.width * scene.screen.high, 0);
+    std::fill_n(scene.pixels, scene.screen.width * scene.screen.height, 0);
     std::fill_n(
         scene.zBuffer,
-        scene.screen.width * scene.screen.high,
+        scene.screen.width * scene.screen.height,
         std::numeric_limits<float>::max() // Initialize zBuffer to the maximum float value
     );
 
     float zNear = 0.1f; // Near plane distance
     float zFar  = 1000.0f; // Far plane distance
-    float aspectRatio = scene.screen.width / scene.screen.high; // Width / Height ratio
+    float aspectRatio = scene.screen.width / scene.screen.height; // Width / Height ratio
     float fovRadians = 60.0f * (3.1415926f / 180.0f);
 
     scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
@@ -77,7 +77,7 @@ vertex Renderer::screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& 
     vertex pixel;
     // Apply the viewport transformation to convert from NDC to screen coordinates
     projectedPoint.x = (projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f); // Convert from NDC to screen coordinates
-    projectedPoint.y = (projectedPoint.y + 1.0f) * (scene.screen.high / 2.0f); // Convert from NDC to screen coordinates
+    projectedPoint.y = (projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f); // Convert from NDC to screen coordinates
     pixel.p_x = (int16_t) projectedPoint.x;
     pixel.p_y = (int16_t) projectedPoint.y;
     pixel.p_z = projectedPoint.z;

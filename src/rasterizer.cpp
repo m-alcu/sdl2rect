@@ -20,7 +20,7 @@ bool Rasterizer::outside(Scene& scene) {
     return ((p1.p_x < 0 && p2.p_x < 0 && p3.p_x < 0) || 
             (p1.p_x >= scene.screen.width && p2.p_x >= scene.screen.width && p3.p_x >= scene.screen.width) ||
             (p1.p_y < 0 && p2.p_y < 0 && p3.p_y < 0) ||
-            (p1.p_y >= scene.screen.high && p2.p_y >= scene.screen.high && p3.p_y >= scene.screen.high)
+            (p1.p_y >= scene.screen.height && p2.p_y >= scene.screen.height && p3.p_y >= scene.screen.height)
             );
 };
 
@@ -125,7 +125,7 @@ void Rasterizer::updateFromPixel(Gradient& updated, const vertex &p, slib::vec3*
 void Rasterizer::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftDy, Gradient rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        if (hy >= 0 && hy < (scene.screen.width * scene.screen.high)) { //vertical clipping
+        if (hy >= 0 && hy < (scene.screen.width * scene.screen.height)) { //vertical clipping
             Gradient gDx = Rasterizer::gradientDx(left, right);
             Gradient gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {

@@ -36,7 +36,7 @@ void Solid::calculateVertexNormals() {
 // Function returning MaterialProperties struct
 MaterialProperties Solid::getMaterialProperties(MaterialType type) {
     switch (type) {
-        case MaterialType::Rubber:   return {0.1f, 0.2f, 0.5f, 2};  // Low specular, moderate ambient, high diffuse
+        case MaterialType::Rubber:   return {0.1f, 0.2f, 0.5f, 2};  // Low specular, moderate ambient, height diffuse
         case MaterialType::Plastic:  return {0.3f, 0.2f, 0.6f, 2};
         case MaterialType::Wood:     return {0.2f, 0.3f, 0.7f, 2};
         case MaterialType::Marble:   return {0.4f, 0.4f, 0.8f, 2};

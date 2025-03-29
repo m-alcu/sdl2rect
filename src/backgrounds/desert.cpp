@@ -24,11 +24,11 @@ void Desert::calcPalette(uint32_t *palette) {
 }
 
 
-void Desert::draw(uint32_t *pixels, uint16_t high, uint16_t width) {
+void Desert::draw(uint32_t *pixels, uint16_t height, uint16_t width) {
 
     seed1 = 0x1234;
     seed2 = 0x2293;
-    uint8_t* greys = new uint8_t[width * high];
+    uint8_t* greys = new uint8_t[width * height];
 
     uint32_t* desertPalette = new uint32_t[64];
     Desert::calcPalette(desertPalette);
@@ -44,7 +44,7 @@ void Desert::draw(uint32_t *pixels, uint16_t high, uint16_t width) {
         pixels[point] = desertPalette[grey];
     }
 
-    for (int point=width; point<(width*high - width); point++) {
+    for (int point=width; point<(width*height - width); point++) {
         uint8_t h_point = greys[point - width + 1];
         uint8_t l_point = greys[point - width];
         uint8_t grey = (h_point >> 1) + (h_point >> 2) + (h_point >> 3) + (l_point >> 3);

@@ -10,7 +10,7 @@ class Desert : public Background {
         uint16_t seed2;
 
     public:
-        void draw(uint32_t *pixels, uint16_t high, uint16_t width);
+        void draw(uint32_t *pixels, uint16_t height, uint16_t width);
 
     private:
         void calcPalette(uint32_t *palette);
