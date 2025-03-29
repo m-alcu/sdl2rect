@@ -40,6 +40,22 @@ namespace smath
         });
     }
 
+/*
+    Viewer
+    (Camera)        zNear                      zFar
+       |              |                          |
+       v              v                          v
+       +--------------+--------------------------+
+                      \                        /
+                       \   Visible Volume     /
+                        \     (Frustum)      /
+                         \                  /
+                          \                /
+                           \              /
+                            +------------+
+                          Projection (Perspective)
+ */   
+
     slib::mat4 perspective(const float zFar, const float zNear, const float aspect, const float fov)
     {
         const float yScale = 1 / tanf(fov);

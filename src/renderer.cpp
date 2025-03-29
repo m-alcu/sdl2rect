@@ -4,6 +4,21 @@
 #include "renderer.hpp"
 #include "scene.hpp"
 
+/*
+Local/Model Space (vertex data)
+↓ (model matrix)
+World Space
+↓ (view matrix) <----- your view / fpsview functions do this
+Camera (View) Space
+↓ (perspective projection matrix) <---- your perspective(...) does this
+Clip Space (4D coordinates)
+↓ (perspective divide by w coordinate, GPU automatic)
+Normalized Device Coordinates (NDC, range [-1, 1])
+↓ (viewport transform, GPU automatic)
+Screen Space (pixels)
+*/
+
+
 void Renderer::drawScene(Scene& scene) {
 
     prepareScene(scene);
@@ -18,8 +33,15 @@ void Renderer::prepareScene(Scene& scene) {
     std::fill_n(
         scene.zBuffer,
         scene.screen.width * scene.screen.high,
-        std::numeric_limits<float>::max()
+        -std::numeric_limits<float>::max() // Initialize zBuffer to a very small value
     );
+
+    float zNear = 0.1f; // Near plane distance
+    float zFar  = 1000.0f; // Far plane distance
+    float aspectRatio = 1.0f; // Width / Height ratio
+    float fovRadians = 60.0f * (3.1415926f / 180.0f);
+
+    scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
 }
 
 void Renderer::drawRenderable(Solid& solid, Scene& scene) {
@@ -36,14 +58,28 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
     slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
     slib::mat4 translate = smath::translation(slib::vec3({solid.position.x, solid.position.y, solid.position.z}));
-    scene.rotate = translate * rotate;
+    slib::mat4 scale = smath::scale(slib::vec3({solid.position.zoom, solid.position.zoom, solid.position.zoom}));
+    scene.fullTransformMat = translate * rotate * scale;
+    scene.normalTransformMat = rotate;
 }
 
-vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i) {
+vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i, const Scene& scene) {
 
     vertex pixel;
-    pixel.p_x = (int16_t) ((position.zoom * point.x) / point.z) + screen.width / 2;
-    pixel.p_y = (int16_t) ((position.zoom * point.y) / point.z) + screen.high / 2;
+    slib::vec4 projectedPoint = slib::vec4(point, 1.0f) * scene.projectionMatrix;
+
+    if (projectedPoint.w != 0) {
+        projectedPoint.x /= projectedPoint.w;
+        projectedPoint.y /= projectedPoint.w;
+        projectedPoint.z /= projectedPoint.w;
+    }
+
+    // Apply the viewport transformation to convert from NDC to screen coordinates
+    projectedPoint.x = (projectedPoint.x + 1.0f) * (screen.width / 2.0f); // Convert from NDC to screen coordinates
+    projectedPoint.y = (projectedPoint.y + 1.0f) * (screen.high / 2.0f); // Convert from NDC to screen coordinates
+
+    pixel.p_x = (int16_t) projectedPoint.x;
+    pixel.p_y = (int16_t) projectedPoint.y;
     pixel.p_z = point.z;
     pixel.vtx = i;
     return pixel;
@@ -54,7 +90,7 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
     slib::vec3* rNormals = new slib::vec3[solid.numVertices];
     for (int i = 0; i < solid.numVertices; i++) {
 
-        rNormals[i] = scene.rotate * slib::vec4(solid.vertexNormals[i], 0);
+        rNormals[i] = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
     }
     return rNormals;
 }
@@ -67,8 +103,8 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
-        point = scene.rotate * slib::vec4(solid.vertices[i], 1);
-        projectedPoints[i] = proj3to2D(point, scene.screen, solid.position, i);
+        point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
+        projectedPoints[i] = proj3to2D(point, scene.screen, solid.position, i, scene);
     }
     // Return the pointer to the array
     return projectedPoints;
@@ -84,21 +120,10 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
         triangle.p2 = projectedPoints[solid.faces[i].vertex2];
         triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
-        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
+        if (triangle.visible() && !triangle.outside(scene)) {
 
-            rotatedFacenormal = scene.rotate * slib::vec4(solid.faceNormals[i], 0);
+            rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
             triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal, rotatedVertexNormals);
         }
     }                        
-}
-
-bool Renderer::triangleNearCenter(vertex p1, vertex p2, vertex p3, Scene& scene) {
-
-    return pointNearCenter(p1.p_x, p1.p_y, scene) || pointNearCenter(p2.p_x, p2.p_y, scene) || pointNearCenter(p3.p_x, p3.p_y, scene);
-    }
-
-bool Renderer::pointNearCenter(int16_t x, int16_t y,  Scene& scene) {
-
-    return (x > (-10 +(scene.screen.width / 2)) && x < (10 +(scene.screen.width / 2)) && y > (-10 +(scene.screen.high / 2)) && y < (10 +(scene.screen.high / 2)));
-
 }

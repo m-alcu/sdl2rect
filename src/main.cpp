@@ -70,13 +70,13 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
                 scene.solids[0]->position.x = scene.solids[0]->position.x + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom + 10;
+                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.1;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom - 10;
+                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.1;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
+                scene.solids[0]->position.z = scene.solids[0]->position.z + 1000;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z - 10;               
+                scene.solids[0]->position.z = scene.solids[0]->position.z - 1000;               
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {

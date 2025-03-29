@@ -129,7 +129,7 @@ void Rasterizer::drawTriSector(int16_t top, int16_t bottom, Gradient& left, Grad
             Gradient gRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
                 if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
-                    if (zBuffer[hy + hx] > gRaster.p_z) {
+                    if (zBuffer[hy + hx] < gRaster.p_z) {
                         switch (scene.shading) {
                             case Shading::Flat: 
                                 pixels[hy + hx] = flatColor;

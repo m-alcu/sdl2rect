@@ -50,15 +50,15 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             int idx3 = i * vSteps + nextJ;
             Torus::faces[faceIndex].material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
 
-            Torus::faces[faceIndex].vertex1 = idx2;
+            Torus::faces[faceIndex].vertex1 = idx0;
             Torus::faces[faceIndex].vertex2 = idx1; // wrap-around for the quad
-            Torus::faces[faceIndex].vertex3 = idx0;
+            Torus::faces[faceIndex].vertex3 = idx2;
             faceIndex++;
             Torus::faces[faceIndex].material = { 0xfffedd00, 0xfffedd00, 0xfffedd00, getMaterialProperties(MaterialType::Metal)};
 
-            Torus::faces[faceIndex].vertex1 = idx3;
+            Torus::faces[faceIndex].vertex1 = idx0;
             Torus::faces[faceIndex].vertex2 = idx2; // wrap-around for the quad
-            Torus::faces[faceIndex].vertex3 = idx0;
+            Torus::faces[faceIndex].vertex3 = idx3;
             faceIndex++;
 
         }

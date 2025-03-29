@@ -16,7 +16,9 @@ public:
     Scene(const Screen& scr)
         : screen(scr),
           zBuffer(nullptr),
-          rotate(smath::identity())
+          fullTransformMat(smath::identity()),
+          normalTransformMat(smath::identity()),
+          projectionMatrix(smath::identity())
     {
         // Allocate memory for zBufferInit and zBuffer.
         zBuffer     = new float[scr.high * scr.width];
@@ -45,7 +47,9 @@ public:
     Shading shading;
     slib::vec3 lux;
     slib::vec3 eye;
-    slib::mat4 rotate;
+    slib::mat4 fullTransformMat;
+    slib::mat4 normalTransformMat;
+    slib::mat4 projectionMatrix;
     float* zBufferInit;
     float* zBuffer;
     uint32_t* pixels;

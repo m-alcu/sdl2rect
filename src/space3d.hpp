@@ -21,7 +21,7 @@ typedef struct Position
     float x;
     float y;
     float z;
-    int zoom;
+    float zoom;
     float xAngle;
     float yAngle;
     float zAngle;    

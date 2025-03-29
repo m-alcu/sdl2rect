@@ -9,15 +9,13 @@ class Renderer {
 
     public:
         void drawScene(Scene& scene);
-        vertex proj3to2D(slib::vec3 vertex, Screen screen, Position position, int16_t i);
+        vertex proj3to2D(slib::vec3 vertex, Screen screen, Position position, int16_t i, const Scene& scene);
         void prepareScene(Scene& scene);
         void prepareRenderable(const Solid& solid, Scene& scene);
         vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);     
         slib::vec3* rotateVertexNormals(const Solid& solid, const Scene& scene);          
         void drawRenderable(Solid& solid, Scene& scene);
         void drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedNormals);
-        bool pointNearCenter(int16_t x, int16_t y,  Scene& scene);
-        bool triangleNearCenter(vertex p1, vertex p2, vertex p3, Scene& scene);
 };
 
 

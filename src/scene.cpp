@@ -9,10 +9,10 @@ void Scene::setup() {
     auto torus = std::make_unique<Torus>(20*10, 20*10*2);
     torus->setup(20, 10, 500, 250);
 
-    torus->position.z = 2000;
+    torus->position.z = -5000;
     torus->position.x = 0;
     torus->position.y = 0;
-    torus->position.zoom = 500;
+    torus->position.zoom = 1;
     torus->position.xAngle = 90.0f;
     torus->position.yAngle = 0.0f;
     torus->position.zAngle = 0.0f;
