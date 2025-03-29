@@ -65,9 +65,7 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
 slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& scene) {
 
-    vertex pixel;
     slib::vec4 projectedPoint =  scene.projectionMatrix * slib::vec4(point, 1.0f);
-
     if (projectedPoint.w != 0) {
         projectedPoint.x /= projectedPoint.w;
         projectedPoint.y /= projectedPoint.w;
