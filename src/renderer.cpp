@@ -33,12 +33,12 @@ void Renderer::prepareScene(Scene& scene) {
     std::fill_n(
         scene.zBuffer,
         scene.screen.width * scene.screen.high,
-        -std::numeric_limits<float>::max() // Initialize zBuffer to a very small value
+        std::numeric_limits<float>::max() // Initialize zBuffer to the maximum float value
     );
 
     float zNear = 0.1f; // Near plane distance
     float zFar  = 1000.0f; // Far plane distance
-    float aspectRatio = 1.0f; // Width / Height ratio
+    float aspectRatio = scene.screen.width / scene.screen.high; // Width / Height ratio
     float fovRadians = 60.0f * (3.1415926f / 180.0f);
 
     scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
@@ -63,24 +63,28 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
     scene.normalTransformMat = rotate;
 }
 
-vertex Renderer::proj3to2D(slib::vec3 point, Screen screen, Position position, int16_t i, const Scene& scene) {
+slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& scene) {
 
     vertex pixel;
-    slib::vec4 projectedPoint = slib::vec4(point, 1.0f) * scene.projectionMatrix;
+    slib::vec4 projectedPoint =  scene.projectionMatrix * slib::vec4(point, 1.0f);
 
     if (projectedPoint.w != 0) {
         projectedPoint.x /= projectedPoint.w;
         projectedPoint.y /= projectedPoint.w;
         projectedPoint.z /= projectedPoint.w;
     }
+    return projectedPoint;
+}
 
+vertex Renderer::screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& scene) {
+
+    vertex pixel;
     // Apply the viewport transformation to convert from NDC to screen coordinates
-    projectedPoint.x = (projectedPoint.x + 1.0f) * (screen.width / 2.0f); // Convert from NDC to screen coordinates
-    projectedPoint.y = (projectedPoint.y + 1.0f) * (screen.high / 2.0f); // Convert from NDC to screen coordinates
-
+    projectedPoint.x = (projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f); // Convert from NDC to screen coordinates
+    projectedPoint.y = (projectedPoint.y + 1.0f) * (scene.screen.high / 2.0f); // Convert from NDC to screen coordinates
     pixel.p_x = (int16_t) projectedPoint.x;
     pixel.p_y = (int16_t) projectedPoint.y;
-    pixel.p_z = point.z;
+    pixel.p_z = projectedPoint.z;
     pixel.vtx = i;
     return pixel;
 }
@@ -99,15 +103,16 @@ slib::vec3* Renderer::rotateVertexNormals(const Solid& solid, const Scene& scene
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
     slib::vec3 point;
-    vertex* projectedPoints = new vertex[solid.numVertices];
+    vertex* screenPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
         point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
-        projectedPoints[i] = proj3to2D(point, scene.screen, solid.position, i, scene);
+        slib::vec4 proyectedPoint = projectedPoint(point, i, scene);
+        screenPoints[i] = screenPoint(proyectedPoint, i, scene);
     }
     // Return the pointer to the array
-    return projectedPoints;
+    return screenPoints;
 }
 
 void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {

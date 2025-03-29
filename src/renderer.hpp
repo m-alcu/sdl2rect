@@ -9,7 +9,8 @@ class Renderer {
 
     public:
         void drawScene(Scene& scene);
-        vertex proj3to2D(slib::vec3 vertex, Screen screen, Position position, int16_t i, const Scene& scene);
+        slib::vec4 projectedPoint(slib::vec3 point, int16_t i, const Scene& scene);
+        vertex screenPoint(slib::vec4 projectedPoint, int16_t i, const Scene& scene);
         void prepareScene(Scene& scene);
         void prepareRenderable(const Solid& solid, Scene& scene);
         vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);     
