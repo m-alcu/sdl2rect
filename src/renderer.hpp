@@ -16,7 +16,7 @@ class Renderer {
         vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);     
         slib::vec3* rotateVertexNormals(const Solid& solid, const Scene& scene);          
         void drawRenderable(Solid& solid, Scene& scene);
-        void drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedNormals);
+        void drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene);
 };
 
 

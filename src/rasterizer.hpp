@@ -35,11 +35,11 @@ class Gradient {
         } 
 
         // From a pixel
-        Gradient(const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face) {
+        Gradient(const vertex &p, slib::vec3* rotatedVertices, Scene& scene, Face face) {
             p_x = ( p.p_x << 16 ) + 0x8000;
             p_z = p.p_z;
             vertexPoint = rotatedVertices[p.vtx];
-            vertexNormal = normals[p.vtx];
+            vertexNormal = p.normal;
             float diff = std::max(0.0f, smath::dot(scene.lux,vertexNormal));
             float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
             ds = (int32_t) (bright * 65536 * 4);
@@ -111,7 +111,7 @@ class Rasterizer {
         Rasterizer(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
-        void draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal, slib::vec3 *rotatedNormals);
+        void draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal);
         bool visible();
         bool outside(Scene& scene);
         bool behind();
@@ -119,13 +119,13 @@ class Rasterizer {
     private:
         void drawTriSector(int16_t top, int16_t bottom, Gradient& left, Gradient& right, Gradient leftEdge, Gradient rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
-        Gradient gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
+        Gradient gradientDy(vertex p1, vertex p2, slib::vec3* rotatedVertices, Scene& scene, Face face);
         void swapVertex(vertex *p1, vertex *p2);
         uint32_t phongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShading(Gradient gRaster, Scene& scene, Face face);
         uint32_t precomputedPhongShading(Gradient gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
         static Gradient gradientDx(const Gradient &left, const Gradient &right);
-        void updateFromPixel(Gradient &updated, const vertex &p, slib::vec3* rotatedVertices, slib::vec3 *normals, Scene& scene, Face face);
+        void updateFromPixel(Gradient &updated, const vertex &p, slib::vec3* rotatedVertices, Scene& scene, Face face);
     };
     
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cmath>
+#include "slib.hpp"
 
 typedef struct Screen
 {
@@ -14,6 +15,8 @@ typedef struct vertex
     int16_t p_y;
     float p_z; 
     int16_t vtx;
+    slib::vec3 normal; // Normal vector for lighting calculations
+    int32_t ds; // Shining gradient (for Gouraud shading)
 } vertex;
 
 typedef struct Position

@@ -49,7 +49,7 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
     prepareRenderable(solid, scene);
     vertex * projectedPoints = projectRotateAllPoints(solid, scene);
     slib::vec3 * rotatedVertexNormals = rotateVertexNormals(solid, scene);
-    drawFaces(projectedPoints, solid, scene, rotatedVertexNormals);
+    drawFaces(projectedPoints, solid, scene);
     delete[] projectedPoints;
     delete[] rotatedVertexNormals;
 }
@@ -108,12 +108,13 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
         point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
         slib::vec4 proyectedPoint = projectedPoint(point, i, scene);
         screenPoints[i] = screenPoint(proyectedPoint, i, scene);
+        screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
     }
     // Return the pointer to the array
     return screenPoints;
 }
 
-void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene, slib::vec3 *rotatedVertexNormals) {
+void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
 
     slib::vec3 rotatedFacenormal;
     for (int i=0; i<solid.numFaces; i++) {
@@ -126,7 +127,7 @@ void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& sce
         if (triangle.visible() && !triangle.outside(scene)) {
 
             rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
-            triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal, rotatedVertexNormals);
+            triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal);
         }
     }                        
 }
