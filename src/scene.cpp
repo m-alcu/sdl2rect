@@ -6,7 +6,7 @@ void Scene::setup() {
 
 
     
-    /*
+    
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -21,7 +21,7 @@ void Scene::setup() {
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
-    */
+    
 
     /*
     auto star = std::make_unique<Star>();
@@ -39,6 +39,7 @@ void Scene::setup() {
     addSolid(std::move(star));
     */
 
+    /*
     auto tetrakis = std::make_unique<Tetrakis>();
     tetrakis->setup();
 
@@ -52,6 +53,7 @@ void Scene::setup() {
     
     calculatePrecomputedShading(*tetrakis);
     addSolid(std::move(tetrakis));
+    */
 
     /*
     auto torus = std::make_unique<Test>(8, 4);
@@ -106,7 +108,7 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
                 float diff = std::max(0.0f, smath::dot(normal,lux));
             
                 slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,lux) - lux);
-                float specAngle = std::max(0.0f, smath::dot(R,lux)); // viewer
+                float specAngle = std::max(0.0f, smath::dot(R,eye)); // viewer
                 float spec = std::pow(specAngle, material.shininess);
             
                 float bright = material.k_a+material.k_d * diff+ material.k_s * spec;
