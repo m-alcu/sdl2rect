@@ -7,7 +7,7 @@
 
 bool Rasterizer::visible(const triangle& triangle) {
 
-    return (((int32_t) (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y)) - ((int32_t) (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y)) < 0);
+    return (((int32_t) (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y)) - ((int32_t) (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y)) > 0);
 };
 
 bool Rasterizer::behind(const triangle& triangle) {
