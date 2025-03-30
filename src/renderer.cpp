@@ -114,11 +114,7 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
         triangle tri(projectedPoints[solid.faces[i].vertex1], projectedPoints[solid.faces[i].vertex2], projectedPoints[solid.faces[i].vertex3], i);
 
         if (rasterizer.visible(tri) && !rasterizer.outside(scene, tri) && !rasterizer.behind(tri)) {
-
             rasterizer.addTriangle(std::make_unique<triangle>(tri));
-
-            //rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
-            //triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal);
         }
     }
     
