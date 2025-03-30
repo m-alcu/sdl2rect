@@ -5,22 +5,22 @@
 #include "slib.hpp"
 #include "smath.hpp"
 
-bool Rasterizer::visible() {
+bool Rasterizer::visible(const triangle& triangle) {
 
-    return (((int32_t) (p3.p_x-p2.p_x)*(p2.p_y-p1.p_y)) - ((int32_t) (p2.p_x-p1.p_x)*(p3.p_y-p2.p_y)) < 0);
+    return (((int32_t) (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y)) - ((int32_t) (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y)) < 0);
 };
 
-bool Rasterizer::behind() {
+bool Rasterizer::behind(const triangle& triangle) {
 
-    return (p1.p_z < 2 || p2.p_z < 2 || p3.p_z < 2);
+    return (triangle.p1.p_z < 2 || triangle.p2.p_z < 2 || triangle.p3.p_z < 2);
 };
 
-bool Rasterizer::outside(Scene& scene) {
+bool Rasterizer::outside(Scene& scene, const triangle& triangle) {
 
-    return ((p1.p_x < 0 && p2.p_x < 0 && p3.p_x < 0) || 
-            (p1.p_x >= scene.screen.width && p2.p_x >= scene.screen.width && p3.p_x >= scene.screen.width) ||
-            (p1.p_y < 0 && p2.p_y < 0 && p3.p_y < 0) ||
-            (p1.p_y >= scene.screen.height && p2.p_y >= scene.screen.height && p3.p_y >= scene.screen.height)
+    return ((triangle.p1.p_x < 0 && triangle.p2.p_x < 0 && triangle.p3.p_x < 0) || 
+            (triangle.p1.p_x >= scene.screen.width && triangle.p2.p_x >= scene.screen.width && triangle.p3.p_x >= scene.screen.width) ||
+            (triangle.p1.p_y < 0 && triangle.p2.p_y < 0 && triangle.p3.p_y < 0) ||
+            (triangle.p1.p_y >= scene.screen.height && triangle.p2.p_y >= scene.screen.height && triangle.p3.p_y >= scene.screen.height)
             );
 };
 
@@ -44,30 +44,32 @@ bool Rasterizer::outside(Scene& scene) {
               p3                    p3
 */
 
-void Rasterizer::draw(const Solid& solid, Scene& scene, const Face& face, slib::vec3 faceNormal) {
+void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
 
-    orderVertices(&p1, &p2, &p3);
-    edge12 = gradientDy(p1, p2, scene.lux, face);
-    edge23 = gradientDy(p2, p3, scene.lux, face);
-    edge13 = gradientDy(p1, p3, scene.lux, face);
+    orderVertices(&tri.p1, &tri.p2, &tri.p3);
+    tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
+    tri.edge23 = gradientDy(tri.p2, tri.p3, scene.lux, solid.faces[tri.i]);
+    tri.edge13 = gradientDy(tri.p1, tri.p3, scene.lux, solid.faces[tri.i]);
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
-        float diff = std::max(0.0f, smath::dot(faceNormal,scene.lux));
-        float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
-        flatColor = RGBAColor(face.material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
+        slib::vec3 rotatedFacenormal;
+        rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[tri.i], 0);
+        float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
+        float bright = solid.faces[tri.i].material.properties.k_a+solid.faces[tri.i].material.properties.k_d * diff;
+        flatColor = RGBAColor(solid.faces[tri.i].material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
     }
 
-    vertex left = vertex(p1, scene.lux, face);
+    vertex left = vertex(tri.p1, scene.lux, solid.faces[tri.i]);
     vertex right = left;
-    if(edge13.p_x < edge12.p_x) {
-        drawTriSector(p1.p_y, p2.p_y, left, right, edge13, edge12, scene, face, flatColor, solid.precomputedShading);
-        updateMiddleVertex(right, p2, scene.lux, face);
-        drawTriSector(p2.p_y, p3.p_y, left, right, edge13, edge23, scene, face, flatColor, solid.precomputedShading);
+    if(tri.edge13.p_x < tri.edge12.p_x) {
+        drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        updateMiddleVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
+        drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
     } else {
-        drawTriSector(p1.p_y, p2.p_y, left, right, edge12, edge13, scene, face, flatColor, solid.precomputedShading);
-        updateMiddleVertex(left, p2, scene.lux, face);
-        drawTriSector(p2.p_y, p3.p_y, left, right, edge23, edge13, scene, face, flatColor, solid.precomputedShading);
+        drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        updateMiddleVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
+        drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
     }
 };
 
@@ -99,11 +101,8 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     float dz = p2.p_z - p1.p_z;
-
-    float diff1 = std::max(0.0f, smath::dot(lux,p1.normal));
-    float bright1 = face.material.properties.k_a+face.material.properties.k_d * diff1;
-    float diff2 = std::max(0.0f, smath::dot(lux,p2.normal));
-    float bright2 = face.material.properties.k_a+face.material.properties.k_d * diff2;
+    float bright1 = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux,p1.normal));
+    float bright2 = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux,p2.normal));
     int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
     if (dy > 0) {
         vertex vertex;

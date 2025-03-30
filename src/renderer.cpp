@@ -48,7 +48,7 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
     vertex * projectedPoints = projectRotateAllPoints(solid, scene);
-    drawFaces(projectedPoints, solid, scene);
+    addFaces(projectedPoints, solid, scene);
     delete[] projectedPoints;
 }
 
@@ -74,17 +74,15 @@ slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& sc
 
 vertex Renderer::screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 projectedPoint, int16_t i, const Scene& scene) {
 
-    vertex pixel;
+    vertex vertex;
     // Apply the viewport transformation to convert from NDC to screen coordinates
-    projectedPoint.x = (projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f); // Convert from NDC to screen coordinates
-    projectedPoint.y = (projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f); // Convert from NDC to screen coordinates
-    pixel.p_x = (int32_t) projectedPoint.x;
-    pixel.p_y = (int32_t) projectedPoint.y;
-    pixel.p_z = projectedPoint.z;
-    pixel.vtx = i;
-    pixel.normal = normal;
-    pixel.vertexPoint = point;
-    return pixel;
+    vertex.p_x = (int32_t) ((projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+    vertex.p_y = (int32_t) ((projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+    vertex.p_z = projectedPoint.z;
+    vertex.vtx = i;
+    vertex.normal = normal;
+    vertex.vertexPoint = point;
+    return vertex;
 }
 
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
@@ -104,20 +102,29 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     return screenPoints;
 }
 
-void Renderer::drawFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
+void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
 
     slib::vec3 rotatedFacenormal;
+
+    Rasterizer rasterizer(&solid, scene.pixels, scene.zBuffer);
+
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
-        Rasterizer triangle(&solid, scene.pixels, scene.zBuffer);
-        triangle.p1 = projectedPoints[solid.faces[i].vertex1];
-        triangle.p2 = projectedPoints[solid.faces[i].vertex2];
-        triangle.p3 = projectedPoints[solid.faces[i].vertex3];
 
-        if (triangle.visible() && !triangle.outside(scene) && !triangle.behind()) {
+        triangle tri(projectedPoints[solid.faces[i].vertex1], projectedPoints[solid.faces[i].vertex2], projectedPoints[solid.faces[i].vertex3], i);
 
-            rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
-            triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal);
+        if (rasterizer.visible(tri) && !rasterizer.outside(scene, tri) && !rasterizer.behind(tri)) {
+
+            rasterizer.addTriangle(std::make_unique<triangle>(tri));
+
+            //rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[i], 0);
+            //triangle.draw(solid, scene, solid.faces[i], rotatedFacenormal);
         }
-    }                        
+    }
+    
+    for (auto& trianglePtr : rasterizer.triangles) {
+        rasterizer.draw(*trianglePtr, solid, scene);
+    }
+
 }
+
