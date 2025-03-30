@@ -71,9 +71,9 @@ void Star::loadVertices() {
                 std::smatch match;
 
                 if (std::regex_search(line, match, faceRegex)) {
-                    face.vertex1 = std::stoi(match[1]);
+                    face.vertex1 = std::stoi(match[3]);
                     face.vertex2 = std::stoi(match[2]);
-                    face.vertex3 = std::stoi(match[3]);
+                    face.vertex3 = std::stoi(match[1]);
                     face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal) };
 
                     faces.push_back(face);

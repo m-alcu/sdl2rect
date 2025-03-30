@@ -6,7 +6,7 @@ void Scene::setup() {
 
 
     
-    
+    /*
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -21,9 +21,9 @@ void Scene::setup() {
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
-    
+    */
 
-    /*
+    
     auto star = std::make_unique<Star>();
     star->setup();
 
@@ -37,7 +37,7 @@ void Scene::setup() {
     
     calculatePrecomputedShading(*star);
     addSolid(std::move(star));
-    */
+    
 
     /*
     auto tetrakis = std::make_unique<Tetrakis>();
