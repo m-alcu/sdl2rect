@@ -39,7 +39,9 @@ int main(int argc, char** argv)
     // Use streaming texture for direct pixel access.
     SDL_Texture* texture = SDL_CreateTexture(sdlRenderer,
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.height);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);    
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.height];
@@ -62,20 +64,8 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.solids[0]->position.y = scene.solids[0]->position.y - 10;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.y = scene.solids[0]->position.y + 10;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                scene.solids[0]->position.x = scene.solids[0]->position.x - 10;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                scene.solids[0]->position.x = scene.solids[0]->position.x + 10;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
                 scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
                 scene.solids[0]->position.z = scene.solids[0]->position.z - 10;               
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
@@ -87,6 +77,15 @@ int main(int argc, char** argv)
                 scene.shading = Shading::Phong;     
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_k) {
                 scene.shading = Shading::Precomputed;                              
+            } else if (event.type == SDL_MOUSEMOTION) {
+                scene.solids[0]->position.x = event.motion.x*2 - scene.screen.width;
+                scene.solids[0]->position.y = event.motion.y*2 - scene.screen.height;
+            } else if (event.type == SDL_MOUSEWHEEL) {
+                if (event.wheel.y > 0) {
+                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.1;
+                } else {
+                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.1;
+                }
             }
         }
 
