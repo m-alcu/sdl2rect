@@ -59,6 +59,7 @@
         "bitset": "cpp",
         "cstring": "cpp",
         "map": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "strstream": "cpp"
     }
 }

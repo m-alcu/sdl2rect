@@ -23,21 +23,35 @@ void Scene::setup() {
     addSolid(std::move(torus));
     */
 
-    
-    auto star = std::make_unique<Star>();
-    star->setup();
+    /*
+    auto ascLoader = std::make_unique<AscLoader>();
+    ascLoader->setup("resources/knot.asc");
 
-    star->position.z = -5000;   
-    star->position.x = 0;
-    star->position.y = 0;
-    star->position.zoom = 1;
-    star->position.xAngle = 90.0f;
-    star->position.yAngle = 0.0f;
-    star->position.zAngle = 0.0f;
+    ascLoader->position.z = -5000;   
+    ascLoader->position.x = 0;
+    ascLoader->position.y = 0;
+    ascLoader->position.zoom = 1;
+    ascLoader->position.xAngle = 90.0f;
+    ascLoader->position.yAngle = 0.0f;
+    ascLoader->position.zAngle = 0.0f;
     
-    calculatePrecomputedShading(*star);
-    addSolid(std::move(star));
+    calculatePrecomputedShading(*ascLoader);
+    addSolid(std::move(ascLoader));
+    */
+
+    auto obj = std::make_unique<ObjLoader>();
+    obj->setup("resources/VideoShip.obj");
+
+    obj->position.z = -5000;   
+    obj->position.x = 0;
+    obj->position.y = 0;
+    obj->position.zoom = 1;
+    obj->position.xAngle = 90.0f;
+    obj->position.yAngle = 0.0f;
+    obj->position.zAngle = 0.0f;
     
+    calculatePrecomputedShading(*obj);
+    addSolid(std::move(obj));
 
     /*
     auto tetrakis = std::make_unique<Tetrakis>();
