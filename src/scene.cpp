@@ -111,7 +111,7 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
                 float specAngle = std::max(0.0f, smath::dot(R,eye)); // viewer
                 float spec = std::pow(specAngle, material.shininess);
             
-                float bright = material.k_a+material.k_d * diff+ material.k_s * spec;
+                float bright = material.k_a+material.k_d * diff+ material.k_s * (diff == 0.0f ? 0 : spec);
                 solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = (int32_t) (bright * 65536 * 0.98);
             } else {
                 solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = 0;
