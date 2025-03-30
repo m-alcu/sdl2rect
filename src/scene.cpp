@@ -104,7 +104,7 @@ void Scene::calculatePrecomputedShading(Solid& solid) {
             if (f_xy_sq <= 1.0f) {
                 float f_z = sqrt(1.0f - f_xy_sq);
 
-                slib::vec3 normal = smath::normalize(slib::vec3({f_x, f_y, f_z}));
+                slib::vec3 normal = smath::normalize(slib::vec3({f_x, f_y, -f_z}));
                 float diff = std::max(0.0f, smath::dot(normal,lux));
             
                 slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,lux) - lux);
