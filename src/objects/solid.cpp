@@ -4,6 +4,10 @@
 #include "../smath.hpp"
 
 void Solid::calculateNormals() {
+
+    // Calculate face normals
+    std::vector<slib::vec3> faceNormals;
+
     for (int i = 0; i < numFaces; i++) {
         const Face &face = Solid::faces[i];
         slib::vec3 v1 = Solid::vertices[face.vertex1];
@@ -14,11 +18,16 @@ void Solid::calculateNormals() {
         slib::vec3 v21 = v2 - v1;
         slib::vec3 v32 = v3 - v2;
 
-        Solid::faceNormals[i] = smath::normalize(smath::cross(v21, v32));
+        faceNormals.push_back(smath::normalize(smath::cross(v21, v32)));
     }
+
+    Solid::faceNormals = faceNormals;
+
 }
 
 void Solid::calculateVertexNormals() {
+
+    std::vector<slib::vec3> vertexNormals;
 
     for (int i = 0; i < numVertices; i++) { 
         slib::vec3 vertexNormal = { 0, 0, 0 };
@@ -29,8 +38,11 @@ void Solid::calculateVertexNormals() {
                     vertexNormal += Solid::faceNormals[j];
             }
         }
-        Solid::vertexNormals[i] = smath::normalize(vertexNormal);
+        // Normalize the vertex normal
+        vertexNormals.push_back(smath::normalize(vertexNormal));
     }
+
+    Solid::vertexNormals = vertexNormals;
 }
 
 // Function returning MaterialProperties struct

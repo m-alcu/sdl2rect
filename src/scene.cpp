@@ -6,7 +6,8 @@ void Scene::setup() {
 
 
     
-    auto torus = std::make_unique<Torus>(20*10, 20*10*2);
+    /*
+    auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
     torus->position.z = -5000;
@@ -20,7 +21,37 @@ void Scene::setup() {
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
+    */
+
+    /*
+    auto star = std::make_unique<Star>();
+    star->setup();
+
+    star->position.z = -5000;   
+    star->position.x = 0;
+    star->position.y = 0;
+    star->position.zoom = 1;
+    star->position.xAngle = 90.0f;
+    star->position.yAngle = 0.0f;
+    star->position.zAngle = 0.0f;
     
+    calculatePrecomputedShading(*star);
+    addSolid(std::move(star));
+    */
+
+    auto tetrakis = std::make_unique<Tetrakis>();
+    tetrakis->setup();
+
+    tetrakis->position.z = -5000;   
+    tetrakis->position.x = 0;
+    tetrakis->position.y = 0;
+    tetrakis->position.zoom = 1;
+    tetrakis->position.xAngle = 90.0f;
+    tetrakis->position.yAngle = 0.0f;
+    tetrakis->position.zAngle = 0.0f;
+    
+    calculatePrecomputedShading(*tetrakis);
+    addSolid(std::move(tetrakis));
 
     /*
     auto torus = std::make_unique<Test>(8, 4);

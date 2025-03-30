@@ -1,46 +1,37 @@
 #pragma once
 
+#include <vector>
 #include "../space3d.hpp"
 #include "../slib.hpp"
 #include "../constants.hpp"
 
 class Solid {
 public:
-    slib::vec3* vertices;
-    Face* faces;
-    slib::vec3* faceNormals;
-    int numVertices;
-    int numFaces;
-    slib::vec3* vertexNormals;
+    std::vector<slib::vec3> vertices;
+    std::vector<Face> faces;
+    std::vector<slib::vec3> faceNormals;
+    std::vector<slib::vec3> vertexNormals;
     Position position;
     uint32_t* precomputedShading;
+    int numVertices;
+    int numFaces;
 
 public:
-    // Base constructor that allocates memory for common data members.
-    Solid(int verticesCount, int facesCount)
-        : numVertices(verticesCount), numFaces(facesCount),
-          vertices(new slib::vec3[verticesCount]),
-          faces(new Face[facesCount]),
-          faceNormals(new slib::vec3[facesCount]),
-          vertexNormals(new slib::vec3[verticesCount]),
-          precomputedShading(new uint32_t[PRECOMPUTE_SIZE*PRECOMPUTE_SIZE])
+    // Base constructor that initializes common data members.
+    Solid()
+        :precomputedShading(new uint32_t[PRECOMPUTE_SIZE*PRECOMPUTE_SIZE])
     {
     }
 
     // Virtual destructor for proper cleanup in derived classes.
-    virtual ~Solid() {
-        delete[] vertices;
-        delete[] faces;
-        delete[] faceNormals;
-        delete[] vertexNormals;
-        delete[] precomputedShading;
-    }
+    virtual ~Solid() = default;
 
     // A common setup method that calls the helper functions.
     virtual void setup() {
         loadVertices();
         loadFaces();
         calculateNormals();
+        calculateVertexNormals();
     }
 
     virtual void calculateNormals();

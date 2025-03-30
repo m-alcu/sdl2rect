@@ -8,23 +8,20 @@
 #include <regex>
 #include "../rasterizer.hpp"
 
-
 void Star::loadVertices() {
-
     std::ifstream file("resources/knot.asc");
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file.\n";
+        return;
     }
-
-    //std::vector<slib::vec3> vertices;
-    //std::vector<Face> faces;
 
     std::string line;
     bool readingVertices = false;
     bool readingFaces = false;
-    int num_vertex = 0;
-    int num_faces = 0;
+
+    std::vector<slib::vec3> vertices;
+    std::vector<Face> faces;
 
     while (std::getline(file, line)) {
         // Remove leading/trailing spaces
@@ -49,8 +46,6 @@ void Star::loadVertices() {
             continue;
         }
 
-
-
         if (readingVertices) {
             if (line.find("Vertex") != std::string::npos) {
                 // Example line: Vertex 0:  X: -95     Y: 0     Z: 0
@@ -63,8 +58,7 @@ void Star::loadVertices() {
                     vertex.y = std::stof(match[2]);
                     vertex.z = std::stof(match[3]);
 
-                    vertices[num_vertex] = vertex;
-                    num_vertex +=1;
+                    vertices.push_back(vertex);
                 }
             }
         }
@@ -77,24 +71,34 @@ void Star::loadVertices() {
                 std::smatch match;
 
                 if (std::regex_search(line, match, faceRegex)) {
-                    face.vertex1 = std::stoi(match[3]);
+                    face.vertex1 = std::stoi(match[1]);
                     face.vertex2 = std::stoi(match[2]);
-                    face.vertex3 = std::stoi(match[1]);
-                    face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
+                    face.vertex3 = std::stoi(match[3]);
+                    face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal) };
 
-                    faces[num_faces] = face;
-                    num_faces +=1;
+                    faces.push_back(face);
                 }
             }
         }
     }
 
     file.close();
+
+    // Calculate total number of vertices and faces
+    int num_vertex = vertices.size();
+    int num_faces = faces.size();
+
+    std::cout << "Total vertices: " << num_vertex << "\n";
+    std::cout << "Total faces: " << num_faces << "\n";
+
+    // Store vertices and faces in the class members
+    Star::vertices = vertices;
+    Star::faces = faces;
+    Star::numVertices = num_vertex;
+    Star::numFaces = num_faces;
 }
 
 void Star::loadFaces() {
-
     calculateNormals();
     calculateVertexNormals();
-
 }

@@ -5,8 +5,7 @@
 
 class Star : public Solid {
     public:
-        Star(int verticesCount, int facesCount)
-        : Solid(verticesCount, facesCount)
+        Star()
     {
     }
 

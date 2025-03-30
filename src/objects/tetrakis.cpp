@@ -7,26 +7,35 @@ void Tetrakis::loadVertices() {
     const float half = 50.f;
     const float axisDist = half * std::sqrt(3.f);  
 
+    std::vector<slib::vec3> vertices;
+
     int index = 0;
     // Generate the 8 cube vertices with explicit sign choices
     for (int xSign : {1, -1}) {
         for (int ySign : {1, -1}) {
             for (int zSign : {1, -1}) {
-                Tetrakis::vertices[index++] = { half * xSign, half * ySign, half * zSign };
+                vertices.push_back({ half * xSign, half * ySign, half * zSign });
             }
         }
     }
 
     // Generate the 6 axis-aligned vertices
-    Tetrakis::vertices[index++] = {  axisDist, 0,         0 };
-    Tetrakis::vertices[index++] = {  0,         axisDist, 0 };
-    Tetrakis::vertices[index++] = {  0,         0,         axisDist };
-    Tetrakis::vertices[index++] = { -axisDist, 0,         0 };
-    Tetrakis::vertices[index++] = {  0,        -axisDist, 0 };
-    Tetrakis::vertices[index++] = {  0,         0,        -axisDist };
+
+    vertices.push_back({ axisDist, 0, 0 });
+    vertices.push_back({ 0, axisDist, 0 });
+    vertices.push_back({ 0, 0, axisDist });
+    vertices.push_back({ -axisDist, 0, 0 });
+    vertices.push_back({ 0, -axisDist, 0 });
+    vertices.push_back({ 0, 0, -axisDist });
+
+    Tetrakis::vertices = vertices;
+    Tetrakis::numVertices = vertices.size();
 }
 
 void Tetrakis::loadFaces() {
+
+    std::vector<Face> faces;
+
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
         {2, 0, 1, 3},  // group 0, center 8
@@ -44,10 +53,16 @@ void Tetrakis::loadFaces() {
             int faceIndex = i * 4 + j;
             // Directly assign values to the face.
             uint32_t color = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
-            Tetrakis::faces[faceIndex].material = { color, color, color, getMaterialProperties(MaterialType::Metal)};
-            Tetrakis::faces[faceIndex].vertex1 = quads[i][j];
-            Tetrakis::faces[faceIndex].vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
-            Tetrakis::faces[faceIndex].vertex3 = centers[i];
+
+            Face face;
+            face.vertex1 = quads[i][j];
+            face.vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            face.vertex3 = centers[i];
+            face.material = { color, color, color, getMaterialProperties(MaterialType::Metal)};
+            faces.push_back(face);
         }
     }
+
+    Tetrakis::faces = faces;
+    Tetrakis::numFaces = faces.size();
 }

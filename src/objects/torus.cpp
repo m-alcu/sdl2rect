@@ -18,6 +18,10 @@ void Torus::setup(int uSteps, int vSteps, float R, float r) {
 
 void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
 
+    std::vector<slib::vec3> vertices;
+    vertices.resize(uSteps * vSteps);
+    Torus::vertices = vertices;
+
     for (int i = 0; i < uSteps; i++) {
         float u = i * 2 * PI / uSteps;
         float cosU = cos(u);
@@ -32,11 +36,15 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
             Torus::vertices[i * vSteps + j] = { x, y, z };
         }
     }
+
+    Torus::numVertices = vertices.size();
 }
 
 void Torus::loadFaces(int uSteps, int vSteps) {
     // Each quad gives rise to 2 triangles.
     // Total faces = uSteps * vSteps * 2
+
+    std::vector<Face> faces;
 
     int faceIndex = 0;
     for (int i = 0; i < uSteps; i++) {
@@ -48,19 +56,22 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             int idx1 = nextI * vSteps + j;
             int idx2 = nextI * vSteps + nextJ;
             int idx3 = i * vSteps + nextJ;
-            Torus::faces[faceIndex].material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
 
-            Torus::faces[faceIndex].vertex1 = idx0;
-            Torus::faces[faceIndex].vertex2 = idx1; // wrap-around for the quad
-            Torus::faces[faceIndex].vertex3 = idx2;
-            faceIndex++;
-            Torus::faces[faceIndex].material = { 0xfffedd00, 0xfffedd00, 0xfffedd00, getMaterialProperties(MaterialType::Metal)};
+            Face face;
+            face.vertex1 = idx0;
+            face.vertex2 = idx1; // wrap-around for the quad
+            face.vertex3 = idx2;
+            face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
+            faces.push_back(face);
 
-            Torus::faces[faceIndex].vertex1 = idx0;
-            Torus::faces[faceIndex].vertex2 = idx2; // wrap-around for the quad
-            Torus::faces[faceIndex].vertex3 = idx3;
-            faceIndex++;
-
+            face.vertex1 = idx0;
+            face.vertex2 = idx2; // wrap-around for the quad
+            face.vertex3 = idx3;
+            face.material = { 0xfffedd00, 0xfffedd00, 0xfffedd00, getMaterialProperties(MaterialType::Metal)};
+            faces.push_back(face);
         }
     }
+
+    Torus::faces = faces;
+    Torus::numFaces = faces.size();
 }
