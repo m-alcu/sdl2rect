@@ -52,11 +52,12 @@ struct vertex {
     slib::vec3 normal;
     slib::vec3 vertexPoint;
     int32_t ds;
+    slib::zvec2 tex; // Texture coordinates
 
     vertex() {}
 
-    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, int32_t s) :
-    p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(s) {}
+    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, int32_t _ds, slib::zvec2 _tex) :
+    p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
     vertex(const vertex &v, slib::vec3 lux, Face face) {
         p_x = ( v.p_x << 16 ) + 0x8000;
@@ -67,10 +68,11 @@ struct vertex {
         float diff = std::max(0.0f, smath::dot(lux,v.normal));
         float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
         ds = (int32_t) (bright * 65536 * 4);
+        tex = v.tex;
     }     
 
     vertex operator+(const vertex &v) const {
-        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds);
+        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
     }
 
     vertex& operator+=(const vertex &v) {
@@ -80,6 +82,7 @@ struct vertex {
         normal += v.normal;
         vertexPoint += v.vertexPoint;
         ds += v.ds;
+        tex += v.tex;
         return *this;
     }
 };

@@ -23,6 +23,59 @@ namespace slib
         return {x - rhs.x, y - rhs.y};
     }
 
+    vec2 vec2::operator+(const vec2& rhs) const
+    {
+        return {x + rhs.x, y + rhs.y};
+    }
+
+    zvec2& zvec2::operator*=(const zvec2& rhs)
+    {
+        x *= rhs.x;
+        y *= rhs.y;
+        w *= rhs.w;
+        return *this;
+    }
+
+    zvec2& zvec2::operator*=(const float rhs)
+    {
+        x *= rhs;
+        y *= rhs;
+        w *= rhs;
+        return *this;
+    }
+
+    zvec2& zvec2::operator/=(const float rhs)
+    {
+        x /= rhs;
+        y /= rhs;
+        w /= rhs;
+        return *this;
+    }
+
+    zvec2& zvec2::operator+=(const zvec2& rhs)
+    {
+        x += rhs.x;
+        y += rhs.y;
+        w += rhs.w;
+        return *this;
+    }
+
+    zvec2 zvec2::operator-(const zvec2& rhs) const
+    {
+        return {x - rhs.x, y - rhs.y, w - rhs.w};
+    }
+
+    zvec2 zvec2::operator+(const zvec2& rhs) const
+    {
+        return {x + rhs.x, y + rhs.y, w + rhs.w};
+    }
+    
+    zvec2 zvec2::operator/(const float rhs) const
+    {
+        return {x / rhs, y / rhs, w / rhs};
+    }
+
+
     vec3& vec3::operator+=(const float rhs)
     {
         x += rhs;

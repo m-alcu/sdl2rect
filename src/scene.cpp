@@ -39,19 +39,21 @@ void Scene::setup() {
     addSolid(std::move(ascLoader));
     */
 
+    
     auto obj = std::make_unique<ObjLoader>();
-    obj->setup("resources/VideoShip.obj");
+    obj->setup("resources/axis.obj");
 
     obj->position.z = -5000;   
     obj->position.x = 0;
     obj->position.y = 0;
     obj->position.zoom = 1;
-    obj->position.xAngle = 90.0f;
+    obj->position.xAngle = 0.0f;
     obj->position.yAngle = 0.0f;
     obj->position.zAngle = 0.0f;
     
     calculatePrecomputedShading(*obj);
     addSolid(std::move(obj));
+    
 
     /*
     auto tetrakis = std::make_unique<Tetrakis>();

@@ -88,12 +88,13 @@ vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
     // Calculate the change in x, then shift right by 16 bits to get pixel steps.
     int16_t dx = (right.p_x - left.p_x) >> 16;
 
-    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0); // Avoid division by zero
+    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0}); // Avoid division by zero
     slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
     slib::vec3 n = (right.normal - left.normal) / dx;
     float dz = (right.p_z - left.p_z) / dx;
     int32_t ds = (right.ds - left.ds) / dx;
-    return vertex(dx, 0, dz, 0, n, v, ds);
+    slib::zvec2 tex = (right.tex - left.tex) / dx;
+    return vertex(dx, 0, dz, 0, n, v, ds, tex);
 }
 
 vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) {
@@ -111,12 +112,13 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
         vertex.vertexPoint = (p2.vertexPoint - p1.vertexPoint) / dy;
         vertex.normal = (p2.normal - p1.normal) / dy;
         vertex.ds = ds / dy;
+        vertex.tex = (p2.tex - p1.tex) / dy;
         return vertex;
     } else {
         if (dx > 0) {
-            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0}, 0);
+            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
         } else {
-            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0}, 0);
+            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
         }
     }
 };
@@ -129,6 +131,7 @@ void Rasterizer::updateMiddleVertex(vertex& updated, const vertex &p, slib::vec3
     float diff = std::max(0.0f, smath::dot(lux, updated.normal));
     float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
     updated.ds = (int32_t) (bright * 65536 * 4);
+    updated.tex = p.tex;
 }
 
 void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {

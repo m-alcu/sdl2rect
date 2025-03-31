@@ -39,6 +39,13 @@ namespace slib
     struct zvec2
     {
         float x, y, w;
+        zvec2& operator*=(const zvec2& rhs);
+        zvec2& operator*=(float rhs);
+        zvec2& operator/=(float rhs);
+        zvec2 operator-(const zvec2& rhs) const;
+        zvec2 operator+(const zvec2& rhs) const;
+        zvec2 operator/(float rhs) const;
+        zvec2& operator+=(const zvec2& rhs);
     };
 
     struct vec2
@@ -47,6 +54,7 @@ namespace slib
         vec2& operator*=(const vec2& rhs);
         vec2& operator*=(float rhs);
         vec2 operator-(const vec2& rhs) const;
+        vec2 operator+(const vec2& rhs) const;
     };
 
     struct vec3
