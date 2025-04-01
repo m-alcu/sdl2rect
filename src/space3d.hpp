@@ -6,8 +6,8 @@
 
 typedef struct Screen
 {
-    uint16_t height;
-    uint16_t width;
+    int32_t height;
+    int32_t width;
 } Screen;
 
 enum class MaterialType {

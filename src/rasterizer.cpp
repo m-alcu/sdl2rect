@@ -5,6 +5,18 @@
 #include "slib.hpp"
 #include "smath.hpp"
 
+/*
+Check if triangle is visible.
+If the triangle is visible, we can proceed with the rasterization process.
+The calculation is based on the cross product of the edges of the triangle.
+- If the result is positive, the triangle is visible.
+- If the result is negative, the triangle is not visible.
+- If the result is zero, the triangle is coplanar with the screen.
+This is a simplified version of the backface culling algorithm.
+The backface culling algorithm is used to determine if a triangle is facing the camera or not.
+If the triangle is facing away from the camera, we can skip the rasterization process.
+*/
+
 bool Rasterizer::visible(const triangle& triangle) {
 
     return (((int32_t) (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y)) - ((int32_t) (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y)) > 0);
@@ -14,6 +26,11 @@ bool Rasterizer::behind(const triangle& triangle) {
 
     return (triangle.p1.p_z < 2 || triangle.p2.p_z < 2 || triangle.p3.p_z < 2);
 };
+
+/*
+Check if triangle is completely outside the screen.
+If all vertices are outside the screen, we can skip the rasterization process.
+*/
 
 bool Rasterizer::outside(Scene& scene, const triangle& triangle) {
 
@@ -63,16 +80,24 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     vertex left = vertex(tri.p1, scene.lux, solid.faces[tri.i]);
     vertex right = left;
     if(tri.edge13.p_x < tri.edge12.p_x) {
-        drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         if (tri.p2.p_y < scene.screen.height) {
-            updateMiddleVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
-            drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            update2ndVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
+            tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
+            drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        } else {
+            tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         };
     } else {
-        drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         if  (tri.p2.p_y < scene.screen.height) {
-            updateMiddleVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
-            drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            update2ndVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
+            tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
+            drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        } else {
+            tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         };
     }
 };
@@ -127,7 +152,7 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     }
 };
 
-void Rasterizer::updateMiddleVertex(vertex& updated, const vertex &p, slib::vec3& lux, Face face) {
+void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& lux, Face face) {
     updated.p_x = ( p.p_x << 16 ) + 0x8000; // shift to pixel space
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
@@ -137,10 +162,10 @@ void Rasterizer::updateMiddleVertex(vertex& updated, const vertex &p, slib::vec3
     updated.tex = p.tex;
 }
 
-void Rasterizer::drawTriSector(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+void Rasterizer::drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        if (hy >= 0 && hy < (scene.screen.width * scene.screen.height)) { //vertical clipping
+        if (hy >= 0) { //vertical clipping
             vertex vDx = Rasterizer::gradientDx(left, right);
             vertex vRaster = left;
             for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
