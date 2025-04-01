@@ -69,6 +69,11 @@ namespace slib
     {
         return {x + rhs.x, y + rhs.y, w + rhs.w};
     }
+
+    zvec2 zvec2::operator*(const float rhs) const
+    {
+        return {x * rhs, y * rhs, w * rhs};
+    }
     
     zvec2 zvec2::operator/(const float rhs) const
     {

@@ -44,6 +44,7 @@ namespace slib
         zvec2& operator/=(float rhs);
         zvec2 operator-(const zvec2& rhs) const;
         zvec2 operator+(const zvec2& rhs) const;
+        zvec2 operator*(float rhs) const;
         zvec2 operator/(float rhs) const;
         zvec2& operator+=(const zvec2& rhs);
     };

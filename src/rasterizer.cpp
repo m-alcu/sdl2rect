@@ -83,10 +83,10 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
         if (tri.p2.p_y < scene.screen.height) {
 
             /*
-            This case happens when both top and bottom half of the triangle is also inside the screen.
-            - draw the top half of the triangle (p1, p2)
-            - update the 2nd vertex (p2) to the right edge of the triangle (p3)
-            - draw the bottom half of the triangle (p2, p3) but culling the bottom pixels greater than the screen height.
+            This case happens when both top and bottom half of the triangle are inside (complete or not) the screen.
+            - draw the top half of the triangle (p1 -> p2)
+            - update the 2nd vertex (p2)
+            - draw the bottom half of the triangle (p2, p3) culling the bottom pixels greater than the screen height.
             */
 
             drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
@@ -96,8 +96,8 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
         } else {
 
             /*
-            This case happens when only top half of the triangle is inside the screen.
-            - draw the top half of the triangle (p1, p2) but culling the bottom pixels greater than the screen height.
+            This case happens when only top half of the triangle is inside (complete or not) the screen.
+            - draw the top half of the triangle (p1, p2) culling the bottom pixels greater than the screen height.
             */
 
             tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
@@ -178,36 +178,42 @@ void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& l
 
 void Rasterizer::drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
+    // Clip the triangle to the screen bounds
+    if (top < 0) {
+        int16_t final = std::min(bottom, (int16_t) 0);
+        left = left + (leftDy * (final - top));
+        right = right + (rightDy * (final - top));
+        top = final;
+    }
+
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        if (hy >= 0) { //vertical clipping
-            vertex vDx = Rasterizer::gradientDx(left, right);
-            vertex vRaster = left;
-            for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
-                if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
-                    if (zBuffer[hy + hx] > vRaster.p_z) {
-                        switch (scene.shading) {
-                            case Shading::Flat: 
-                                pixels[hy + hx] = flatColor;
-                                break;      
-                            case Shading::Gouraud: 
-                                pixels[hy + hx] = RGBAColor(face.material.Ambient, vRaster.ds).bgra_value;
-                                break;
-                            case Shading::BlinnPhong:
-                                pixels[hy + hx] = blinnPhongShadingShader(vRaster, scene, face);
-                                break;                                
-                            case Shading::Phong:
-                                pixels[hy + hx] = phongShadingShader(vRaster, scene, face);
-                                break;
-                            case Shading::Precomputed:
-                                pixels[hy + hx] = precomputedPhongShadingShader(vRaster, scene, face, precomputedShading);
-                                break;                                
-                            default: pixels[hy + hx] = flatColor;
-                        }
-                        zBuffer[hy + hx] = vRaster.p_z;
+        vertex vDx = Rasterizer::gradientDx(left, right);
+        vertex vRaster = left;
+        for(int hx=(left.p_x >> 16); hx<(right.p_x >> 16); hx++) {
+            if (hx >= 0 && hx < scene.screen.width) { //horizontal clipping
+                if (zBuffer[hy + hx] > vRaster.p_z) {
+                    switch (scene.shading) {
+                        case Shading::Flat: 
+                            pixels[hy + hx] = flatColor;
+                            break;      
+                        case Shading::Gouraud: 
+                            pixels[hy + hx] = RGBAColor(face.material.Ambient, vRaster.ds).bgra_value;
+                            break;
+                        case Shading::BlinnPhong:
+                            pixels[hy + hx] = blinnPhongShadingShader(vRaster, scene, face);
+                            break;                                
+                        case Shading::Phong:
+                            pixels[hy + hx] = phongShadingShader(vRaster, scene, face);
+                            break;
+                        case Shading::Precomputed:
+                            pixels[hy + hx] = precomputedPhongShadingShader(vRaster, scene, face, precomputedShading);
+                            break;                                
+                        default: pixels[hy + hx] = flatColor;
                     }
+                    zBuffer[hy + hx] = vRaster.p_z;
                 }
-                vRaster += vDx;
             }
+            vRaster += vDx;
         }
         left += leftDy;
         right += rightDy;
