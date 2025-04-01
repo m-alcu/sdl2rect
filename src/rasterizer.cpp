@@ -81,11 +81,25 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     vertex right = left;
     if(tri.edge13.p_x < tri.edge12.p_x) {
         if (tri.p2.p_y < scene.screen.height) {
+
+            /*
+            This case happens when both top and bottom half of the triangle is also inside the screen.
+            - draw the top half of the triangle (p1, p2)
+            - update the 2nd vertex (p2) to the right edge of the triangle (p3)
+            - draw the bottom half of the triangle (p2, p3) but culling the bottom pixels greater than the screen height.
+            */
+
             drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             update2ndVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
+
+            /*
+            This case happens when only top half of the triangle is inside the screen.
+            - draw the top half of the triangle (p1, p2) but culling the bottom pixels greater than the screen height.
+            */
+
             tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
             drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         };
