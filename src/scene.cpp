@@ -6,7 +6,7 @@ void Scene::setup() {
 
 
     
-    /*
+    
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -21,7 +21,7 @@ void Scene::setup() {
     calculatePrecomputedShading(*torus);
 
     addSolid(std::move(torus));
-    */
+    
 
     /*
     auto ascLoader = std::make_unique<AscLoader>();
@@ -39,7 +39,7 @@ void Scene::setup() {
     addSolid(std::move(ascLoader));
     */
 
-    
+    /*
     auto obj = std::make_unique<ObjLoader>();
     obj->setup("resources/axis.obj");
 
@@ -53,7 +53,7 @@ void Scene::setup() {
     
     calculatePrecomputedShading(*obj);
     addSolid(std::move(obj));
-    
+    */
 
     /*
     auto tetrakis = std::make_unique<Tetrakis>();

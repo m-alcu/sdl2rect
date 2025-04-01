@@ -74,6 +74,7 @@ struct vertex {
     vertex operator+(const vertex &v) const {
         return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
     }
+    
 
     vertex& operator+=(const vertex &v) {
         p_x += v.p_x;

@@ -64,12 +64,16 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     vertex right = left;
     if(tri.edge13.p_x < tri.edge12.p_x) {
         drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
-        updateMiddleVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
-        drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        if (tri.p2.p_y < scene.screen.height) {
+            updateMiddleVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
+            drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        };
     } else {
         drawTriSector(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
-        updateMiddleVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
-        drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        if  (tri.p2.p_y < scene.screen.height) {
+            updateMiddleVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
+            drawTriSector(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+        };
     }
 };
 
@@ -128,8 +132,7 @@ void Rasterizer::updateMiddleVertex(vertex& updated, const vertex &p, slib::vec3
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
     updated.normal = p.normal;
-    float diff = std::max(0.0f, smath::dot(lux, updated.normal));
-    float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
+    float bright = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux, updated.normal));
     updated.ds = (int32_t) (bright * 65536 * 4);
     updated.tex = p.tex;
 }
