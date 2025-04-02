@@ -178,7 +178,7 @@ void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& l
 
 void Rasterizer::drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
-    // Clip the triangle to the screen bounds
+    // Culling the top rows of the half-triangle
     if (top < 0) {
         int16_t final = std::min(bottom, (int16_t) 0);
         left = left + (leftDy * (final - top));
@@ -186,6 +186,7 @@ void Rasterizer::drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& 
         top = final;
     }
 
+    // Now we can raster without taking care of borders
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         vertex vDx = Rasterizer::gradientDx(left, right);
         vertex vRaster = left;

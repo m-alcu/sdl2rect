@@ -16,6 +16,9 @@ class Renderer {
         vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);            
         void drawRenderable(Solid& solid, Scene& scene);
         void addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene);
+        void orderVerticesX(vertex *p1, vertex *p2, vertex *p3);
+        void divideTriangle(triangle& tri, Rasterizer& rasterizer, Scene& scene, const Face& face);
+        vertex gradientDy(vertex p1, vertex p2, slib::vec3& lux, const Face& face);
 };
 
 
