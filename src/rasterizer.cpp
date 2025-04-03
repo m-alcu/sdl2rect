@@ -63,10 +63,6 @@ bool Rasterizer::outside(Scene& scene, const triangle& triangle) {
 
 void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
 
-    orderVertices(&tri.p1, &tri.p2, &tri.p3);
-    tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
-    tri.edge23 = gradientDy(tri.p2, tri.p3, scene.lux, solid.faces[tri.i]);
-    tri.edge13 = gradientDy(tri.p1, tri.p3, scene.lux, solid.faces[tri.i]);
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -75,7 +71,18 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
         float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
         float bright = solid.faces[tri.i].material.properties.k_a+solid.faces[tri.i].material.properties.k_d * diff;
         flatColor = RGBAColor(solid.faces[tri.i].material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
+    } else {
+        float ka = solid.faces[tri.i].material.properties.k_a;
+        float kd = solid.faces[tri.i].material.properties.k_d;
+        tri.p1.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p1.normal)) * 65536 * 4); 
+        tri.p2.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p2.normal)) * 65536 * 4); 
+        tri.p3.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p3.normal)) * 65536 * 4); 
     }
+
+    orderVertices(&tri.p1, &tri.p2, &tri.p3);
+    tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
+    tri.edge23 = gradientDy(tri.p2, tri.p3, scene.lux, solid.faces[tri.i]);
+    tri.edge13 = gradientDy(tri.p1, tri.p3, scene.lux, solid.faces[tri.i]);
 
     vertex left = vertex(tri.p1, scene.lux, solid.faces[tri.i]);
     vertex right = left;
@@ -152,9 +159,7 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     float dz = p2.p_z - p1.p_z;
-    float bright1 = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux,p1.normal));
-    float bright2 = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux,p2.normal));
-    int32_t ds = (int32_t) ((bright2 - bright1) * 65536 * 4); 
+    int32_t ds = p2.ds - p1.ds;
     if (dy > 0) {
         vertex vertex;
         vertex.p_x = dx / dy;
