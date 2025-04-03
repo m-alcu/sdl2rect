@@ -65,7 +65,7 @@ struct vertex {
         vertexPoint = v.vertexPoint;
         normal = v.normal;
         tex = v.tex;
-        ds = std::max(0.0f, smath::dot(lux,v.normal));
+        ds = v.ds;
         vtx = v.vtx;
     }     
 

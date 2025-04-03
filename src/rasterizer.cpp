@@ -94,7 +94,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
             } else {
                 drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             }
-            update2ndVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
+            update2ndVertex(right, tri.p2);
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
@@ -114,7 +114,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
             } else {
                 drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             }
-            update2ndVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
+            update2ndVertex(left, tri.p2);
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
@@ -172,12 +172,12 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     }
 };
 
-void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& lux, Face face) {
+void Rasterizer::update2ndVertex(vertex& updated, const vertex &p) {
     updated.p_x = ( p.p_x << 16 ) + 0x8000; // shift to pixel space
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
     updated.normal = p.normal;
-    updated.ds = std::max(0.0f, smath::dot(lux, updated.normal));
+    updated.ds = p.ds;
     updated.tex = p.tex;
 }
 

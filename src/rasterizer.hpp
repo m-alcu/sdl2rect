@@ -88,7 +88,7 @@ class Rasterizer {
         uint32_t blinnPhongShadingShader(vertex gRaster, Scene& scene, Face face);
         uint32_t precomputedPhongShadingShader(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
         static vertex gradientDx(const vertex &left, const vertex &right);
-        void update2ndVertex(vertex &updated, const vertex &p, slib::vec3& lux, Face face);
+        void update2ndVertex(vertex &updated, const vertex &p);
     };
     
 
