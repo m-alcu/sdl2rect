@@ -74,9 +74,9 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     } 
 
     orderVertices(&tri.p1, &tri.p2, &tri.p3);
-    tri.p1.p_x = tri.p1.p_x << 16; // shift to pixel space
-    tri.p2.p_x = tri.p2.p_x << 16; // shift to pixel space
-    tri.p3.p_x = tri.p3.p_x << 16; // shift to pixel space
+    tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
+    tri.p2.p_x = tri.p2.p_x << 16; // shift to 16.16 space
+    tri.p3.p_x = tri.p3.p_x << 16; // shift to 16.16 space
     tri.edge12 = gradientDy(tri.p1, tri.p2);
     tri.edge23 = gradientDy(tri.p2, tri.p3);
     tri.edge13 = gradientDy(tri.p1, tri.p3);
@@ -84,28 +84,19 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     vertex left = tri.p1, right = tri.p1;
     if(tri.edge13.p_x < tri.edge12.p_x) {
         if (tri.p2.p_y < scene.screen.height) {
-
-            /*
-            This case happens when both top and bottom half of the triangle are inside (complete or not) the screen.
-            - draw the top half of the triangle (p1 -> p2)
-            - update the 2nd vertex (p2)
-            - draw the bottom half of the triangle (p2, p3) culling the bottom pixels greater than the screen height.
-            */
             if (tri.p2.p_y < 0) {
+                //Culling the entire top triangle
                 left = left + (tri.edge13 * (tri.p2.p_y - tri.p1.p_y));
             } else {
+                //This triangle finishes in the screen
                 drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             }
             right = tri.p2;
+            //Culling the bottom pixels of the bottom triangle
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
-
-            /*
-            This case happens when only top half of the triangle is inside (complete or not) the screen.
-            - draw the top half of the triangle (p1, p2) culling the bottom pixels greater than the screen height.
-            */
-
+            //Only exists the bottom triangle; culling the bottom pixels
             tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
             drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         };
@@ -149,7 +140,7 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
 
 void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
-    // Clip the triangle to the screen bounds
+    // Culling the top pixels greater than the screen height.
     if (top < 0) {
         int32_t final = std::min(bottom, 0);
         left = left + (leftDy * (final - top));
@@ -164,11 +155,13 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
         vertex vRaster = left;
         int32_t xInitial = left.p_x >> 16;
         
+        // Culling the left pixels less than 0
         if (xInitial < 0) {
             int32_t xFinal = std::min(right.p_x >> 16, 0);
             vRaster = vRaster + vDx * (xFinal - xInitial);
             xInitial = xFinal;
         }
+        // Culling the right pixels greater than the screen width
         int32_t xFinal = std::min(right.p_x >> 16, scene.screen.width);
         for(int hx = xInitial; hx < xFinal; hx++) {
             if (zBuffer[hy + hx] > vRaster.p_z) {
