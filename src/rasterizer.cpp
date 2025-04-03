@@ -77,11 +77,11 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     tri.p1.p_x = tri.p1.p_x << 16; // shift to pixel space
     tri.p2.p_x = tri.p2.p_x << 16; // shift to pixel space
     tri.p3.p_x = tri.p3.p_x << 16; // shift to pixel space
-    tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
-    tri.edge23 = gradientDy(tri.p2, tri.p3, scene.lux, solid.faces[tri.i]);
-    tri.edge13 = gradientDy(tri.p1, tri.p3, scene.lux, solid.faces[tri.i]);
+    tri.edge12 = gradientDy(tri.p1, tri.p2);
+    tri.edge23 = gradientDy(tri.p2, tri.p3);
+    tri.edge13 = gradientDy(tri.p1, tri.p3);
 
-    vertex left = vertex(tri.p1, scene.lux, solid.faces[tri.i]);
+    vertex left = tri.p1;
     vertex right = left;
     if(tri.edge13.p_x < tri.edge12.p_x) {
         if (tri.p2.p_y < scene.screen.height) {
@@ -97,7 +97,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
             } else {
                 drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             }
-            update2ndVertex(right, tri.p2);
+            right = tri.p2;
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
@@ -117,7 +117,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
             } else {
                 drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
             }
-            update2ndVertex(left, tri.p2);
+            left = tri.p2;
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
         } else {
@@ -134,24 +134,7 @@ void Rasterizer::orderVertices(vertex *p1, vertex *p2, vertex *p3) {
     if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
 }
 
-// Computes the pixel step gradient from left and right gradients.
-// left: starting gradient
-// right: ending gradient
-vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
-
-    // Calculate the change in x, then shift right by 16 bits to get pixel steps.
-    int16_t dx = (right.p_x - left.p_x) >> 16;
-
-    if (dx == 0) return vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0}); // Avoid division by zero
-    slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
-    slib::vec3 n = (right.normal - left.normal) / dx;
-    float dz = (right.p_z - left.p_z) / dx;
-    float ds = (right.ds - left.ds) / dx;
-    slib::zvec2 tex = (right.tex - left.tex) / dx;
-    return vertex(dx, 0, dz, 0, n, v, ds, tex);
-}
-
-vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) {
+vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
 
     int dy = p2.p_y - p1.p_y;
     if (dy > 0) {
@@ -165,15 +148,6 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     }
 };
 
-void Rasterizer::update2ndVertex(vertex& updated, const vertex &p) {
-    updated.p_x = p.p_x; // shift to pixel space
-    updated.p_z = p.p_z;
-    updated.vertexPoint = p.vertexPoint;
-    updated.normal = p.normal;
-    updated.ds = p.ds;
-    updated.tex = p.tex;
-}
-
 void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     // Clip the triangle to the screen bounds
@@ -185,9 +159,10 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
     }
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        vertex vDx = Rasterizer::gradientDx(left, right);
+        vertex vDx = vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
+        int16_t dx = (right.p_x - left.p_x) >> 16;
+        if (dx != 0) vDx = (right - left) / dx;
         vertex vRaster = left;
-
         int32_t xInitial = left.p_x >> 16;
         
         if (xInitial < 0) {
