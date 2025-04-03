@@ -83,10 +83,10 @@ class Rasterizer {
         void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
         vertex gradientDy(vertex p1, vertex p2);
-        uint32_t gouraudShadingShader(vertex gRaster, Scene& scene, Face face);
-        uint32_t phongShadingShader(vertex gRaster, Scene& scene, Face face);
-        uint32_t blinnPhongShadingShader(vertex gRaster, Scene& scene, Face face);
-        uint32_t precomputedPhongShadingShader(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
+        uint32_t gouraudShadingFragment(vertex gRaster, Scene& scene, Face face);
+        uint32_t phongShadingFragment(vertex gRaster, Scene& scene, Face face);
+        uint32_t blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face);
+        uint32_t precomputedPhongShadingFragment(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading);
     };
     
 

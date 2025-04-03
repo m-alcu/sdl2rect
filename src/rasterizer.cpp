@@ -178,16 +178,16 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
                         pixels[hy + hx] = flatColor;
                         break;      
                     case Shading::Gouraud: 
-                        pixels[hy + hx] = gouraudShadingShader(vRaster, scene, face);
+                        pixels[hy + hx] = gouraudShadingFragment(vRaster, scene, face);
                         break;
                     case Shading::BlinnPhong:
-                        pixels[hy + hx] = blinnPhongShadingShader(vRaster, scene, face);
+                        pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
                         break;                                
                     case Shading::Phong:
-                        pixels[hy + hx] = phongShadingShader(vRaster, scene, face);
+                        pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
                         break;
                     case Shading::Precomputed:
-                        pixels[hy + hx] = precomputedPhongShadingShader(vRaster, scene, face, precomputedShading);
+                        pixels[hy + hx] = precomputedPhongShadingFragment(vRaster, scene, face, precomputedShading);
                         break;                                
                     default: pixels[hy + hx] = flatColor;
                 }
@@ -200,11 +200,11 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
     }
 };
 
-uint32_t Rasterizer::gouraudShadingShader(vertex vRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
     return RGBAColor(face.material.Ambient, (int32_t) ((face.material.properties.k_a+face.material.properties.k_d * vRaster.ds) * 65536 * 4)).bgra_value;
 }
 
-uint32_t Rasterizer::phongShadingShader(vertex gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, Face face) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
@@ -218,7 +218,7 @@ uint32_t Rasterizer::phongShadingShader(vertex gRaster, Scene& scene, Face face)
 
 }
 
-uint32_t Rasterizer::blinnPhongShadingShader(vertex gRaster, Scene& scene, Face face) {
+uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face) {
 
     // Normalize vectors
     slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
@@ -244,7 +244,7 @@ uint32_t Rasterizer::blinnPhongShadingShader(vertex gRaster, Scene& scene, Face 
     return RGBAColor(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
 }
 
-uint32_t Rasterizer::precomputedPhongShadingShader(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
+uint32_t Rasterizer::precomputedPhongShadingFragment(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
 
