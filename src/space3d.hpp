@@ -48,15 +48,15 @@ struct vertex {
     int32_t p_x;
     int32_t p_y;
     float p_z; 
-    int16_t vtx;
     slib::vec3 normal;
     slib::vec3 vertexPoint;
-    int32_t ds;
     slib::zvec2 tex; // Texture coordinates
+    float ds;
+    int16_t vtx;
 
     vertex() {}
 
-    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, int32_t _ds, slib::zvec2 _tex) :
+    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, float _ds, slib::zvec2 _tex) :
     p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
     vertex(const vertex &v, slib::vec3 lux, Face face) {
@@ -64,11 +64,9 @@ struct vertex {
         p_z = v.p_z;
         vertexPoint = v.vertexPoint;
         normal = v.normal;
-        vtx = v.vtx;
-        float diff = std::max(0.0f, smath::dot(lux,v.normal));
-        float bright = face.material.properties.k_a+face.material.properties.k_d * diff;
-        ds = (int32_t) (bright * 65536 * 4);
         tex = v.tex;
+        ds = std::max(0.0f, smath::dot(lux,v.normal));
+        vtx = v.vtx;
     }     
 
     vertex operator+(const vertex &v) const {

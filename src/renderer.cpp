@@ -82,6 +82,7 @@ vertex Renderer::screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 pro
     vertex.vtx = i;
     vertex.normal = normal;
     vertex.vertexPoint = point;
+    vertex.ds = std::max(0.0f, smath::dot(normal, scene.lux)); // Calculate the dot product with the light direction
     return vertex;
 }
 

@@ -71,13 +71,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
         float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
         float bright = solid.faces[tri.i].material.properties.k_a+solid.faces[tri.i].material.properties.k_d * diff;
         flatColor = RGBAColor(solid.faces[tri.i].material.Ambient, (int32_t) (bright * 65536 * 4)).bgra_value;
-    } else {
-        float ka = solid.faces[tri.i].material.properties.k_a;
-        float kd = solid.faces[tri.i].material.properties.k_d;
-        tri.p1.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p1.normal)) * 65536 * 4); 
-        tri.p2.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p2.normal)) * 65536 * 4); 
-        tri.p3.ds = (int32_t) (ka + kd * std::max(0.0f, smath::dot(scene.lux,tri.p3.normal)) * 65536 * 4); 
-    }
+    } 
 
     orderVertices(&tri.p1, &tri.p2, &tri.p3);
     tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
@@ -149,7 +143,7 @@ vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
     slib::vec3 v = (right.vertexPoint - left.vertexPoint) / dx;
     slib::vec3 n = (right.normal - left.normal) / dx;
     float dz = (right.p_z - left.p_z) / dx;
-    int32_t ds = (right.ds - left.ds) / dx;
+    float ds = (right.ds - left.ds) / dx;
     slib::zvec2 tex = (right.tex - left.tex) / dx;
     return vertex(dx, 0, dz, 0, n, v, ds, tex);
 }
@@ -159,7 +153,7 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
     int dy = p2.p_y - p1.p_y;
     int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
     float dz = p2.p_z - p1.p_z;
-    int32_t ds = p2.ds - p1.ds;
+    float ds = p2.ds - p1.ds;
     if (dy > 0) {
         vertex vertex;
         vertex.p_x = dx / dy;
@@ -183,8 +177,7 @@ void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& l
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
     updated.normal = p.normal;
-    float bright = face.material.properties.k_a+face.material.properties.k_d * std::max(0.0f, smath::dot(lux, updated.normal));
-    updated.ds = (int32_t) (bright * 65536 * 4);
+    updated.ds = std::max(0.0f, smath::dot(lux, updated.normal));
     updated.tex = p.tex;
 }
 
@@ -217,7 +210,7 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
                         pixels[hy + hx] = flatColor;
                         break;      
                     case Shading::Gouraud: 
-                        pixels[hy + hx] = RGBAColor(face.material.Ambient, vRaster.ds).bgra_value;
+                        pixels[hy + hx] = gouraudShadingShader(vRaster, scene, face);
                         break;
                     case Shading::BlinnPhong:
                         pixels[hy + hx] = blinnPhongShadingShader(vRaster, scene, face);
@@ -239,6 +232,9 @@ void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& 
     }
 };
 
+uint32_t Rasterizer::gouraudShadingShader(vertex vRaster, Scene& scene, Face face) {
+    return RGBAColor(face.material.Ambient, (int32_t) ((face.material.properties.k_a+face.material.properties.k_d * vRaster.ds) * 65536 * 4)).bgra_value;
+}
 
 uint32_t Rasterizer::phongShadingShader(vertex gRaster, Scene& scene, Face face) {
 
