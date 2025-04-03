@@ -88,8 +88,11 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
             - update the 2nd vertex (p2)
             - draw the bottom half of the triangle (p2, p3) culling the bottom pixels greater than the screen height.
             */
-
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            if (tri.p2.p_y < 0) {
+                left = left + (tri.edge13 * (tri.p2.p_y - tri.p1.p_y));
+            } else {
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            }
             update2ndVertex(right, tri.p2, scene.lux, solid.faces[tri.i]);
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
@@ -105,7 +108,11 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
         };
     } else {
         if  (tri.p2.p_y < scene.screen.height) {
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            if (tri.p2.p_y < 0) {
+                right = right + (tri.edge13 * (tri.p2.p_y - tri.p1.p_y));
+            } else {
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            }
             update2ndVertex(left, tri.p2, scene.lux, solid.faces[tri.i]);
             tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
             drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
