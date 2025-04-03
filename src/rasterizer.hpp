@@ -80,7 +80,7 @@ class Rasterizer {
         }
     
     private:
-        void drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
+        void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
         vertex gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face);
         uint32_t phongShadingShader(vertex gRaster, Scene& scene, Face face);

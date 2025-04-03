@@ -183,11 +183,11 @@ void Rasterizer::update2ndVertex(vertex& updated, const vertex &p, slib::vec3& l
     updated.tex = p.tex;
 }
 
-void Rasterizer::drawTriHalf(int16_t top, int16_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
 
     // Clip the triangle to the screen bounds
     if (top < 0) {
-        int16_t final = std::min(bottom, (int16_t) 0);
+        int32_t final = std::min(bottom, 0);
         left = left + (leftDy * (final - top));
         right = right + (rightDy * (final - top));
         top = final;
