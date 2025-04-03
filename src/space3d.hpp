@@ -60,7 +60,7 @@ struct vertex {
     p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
     vertex(const vertex &v, slib::vec3 lux, Face face) {
-        p_x = ( v.p_x << 16 ) + 0x8000;
+        p_x = v.p_x;
         p_z = v.p_z;
         vertexPoint = v.vertexPoint;
         normal = v.normal;
@@ -73,8 +73,16 @@ struct vertex {
         return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
     }
 
-    vertex operator*(const int16_t &rhs) const {
+    vertex operator-(const vertex &v) const {
+        return vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, vtx, normal - v.normal, vertexPoint - v.vertexPoint, ds - v.ds, tex - v.tex);
+    }
+
+    vertex operator*(const int32_t &rhs) const {
         return vertex(p_x * rhs, p_y * rhs, p_z * rhs, vtx, normal * rhs, vertexPoint * rhs, ds * rhs, tex * rhs);
+    }
+
+    vertex operator/(const int32_t &rhs) const {
+        return vertex(p_x / rhs, p_y / rhs, p_z / rhs, vtx, normal / rhs, vertexPoint / rhs, ds / rhs, tex / rhs);
     }
     
 

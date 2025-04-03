@@ -74,6 +74,9 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     } 
 
     orderVertices(&tri.p1, &tri.p2, &tri.p3);
+    tri.p1.p_x = tri.p1.p_x << 16; // shift to pixel space
+    tri.p2.p_x = tri.p2.p_x << 16; // shift to pixel space
+    tri.p3.p_x = tri.p3.p_x << 16; // shift to pixel space
     tri.edge12 = gradientDy(tri.p1, tri.p2, scene.lux, solid.faces[tri.i]);
     tri.edge23 = gradientDy(tri.p2, tri.p3, scene.lux, solid.faces[tri.i]);
     tri.edge13 = gradientDy(tri.p1, tri.p3, scene.lux, solid.faces[tri.i]);
@@ -151,20 +154,10 @@ vertex Rasterizer::gradientDx(const vertex &left, const vertex &right) {
 vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) {
 
     int dy = p2.p_y - p1.p_y;
-    int32_t dx = ((int32_t) (p2.p_x - p1.p_x)) << 16;
-    float dz = p2.p_z - p1.p_z;
-    float ds = p2.ds - p1.ds;
     if (dy > 0) {
-        vertex vertex;
-        vertex.p_x = dx / dy;
-        vertex.p_z = dz / dy;
-        vertex.vertexPoint = (p2.vertexPoint - p1.vertexPoint) / dy;
-        vertex.normal = (p2.normal - p1.normal) / dy;
-        vertex.ds = ds / dy;
-        vertex.tex = (p2.tex - p1.tex) / dy;
-        return vertex;
+        return (p2 - p1) / dy;
     } else {
-        if (dx > 0) {
+        if (p2.p_x - p1.p_x > 0) {
             return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
         } else {
             return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
@@ -173,7 +166,7 @@ vertex Rasterizer::gradientDy(vertex p1, vertex p2, slib::vec3& lux, Face face) 
 };
 
 void Rasterizer::update2ndVertex(vertex& updated, const vertex &p) {
-    updated.p_x = ( p.p_x << 16 ) + 0x8000; // shift to pixel space
+    updated.p_x = p.p_x; // shift to pixel space
     updated.p_z = p.p_z;
     updated.vertexPoint = p.vertexPoint;
     updated.normal = p.normal;
