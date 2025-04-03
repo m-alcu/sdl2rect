@@ -81,8 +81,7 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
     tri.edge23 = gradientDy(tri.p2, tri.p3);
     tri.edge13 = gradientDy(tri.p1, tri.p3);
 
-    vertex left = tri.p1;
-    vertex right = left;
+    vertex left = tri.p1, right = tri.p1;
     if(tri.edge13.p_x < tri.edge12.p_x) {
         if (tri.p2.p_y < scene.screen.height) {
 
