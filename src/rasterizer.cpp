@@ -35,7 +35,7 @@ Check if triangle is completely outside the screen.
 If all vertices are outside the screen, we can skip the rasterization process.
 */
 
-bool Rasterizer::outside(Scene& scene, const triangle& triangle) {
+bool Rasterizer::screenOutside(Scene& scene, const triangle& triangle) {
 
     return ((triangle.p1.p_x < 0 && triangle.p2.p_x < 0 && triangle.p3.p_x < 0) || 
             (triangle.p1.p_x >= scene.screen.width && triangle.p2.p_x >= scene.screen.width && triangle.p3.p_x >= scene.screen.width) ||

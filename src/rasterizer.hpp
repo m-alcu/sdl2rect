@@ -71,7 +71,7 @@ class Rasterizer {
     
         void draw(triangle& tri, const Solid& solid, Scene& scene);
         bool visible(const triangle& triangle);
-        bool outside(Scene& scene, const triangle& triangle);
+        bool screenOutside(Scene& scene, const triangle& triangle);
         bool zFrustrum(const triangle& triangle);
 
         void addTriangle(std::unique_ptr<triangle> triangle)
