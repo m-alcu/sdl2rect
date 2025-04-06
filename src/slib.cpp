@@ -299,7 +299,11 @@ namespace slib
 
     vec4 vec4::operator*(const mat4& m) const
     {
-        return m * (*this);
+        float res_x = m.data[0][0] * (this->x) + m.data[1][0] * this->y + m.data[2][0] * this->z + m.data[3][0] * this->w;
+        float res_y = m.data[0][1] * this->x + m.data[1][1] * this->y + m.data[2][1] * this->z + m.data[3][1] * this->w;
+        float res_z = m.data[0][2] * this->x + m.data[1][2] * this->y + m.data[2][2] * this->z + m.data[3][2] * this->w;
+        float res_w = m.data[0][3] * this->x + m.data[1][3] * this->y + m.data[2][3] * this->z + m.data[3][3] * this->w;
+        return vec4{res_x, res_y, res_z, res_w};
     }
 
     vec4 vec4::operator*=(const mat4& rhs)

@@ -13,7 +13,7 @@ void Scene::setup() {
     torus->position.z = -5000;
     torus->position.x = 0;
     torus->position.y = 0;
-    torus->position.zoom = 1;
+    torus->position.zoom = 1.0f;
     torus->position.xAngle = 90.0f;
     torus->position.yAngle = 0.0f;
     torus->position.zAngle = 0.0f;

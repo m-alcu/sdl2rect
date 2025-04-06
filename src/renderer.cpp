@@ -19,15 +19,15 @@ Screen Space (pixels)
 */
 
 
-void Renderer::drawScene(Scene& scene) {
+void Renderer::drawScene(Scene& scene, float zNear, float zFar, float viewAngle) {
 
-    prepareScene(scene);
+    prepareScene(scene, zNear, zFar, viewAngle);
     for (auto& solidPtr : scene.solids) {
         drawRenderable(*solidPtr, scene);
     }
 }
 
-void Renderer::prepareScene(Scene& scene) {
+void Renderer::prepareScene(Scene& scene, float zNear, float zFar, float viewAngle) {
 
     std::fill_n(scene.pixels, scene.screen.width * scene.screen.height, 0);
     std::fill_n(
@@ -36,10 +36,10 @@ void Renderer::prepareScene(Scene& scene) {
         std::numeric_limits<float>::max() // Initialize zBuffer to the maximum float value
     );
 
-    float zNear = 0.1f; // Near plane distance
-    float zFar  = 1000.0f; // Far plane distance
+    //float zNear = 0.1f; // Near plane distance
+    //float zFar  = 10000.0f; // Far plane distance
     float aspectRatio = scene.screen.width / scene.screen.height; // Width / Height ratio
-    float fovRadians = 60.0f * (3.1415926f / 180.0f);
+    float fovRadians = viewAngle * (PI / 180.0f);
 
     scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
 }
@@ -63,7 +63,7 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
 
 slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& scene) {
 
-    slib::vec4 projectedPoint =  scene.projectionMatrix * slib::vec4(point, 1.0f);
+    slib::vec4 projectedPoint = slib::vec4(point, 1.0f) * scene.projectionMatrix;
     if (projectedPoint.w != 0) {
         projectedPoint.x /= projectedPoint.w;
         projectedPoint.y /= projectedPoint.w;
@@ -114,7 +114,7 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
 
         triangle tri(projectedPoints[solid.faces[i].vertex1], projectedPoints[solid.faces[i].vertex2], projectedPoints[solid.faces[i].vertex3], i);
 
-        if (rasterizer.visible(tri) && !rasterizer.outside(scene, tri) && !rasterizer.behind(tri)) {
+        if (rasterizer.visible(tri) && rasterizer.zFrustrum(tri) && !rasterizer.outside(scene, tri)) {
             rasterizer.addTriangle(std::make_unique<triangle>(tri));
         }
     }

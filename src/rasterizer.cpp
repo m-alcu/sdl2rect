@@ -10,7 +10,7 @@ Check if triangle is visible.
 If the triangle is visible, we can proceed with the rasterization process.
 The calculation is based on the cross product of the edges of the triangle.
 - If the result is positive, the triangle is visible.
-- If the result is negative, the triangle is not visible.
+- If the result is negative, the triangle is not visible.edeeee
 - If the result is zero, the triangle is coplanar with the screen.
 This is a simplified version of the backface culling algorithm.
 The backface culling algorithm is used to determine if a triangle is facing the camera or not.
@@ -19,12 +19,15 @@ If the triangle is facing away from the camera, we can skip the rasterization pr
 
 bool Rasterizer::visible(const triangle& triangle) {
 
-    return (((int32_t) (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y)) - ((int32_t) (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y)) > 0);
+    return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) > 0;
 };
 
-bool Rasterizer::behind(const triangle& triangle) {
+bool Rasterizer::zFrustrum(const triangle& triangle) {
 
-    return (triangle.p1.p_z < 2 || triangle.p2.p_z < 2 || triangle.p3.p_z < 2);
+    return (triangle.p1.p_z > -1 && triangle.p2.p_z > -1 && triangle.p3.p_z > -1) &&
+           (triangle.p1.p_z < 1 && triangle.p2.p_z < 1 && triangle.p3.p_z < 1);
+
+
 };
 
 /*

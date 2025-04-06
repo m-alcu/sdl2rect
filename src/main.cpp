@@ -27,6 +27,10 @@ int main(int argc, char** argv)
     scene.shading = Shading::Flat;
     scene.setup();
 
+    float zNear = 0.1f; // Near plane distance
+    float zFar  = 10000.0f; // Far plane distance
+    float viewAngle = 60.0f; // Field of view angle in degrees
+
     // Renderer engine
     Renderer renderer;
 
@@ -41,7 +45,7 @@ int main(int argc, char** argv)
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.height);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    //SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.height];
@@ -66,7 +70,19 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
                 scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z - 10;               
+                scene.solids[0]->position.z = scene.solids[0]->position.z - 10;     
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
+                zFar = zFar * 1.1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
+                zFar = zFar / 1.1;   
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
+                zNear = zNear * 1.1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
+                zNear = zNear / 1.1;   
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_r) {
+                viewAngle = viewAngle + 1.0f;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
+                viewAngle = viewAngle - 1.0f;                                   
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
@@ -90,7 +106,7 @@ int main(int argc, char** argv)
         }
 
         from = SDL_GetTicks();
-        renderer.drawScene(scene);
+        renderer.drawScene(scene, zNear, zFar, viewAngle);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
@@ -98,6 +114,10 @@ int main(int argc, char** argv)
             << " yAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.yAngle
             << " xPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.x
             << " yPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.y
+            << " zPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.z
+            << " zNear: " << std::fixed << std::setprecision(2) << zNear
+            << " zFar: " << std::fixed << std::setprecision(2) << zFar
+            << " ViewAngle: " << std::fixed << std::setprecision(2) << viewAngle
             << " zoom: " << scene.solids[0]->position.zoom
             << " frames (ms): " << (to - from);
         std::string title = oss.str();
