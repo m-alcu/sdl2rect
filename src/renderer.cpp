@@ -61,7 +61,7 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
     scene.normalTransformMat = rotate;
 }
 
-slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& scene) {
+slib::vec4 Renderer::ndc(slib::vec3 point, const Scene& scene) {
 
     slib::vec4 projectedPoint = slib::vec4(point, 1.0f) * scene.projectionMatrix;
     if (projectedPoint.w != 0) {
@@ -72,32 +72,25 @@ slib::vec4 Renderer::projectedPoint(slib::vec3 point, int16_t i, const Scene& sc
     return projectedPoint;
 }
 
-vertex Renderer::screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 projectedPoint, int16_t i, const Scene& scene) {
-
-    vertex vertex;
+void Renderer::screenProyection(vertex& vertex, slib::vec4 projectedPoint, const Scene& scene) {
     // Apply the viewport transformation to convert from NDC to screen coordinates
     vertex.p_x = (int32_t) ((projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
     vertex.p_y = (int32_t) ((projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
     vertex.p_z = projectedPoint.z;
-    vertex.vtx = i;
-    vertex.normal = normal;
-    vertex.vertexPoint = point;
-    vertex.ds = std::max(0.0f, smath::dot(normal, scene.lux)); // Calculate the dot product with the light direction
-    return vertex;
-}
+}    
 
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
-    slib::vec3 point;
-    slib::vec3 normal;
     vertex* screenPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
-        point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
-        normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
-        slib::vec4 proyectedPoint = projectedPoint(point, i, scene);
-        screenPoints[i] = screenPoint(point, normal, proyectedPoint, i, scene);
+        screenPoints[i].vtx = i;
+        screenPoints[i].vertexPoint = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
+        screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
+        screenPoints[i].ds = std::max(0.0f, smath::dot(screenPoints[i].normal, scene.lux)); // Calculate the dot product with the light direction
+        slib::vec4 proyectedPoint = ndc(screenPoints[i].vertexPoint, scene);
+        screenProyection(screenPoints[i], proyectedPoint, scene);
         }
     // Return the pointer to the array
     return screenPoints;

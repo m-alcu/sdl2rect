@@ -9,8 +9,8 @@ class Renderer {
 
     public:
         void drawScene(Scene& scene, float zNear, float zFar, float viewAngle);
-        slib::vec4 projectedPoint(slib::vec3 point, int16_t i, const Scene& scene);
-        vertex screenPoint(slib::vec3 point, slib::vec3 normal, slib::vec4 projectedPoint, int16_t i, const Scene& scene);
+        slib::vec4 ndc(slib::vec3 point, const Scene& scene);
+        void screenProyection(vertex& vertex, slib::vec4 projectedPoint, const Scene& scene);
         void prepareScene(Scene& scene, float zNear, float zFar, float viewAngle);
         void prepareRenderable(const Solid& solid, Scene& scene);
         vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);            
