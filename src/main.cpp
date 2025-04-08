@@ -68,21 +68,9 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
+                scene.solids[0]->position.z = scene.solids[0]->position.z + 100;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z - 10;     
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                zFar = zFar * 1.1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                zFar = zFar / 1.1;   
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
-                zNear = zNear * 1.1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_d) {
-                zNear = zNear / 1.1;   
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_r) {
-                viewAngle = viewAngle + 1.0f;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
-                viewAngle = viewAngle - 1.0f;                                   
+                scene.solids[0]->position.z = scene.solids[0]->position.z - 100; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {

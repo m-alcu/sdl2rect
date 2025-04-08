@@ -59,16 +59,6 @@ struct vertex {
     vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, float _ds, slib::zvec2 _tex) :
     p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
-    vertex(const vertex &v, slib::vec3 lux, Face face) {
-        p_x = v.p_x;
-        p_z = v.p_z;
-        vertexPoint = v.vertexPoint;
-        normal = v.normal;
-        tex = v.tex;
-        ds = v.ds;
-        vtx = v.vtx;
-    }     
-
     vertex operator+(const vertex &v) const {
         return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
     }

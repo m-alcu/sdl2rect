@@ -98,8 +98,6 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
 
 void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
 
-    slib::vec3 rotatedFacenormal;
-
     Rasterizer rasterizer(&solid, scene.pixels, scene.zBuffer);
 
     for (int i=0; i<solid.numFaces; i++) {
