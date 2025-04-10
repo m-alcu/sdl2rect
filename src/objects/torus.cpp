@@ -61,13 +61,23 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             face.vertex1 = idx2;
             face.vertex2 = idx1; // wrap-around for the quad
             face.vertex3 = idx0;
-            face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)};
+            MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
+
+            face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, properties};
+            face.materyal.Ka = { getColorFromMaterial(properties.k_a * 0x00 / 256), getColorFromMaterial(properties.k_a * 0x58 / 256), getColorFromMaterial(properties.k_a * 0xfc / 256)};
+            face.materyal.Kd = { getColorFromMaterial(properties.k_d * 0x00 / 256), getColorFromMaterial(properties.k_d * 0x58 / 256), getColorFromMaterial(properties.k_d * 0xfc / 256)};
+            face.materyal.Ks = { getColorFromMaterial(properties.k_s * 0x00 / 256), getColorFromMaterial(properties.k_s * 0x58 / 256), getColorFromMaterial(properties.k_s * 0xfc / 256)};
+            face.materyal.Ns = properties.shininess;
             faces.push_back(face);
 
             face.vertex1 = idx3;
             face.vertex2 = idx2; // wrap-around for the quad
             face.vertex3 = idx0;
-            face.material = { 0xfffedd00, 0xfffedd00, 0xfffedd00, getMaterialProperties(MaterialType::Metal)};
+            face.material = { 0xfffedd00, 0xfffedd00, 0xfffedd00, properties};
+            face.materyal.Ka = { getColorFromMaterial(properties.k_a * 0xfe / 256), getColorFromMaterial(properties.k_a * 0xdd / 256), getColorFromMaterial(properties.k_a * 0x00 / 256)};
+            face.materyal.Kd = { getColorFromMaterial(properties.k_d * 0xfe / 256), getColorFromMaterial(properties.k_d * 0xdd / 256), getColorFromMaterial(properties.k_d * 0x00 / 256)};
+            face.materyal.Ks = { getColorFromMaterial(properties.k_s * 0xfe / 256), getColorFromMaterial(properties.k_s * 0xdd / 256), getColorFromMaterial(properties.k_s * 0x00 / 256)};
+            face.materyal.Ns = properties.shininess;
             faces.push_back(face);
         }
     }

@@ -42,6 +42,7 @@ typedef struct Face
     int16_t vertex2;
     int16_t vertex3;
     Material material;
+    slib::material materyal;
 } Face;
 
 struct vertex {
@@ -104,6 +105,5 @@ enum class Shading {
     Flat,
     Gouraud,
     BlinnPhong,
-    Phong,
-    Precomputed
+    Phong
 };

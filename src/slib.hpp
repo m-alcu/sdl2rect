@@ -24,10 +24,10 @@ namespace slib
     struct material
     {
         float Ns{};
-        std::array<float, 3> Ka{};
-        std::array<float, 3> Kd{};
-        std::array<float, 3> Ks{};
-        std::array<float, 3> Ke{};
+        std::array<int, 3> Ka{};
+        std::array<int, 3> Kd{};
+        std::array<int, 3> Ks{};
+        std::array<int, 3> Ke{};
         float Ni{};
         float d{};
         int illum{};

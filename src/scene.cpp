@@ -18,8 +18,6 @@ void Scene::setup() {
     torus->position.yAngle = 0.0f;
     torus->position.zAngle = 0.0f;
     
-    calculatePrecomputedShading(*torus);
-
     addSolid(std::move(torus));
     
 
@@ -102,37 +100,5 @@ void Scene::setup() {
 
     addSolid(std::move(torus2));
     */
-
-}
-
-void Scene::calculatePrecomputedShading(Solid& solid) {
-
-    MaterialProperties material = solid.getMaterialProperties(MaterialType::Metal);
-
-    for(int x = 0; x < PRECOMPUTE_SIZE; x++) {
-        for (int y = 0; y < PRECOMPUTE_SIZE; y++) {
-
-            float f_x = (float)(x - PRECOMPUTE_SIZE/2) / (PRECOMPUTE_SIZE/2);
-            float f_y = (float)(y - PRECOMPUTE_SIZE/2) / (PRECOMPUTE_SIZE/2);
-
-            float f_xy_sq = f_x * f_x + f_y * f_y;
-
-            if (f_xy_sq <= 1.0f) {
-                float f_z = sqrt(1.0f - f_xy_sq);
-
-                slib::vec3 normal = smath::normalize(slib::vec3({f_x, f_y, -f_z}));
-                float diff = std::max(0.0f, smath::dot(normal,lux));
-            
-                slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,lux) - lux);
-                float specAngle = std::max(0.0f, smath::dot(R,eye)); // viewer
-                float spec = std::pow(specAngle, material.shininess);
-            
-                float bright = material.k_a+material.k_d * diff+ material.k_s * (diff == 0.0f ? 0 : spec);
-                solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = (int32_t) (bright * 65536 * 0.98);
-            } else {
-                solid.precomputedShading[y*PRECOMPUTE_SIZE+x] = 0;
-            }
-        }
-    }
 
 }

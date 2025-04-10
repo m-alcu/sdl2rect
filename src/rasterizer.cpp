@@ -105,21 +105,21 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
                 //Culling the bottom pixels of the bottom triangle
                 cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge13, right, tri.edge23);
                 tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
             } else {
                 //This triangle finishes in the screen (but needs culling top pixels)
                 cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge13, right, tri.edge12);
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
                 right = tri.p2;
                 //Culling the bottom pixels of the bottom triangle
                 tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
             }
         } else {
             //Needs to cull the top and the bottom pixels 
             cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge13, right, tri.edge12);
             tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
         };
     } else {
         if  (tri.p2.p_y < scene.screen.height) {
@@ -128,19 +128,19 @@ void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
                 left = tri.p2;
                 cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge23, right, tri.edge13);
                 tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
             } else {
                 cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge12, right, tri.edge13);
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
                 left = tri.p2;
                 cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge23, right, tri.edge13);
                 tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
             }
         } else {
             cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge12, right, tri.edge13);
             tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.precomputedShading);
+            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
         };
     }
 };
@@ -167,7 +167,7 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
     }
 };
 
-inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor, uint32_t* precomputedShading) {
+inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         vertex vDx = vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
@@ -198,10 +198,7 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
                         break;                                
                     case Shading::Phong:
                         pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
-                        break;
-                    case Shading::Precomputed:
-                        pixels[hy + hx] = precomputedPhongShadingFragment(vRaster, scene, face, precomputedShading);
-                        break;                                
+                        break;                         
                     default: pixels[hy + hx] = flatColor;
                 }
                 zBuffer[hy + hx] = vRaster.p_z;
@@ -214,7 +211,11 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
 };
 
 inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
-    return RGBAColor(face.material.Ambient, (int32_t) ((face.material.properties.k_a+face.material.properties.k_d * vRaster.ds) * 65536 * 4)).bgra_value;
+
+    unsigned char r = std::max(0, std::min(static_cast<int>(face.materyal.Ka[0] + face.materyal.Kd[0] * vRaster.ds) * 4, 255));
+    unsigned char g = std::max(0, std::min(static_cast<int>(face.materyal.Ka[1] + face.materyal.Kd[1] * vRaster.ds) * 4, 255));
+    unsigned char b = std::max(0, std::min(static_cast<int>(face.materyal.Ka[2] + face.materyal.Kd[2] * vRaster.ds) * 4, 255));
+    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, Face face) {
@@ -224,11 +225,17 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
 
     slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
     float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
-    float spec = std::pow(specAngle, face.material.properties.shininess);
+    float spec = std::pow(specAngle, face.materyal.Ns);
 
-    float bright = face.material.properties.k_a+face.material.properties.k_d * diff+ face.material.properties.k_s * spec;
-    return RGBAColor(face.material.Ambient, (int32_t) (bright * 65536 * 0.98)).bgra_value;
+    unsigned char r = std::max(0, std::min(static_cast<int>(face.materyal.Ka[0] + face.materyal.Kd[0] * diff + face.materyal.Ks[0] * spec), 255));
+    unsigned char g = std::max(0, std::min(static_cast<int>(face.materyal.Ka[1] + face.materyal.Kd[1] * diff + face.materyal.Ks[1] * spec), 255));
+    unsigned char b = std::max(0, std::min(static_cast<int>(face.materyal.Ka[2] + face.materyal.Kd[2] * diff + face.materyal.Ks[2] * spec), 255));
 
+    if (diff > 0.99) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
+
+    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face) {
@@ -249,22 +256,15 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     float spec = std::pow(specAngle, face.material.properties.shininess * 4); // Blinn Phong shininess needs *4 to be like Phong
 
     // Calculate brightness
-    float bright = face.material.properties.k_a + 
-                   face.material.properties.k_d * diff + 
-                   face.material.properties.k_s * spec;
+    unsigned char r = std::max(0, std::min(static_cast<int>(face.materyal.Ka[0] + face.materyal.Kd[0] * diff + face.materyal.Ks[0] * spec), 255));
+    unsigned char g = std::max(0, std::min(static_cast<int>(face.materyal.Ka[1] + face.materyal.Kd[1] * diff + face.materyal.Ks[1] * spec), 255));
+    unsigned char b = std::max(0, std::min(static_cast<int>(face.materyal.Ka[2] + face.materyal.Kd[2] * diff + face.materyal.Ks[2] * spec), 255));
 
-    // Final color composition (ambient color scaled by total brightness)
-    return RGBAColor(face.material.Ambient, (int32_t)(bright * 65536 * 0.98)).bgra_value;
-}
+    if (diff > 0.99) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
 
-inline uint32_t Rasterizer::precomputedPhongShadingFragment(vertex gRaster, Scene& scene, Face face, uint32_t* precomputedShading) {
-
-    slib::vec3 normal = smath::normalize(gRaster.normal);
-
-    int16_t normal_x = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.x * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
-    int16_t normal_y = std::max((int16_t) 0,std::min( (int16_t) (PRECOMPUTE_SIZE-1),(int16_t) (normal.y * PRECOMPUTE_SIZE/2 + PRECOMPUTE_SIZE/2)));
-    return RGBAColor(face.material.Ambient, precomputedShading[normal_y*PRECOMPUTE_SIZE+normal_x]).bgra_value;
-
+    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 

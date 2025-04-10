@@ -78,9 +78,7 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
                 scene.shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
-                scene.shading = Shading::Phong;     
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_k) {
-                scene.shading = Shading::Precomputed;                              
+                scene.shading = Shading::Phong;                                 
             } else if (event.type == SDL_MOUSEMOTION) {
                 scene.solids[0]->position.x = event.motion.x*2 - scene.screen.width;
                 scene.solids[0]->position.y = event.motion.y*2 - scene.screen.height;

@@ -59,5 +59,12 @@ MaterialProperties Solid::getMaterialProperties(MaterialType type) {
     }
 }
 
+int Solid::getColorFromMaterial(const float color) {
+
+    float kaR = std::fmod(color, 1.0f);
+    kaR = kaR < 0 ? 1.0f + kaR : kaR;
+    return (static_cast<int>(kaR * 255));
+}
+
 
 
