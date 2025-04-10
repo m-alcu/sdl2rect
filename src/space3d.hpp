@@ -28,21 +28,12 @@ typedef struct MaterialProperties {
     float shininess;
 } MaterialProperties;
 
-typedef struct Material
-{
-    uint32_t Ambient;
-    uint32_t Diffuse;
-    uint32_t Specular;
-    MaterialProperties properties;
-} Material;
-
 typedef struct Face
 {
     int16_t vertex1;
     int16_t vertex2;
     int16_t vertex3;
-    Material material;
-    slib::material materyal;
+    slib::material material;
 } Face;
 
 struct vertex {

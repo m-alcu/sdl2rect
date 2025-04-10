@@ -30,6 +30,8 @@ void AscLoader::loadVertices(const std::string& filename) {
     std::vector<slib::vec3> vertices;
     std::vector<Face> faces;
 
+    MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
+
     while (std::getline(file, line)) {
         // Remove leading/trailing spaces
         line.erase(0, line.find_first_not_of(" \t\r\n"));
@@ -81,7 +83,10 @@ void AscLoader::loadVertices(const std::string& filename) {
                     face.vertex1 = std::stoi(match[3]);
                     face.vertex2 = std::stoi(match[2]);
                     face.vertex3 = std::stoi(match[1]);
-                    face.material = { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal) };
+                    face.material.Ka = { getColorFromMaterial(properties.k_a * 0x00), getColorFromMaterial(properties.k_a * 0x58), getColorFromMaterial(properties.k_a * 0xfc) };
+                    face.material.Kd = { getColorFromMaterial(properties.k_d * 0x00), getColorFromMaterial(properties.k_d * 0x58), getColorFromMaterial(properties.k_d * 0xfc) };
+                    face.material.Ks = { getColorFromMaterial(properties.k_s * 0x00), getColorFromMaterial(properties.k_s * 0x58), getColorFromMaterial(properties.k_s * 0xfc) };
+                    face.material.Ns = properties.shininess;
 
                     faces.push_back(face);
                 }
