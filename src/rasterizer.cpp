@@ -213,9 +213,9 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
 
 inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
 
-    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds) * 4, 255));
-    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds) * 4, 255));
-    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds) * 4, 255));
+    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255));
+    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255));
+    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds), 255));
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
@@ -232,9 +232,10 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
     unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
     unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
+    /*
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }
+    }*/
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
@@ -261,9 +262,10 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
     unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
+    /*
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }
+    }*/
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
@@ -312,8 +314,9 @@ void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
     const auto Clip1 = [this]( vertex& p1, vertex& p2, vertex& p3 , int16_t i)
     {
         // calculate alpha values for getting adjusted vertices
-        const float alphaA = (-p1.vertexPoint.w - p1.vertexPoint.z) / (p2.vertexPoint.z - p1.vertexPoint.z);
-        const float alphaB = (-p1.vertexPoint.w - p1.vertexPoint.z) / (p3.vertexPoint.z - p1.vertexPoint.z);
+        // t = (zA + wA) / ((zA + wA) - (zB + wB))
+        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
+        const float alphaB = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
         // interpolate to get p1a and p1b
         const auto p1a = p1 + (p2 - p1) * alphaA;
         const auto p1b = p1 + (p3 - p1) * alphaB;
@@ -331,8 +334,8 @@ void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
     const auto Clip2 = [this]( vertex& p1,vertex& p2,vertex& p3, int16_t i)
     {
         // calculate alpha values for getting adjusted vertices
-        const float alpha0 = (-p1.vertexPoint.w -p1.vertexPoint.z) / (p3.vertexPoint.z - p1.vertexPoint.z);
-        const float alpha1 = (-p1.vertexPoint.w -p2.vertexPoint.z) / (p3.vertexPoint.z - p2.vertexPoint.z);
+        const float alpha0 = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+        const float alpha1 = (p2.vertexPoint.z + p2.vertexPoint.w) / ((p2.vertexPoint.z + p2.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
         // interpolate to get p1a and p1b
         p1 = p1 + (p3 - p1) * alpha0;
         p2 = p2 + (p3 - p2) * alpha1;

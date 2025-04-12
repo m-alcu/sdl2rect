@@ -65,7 +65,6 @@ void Scene::setup() {
     tetrakis->position.yAngle = 0.0f;
     tetrakis->position.zAngle = 0.0f;
     
-    calculatePrecomputedShading(*tetrakis);
     addSolid(std::move(tetrakis));
     */
 

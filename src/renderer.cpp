@@ -88,8 +88,9 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
 
         triangle tri(projectedPoints[solid.faces[i].vertex1], projectedPoints[solid.faces[i].vertex2], projectedPoints[solid.faces[i].vertex3], i);
 
-        if (rasterizer.visible(tri) && rasterizer.zFrustrum(tri) && !rasterizer.screenOutside(scene, tri)) {
-            rasterizer.addTriangle(std::make_unique<triangle>(tri));
+        if (rasterizer.visible(tri) && !rasterizer.screenOutside(scene, tri)) {
+            //rasterizer.addTriangle(std::make_unique<triangle>(tri));
+            rasterizer.ClipCullTriangle(std::make_unique<triangle>(tri));
         }
     }
     

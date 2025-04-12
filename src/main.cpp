@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     scene.shading = Shading::Flat;
     scene.setup();
 
-    float zNear = 0.1f; // Near plane distance
+    float zNear = 100.0f; // Near plane distance
     float zFar  = 10000.0f; // Far plane distance
     float viewAngle = 60.0f; // Field of view angle in degrees
 
@@ -68,9 +68,13 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z + 100;
+                scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z - 100; 
+                scene.solids[0]->position.z = scene.solids[0]->position.z - 10; 
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
+                scene.solids[0]->position.xAngle = scene.solids[0]->position.xAngle + 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
+                scene.solids[0]->position.yAngle = scene.solids[0]->position.yAngle - 1;         
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
@@ -84,9 +88,9 @@ int main(int argc, char** argv)
                 scene.solids[0]->position.y = event.motion.y*2 - scene.screen.height;
             } else if (event.type == SDL_MOUSEWHEEL) {
                 if (event.wheel.y > 0) {
-                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.1;
+                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.01;
                 } else {
-                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.1;
+                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.01;
                 }
             }
         }
@@ -126,8 +130,10 @@ int main(int argc, char** argv)
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
+        /*
         scene.solids[0]->position.xAngle += 0.5f;
         scene.solids[0]->position.yAngle += 1.0f;
+        */
     }
 
     // Free resources.

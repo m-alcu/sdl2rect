@@ -32,17 +32,6 @@ class RGBAColor {
             rgba.alpha = alpha;
         }
 
-        RGBAColor(uint32_t value, int32_t shining) {
-            bgra_value = value;
-            if (shining > 0x0000ffff) { 
-                bgra_value|= 0x00FFFFFF;
-            } else {
-                rgba.red = (uint8_t) ((rgba.red * shining) >> 16);
-                rgba.green = (uint8_t) ((rgba.green * shining) >> 16);
-                rgba.blue = (uint8_t) ((rgba.blue * shining) >> 16);             
-            }
-        }
-
         RGBAColor(uint32_t value) {
             bgra_value = value;
         }
