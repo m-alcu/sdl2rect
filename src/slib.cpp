@@ -311,4 +311,44 @@ namespace slib
         *this = *this * rhs;
         return *this;
     }
+
+    vec4 vec4::operator-(const vec4& rhs) const
+    {
+        return {x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
+    }
+
+    vec4 vec4::operator+(const vec4& rhs) const
+    {
+        return {x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w};
+    }
+
+    vec4& vec4::operator+=(const vec4& rhs)
+    {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        w += rhs.w;
+        return *this;
+    }
+
+    vec4& vec4::operator-=(const vec4& rhs)
+    {
+        x -= rhs.x;
+        y -= rhs.y;
+        z -= rhs.z;
+        w -= rhs.w;
+        return *this;
+    }
+
+    vec4 vec4::operator*(const float rhs) const
+    {
+        return {x * rhs, y * rhs, z * rhs, w * rhs};	
+    }
+
+    vec4 vec4::operator/(const float rhs) const
+    {
+        return {x / rhs, y / rhs, z / rhs, w / rhs};
+    }
+
+
 } // namespace slib

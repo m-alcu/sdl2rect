@@ -93,6 +93,12 @@ namespace slib
         float x, y, z, w;
         vec4 operator*(const mat4& rhs) const;
         vec4 operator*=(const mat4& rhs);
+        vec4 operator-(const vec4& rhs) const;
+        vec4 operator+(const vec4& rhs) const;
+        vec4& operator+=(const vec4& rhs);
+        vec4& operator-=(const vec4& rhs);
+        vec4 operator*(float rhs) const;
+        vec4 operator/(float rhs) const;
         vec4() = default;
         vec4(const vec3& v3, const float _w) : x(v3.x), y(v3.y), z(v3.z), w(_w)
         {

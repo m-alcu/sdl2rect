@@ -77,7 +77,6 @@ inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& l
 
 void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
 
-
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
         slib::vec3 rotatedFacenormal;
@@ -162,9 +161,9 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
         return (p2 - p1) / dy;
     } else {
         if (p2.p_x - p1.p_x > 0) {
-            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         } else {
-            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         }
     }
 };
@@ -172,7 +171,7 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
 inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        vertex vDx = vertex(0, 0, 0, 0, {0,0,0}, {0,0,0}, 0, {0,0,0});
+        vertex vDx = vertex(0, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         int16_t dx = (right.p_x - left.p_x) >> 16;
         if (dx != 0) vDx = (right - left) / dx;
         vertex vRaster = left;
@@ -267,6 +266,119 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     }
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+}
+
+void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
+{
+    // cull tests
+    if( t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.x > t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.x > t->p3.vertexPoint.w )
+    {
+        return;
+    }
+    if( t->p1.vertexPoint.x < -t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.x < -t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.x < -t->p3.vertexPoint.w )
+    {
+        return;
+    }
+    if( t->p1.vertexPoint.y > t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.y > t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.y > t->p3.vertexPoint.w )
+    {
+        return;
+    }
+    if( t->p1.vertexPoint.y < - t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.y < - t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.y < - t->p3.vertexPoint.w )
+    {
+        return;
+    }
+    if( t->p1.vertexPoint.z > t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.z > t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.z > t->p3.vertexPoint.w )
+    {
+        return;
+    }
+    if( t->p1.vertexPoint.z < - t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.z < - t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
+    {
+        return;
+    }
+
+    // clipping routines
+    const auto Clip1 = [this]( vertex& p1, vertex& p2, vertex& p3 , int16_t i)
+    {
+        // calculate alpha values for getting adjusted vertices
+        const float alphaA = (-p1.vertexPoint.w - p1.vertexPoint.z) / (p2.vertexPoint.z - p1.vertexPoint.z);
+        const float alphaB = (-p1.vertexPoint.w - p1.vertexPoint.z) / (p3.vertexPoint.z - p1.vertexPoint.z);
+        // interpolate to get p1a and p1b
+        const auto p1a = p1 + (p2 - p1) * alphaA;
+        const auto p1b = p1 + (p3 - p1) * alphaB;
+        // draw triangles
+        {
+            triangle tri(p1a, p2, p3, i);
+            addTriangle(std::make_unique<triangle>(tri));
+
+        }
+        {
+            triangle tri(p1b, p1a, p3, i);
+            addTriangle(std::make_unique<triangle>(tri));
+        }
+    };
+    const auto Clip2 = [this]( vertex& p1,vertex& p2,vertex& p3, int16_t i)
+    {
+        // calculate alpha values for getting adjusted vertices
+        const float alpha0 = (-p1.vertexPoint.w -p1.vertexPoint.z) / (p3.vertexPoint.z - p1.vertexPoint.z);
+        const float alpha1 = (-p1.vertexPoint.w -p2.vertexPoint.z) / (p3.vertexPoint.z - p2.vertexPoint.z);
+        // interpolate to get p1a and p1b
+        p1 = p1 + (p3 - p1) * alpha0;
+        p2 = p2 + (p3 - p2) * alpha1;
+        {
+            triangle tri(p1, p2, p3, i);
+            addTriangle(std::make_unique<triangle>(tri));
+        }
+    };
+
+    // near clipping tests
+    if( t->p1.vertexPoint.z < - t->p1.vertexPoint.w )
+    {
+        if( t->p2.vertexPoint.z < - t->p2.vertexPoint.w )
+        
+        {
+            Clip2( t->p1,t->p2,t->p3 , t->i);
+        }
+        else if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
+        {
+            Clip2( t->p1,t->p3,t->p2 , t->i);
+        }
+        else
+        {
+            Clip1( t->p1,t->p2,t->p3, t->i);
+        }
+    }
+    else if( t->p2.vertexPoint.z < - t->p2.vertexPoint.w )
+    {
+        if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
+        {
+            Clip2( t->p2,t->p3,t->p1, t->i);
+        }
+        else
+        {
+            Clip1( t->p2,t->p1,t->p3, t->i);
+        }
+    }
+    else if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
+    {
+        Clip1( t->p3,t->p1,t->p2, t->i);
+    }
+    else // no near clipping necessary
+    {
+        triangle tri(t->p1, t->p2, t->p3, t->i);
+        addTriangle(std::make_unique<triangle>(tri));
+    }
 }
 
 

@@ -61,24 +61,6 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
     scene.normalTransformMat = rotate;
 }
 
-slib::vec4 Renderer::ndc(slib::vec3 point, const Scene& scene) {
-
-    slib::vec4 projectedPoint = slib::vec4(point, 1.0f) * scene.projectionMatrix;
-    if (projectedPoint.w != 0) {
-        projectedPoint.x /= projectedPoint.w;
-        projectedPoint.y /= projectedPoint.w;
-        projectedPoint.z /= projectedPoint.w;
-    }
-    return projectedPoint;
-}
-
-void Renderer::screenProyection(vertex& vertex, slib::vec4 projectedPoint, const Scene& scene) {
-    // Apply the viewport transformation to convert from NDC to screen coordinates
-    vertex.p_x = (int32_t) ((projectedPoint.x + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
-    vertex.p_y = (int32_t) ((projectedPoint.y + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
-    vertex.p_z = projectedPoint.z;
-}    
-
 vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Allocate an array of Pixels on the heap
     vertex* screenPoints = new vertex[solid.numVertices];
@@ -86,13 +68,14 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     for (int i = 0; i < solid.numVertices; i++) {
 
         screenPoints[i].vtx = i;
-        screenPoints[i].vertexPoint = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
+        slib::vec4 point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
+        screenPoints[i].vertexPoint = point * scene.projectionMatrix;
         screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
         screenPoints[i].ds = std::max(0.0f, smath::dot(screenPoints[i].normal, scene.lux)); // Calculate the dot product with the light direction
-        slib::vec4 proyectedPoint = ndc(screenPoints[i].vertexPoint, scene);
-        screenProyection(screenPoints[i], proyectedPoint, scene);
+        screenPoints[i].p_x = (int32_t) ((screenPoints[i].vertexPoint.x / screenPoints[i].vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoints[i].p_y = (int32_t) ((screenPoints[i].vertexPoint.y / screenPoints[i].vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoints[i].p_z = screenPoints[i].vertexPoint.z / screenPoints[i].vertexPoint.w; // Store the depth value in the z-buffer
         }
-    // Return the pointer to the array
     return screenPoints;
 }
 
@@ -115,4 +98,5 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
     }
 
 }
+
 

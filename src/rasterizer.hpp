@@ -73,6 +73,7 @@ class Rasterizer {
         bool visible(const triangle& triangle);
         bool screenOutside(Scene& scene, const triangle& triangle);
         bool zFrustrum(const triangle& triangle);
+        void ClipCullTriangle( std::unique_ptr<triangle> t );
 
         void addTriangle(std::unique_ptr<triangle> triangle)
         {
@@ -86,6 +87,7 @@ class Rasterizer {
         uint32_t gouraudShadingFragment(vertex gRaster, Scene& scene, Face face);
         uint32_t phongShadingFragment(vertex gRaster, Scene& scene, Face face);
         uint32_t blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face);
+        
     };
     
 

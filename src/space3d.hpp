@@ -41,14 +41,14 @@ struct vertex {
     int32_t p_y;
     float p_z; 
     slib::vec3 normal;
-    slib::vec3 vertexPoint;
+    slib::vec4 vertexPoint;
     slib::zvec2 tex; // Texture coordinates
     float ds;
     int16_t vtx;
 
     vertex() {}
 
-    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec3 vp, float _ds, slib::zvec2 _tex) :
+    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec4 vp, float _ds, slib::zvec2 _tex) :
     p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
     vertex operator+(const vertex &v) const {
