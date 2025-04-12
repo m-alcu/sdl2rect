@@ -38,18 +38,21 @@ class RGBAColor {
 
     };
 
-struct triangle
+
+template<class V>
+class Triangle
 {
-    vertex p1, p2, p3;
-    vertex edge12, edge23, edge13;
+public:
+    V p1, p2, p3;
+    V edge12, edge23, edge13;
     int16_t i;
-    triangle(const triangle& _t) : p1(_t.p1), p2(_t.p2), p3(_t.p3), i(_t.i) {};
-    triangle(const vertex& _p1, const vertex& _p2, const vertex& _p3, int16_t _i) : p1(_p1), p2(_p2), p3(_p3), i(_i) {};
+    Triangle(const Triangle& _t) : p1(_t.p1), p2(_t.p2), p3(_t.p3), i(_t.i) {};
+    Triangle(const V& _p1, const V& _p2, const V& _p3, int16_t _i) : p1(_p1), p2(_p2), p3(_p3), i(_i) {};
 };
 
 class Rasterizer {
     public:
-        std::vector<std::unique_ptr<triangle>> triangles;
+        std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         uint32_t *pixels;
         float *zBuffer;
         const Solid* solid;  // Pointer to the abstract Solid
@@ -58,13 +61,13 @@ class Rasterizer {
         Rasterizer(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
           : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
     
-        void draw(triangle& tri, const Solid& solid, Scene& scene);
-        bool visible(const triangle& triangle);
-        bool screenOutside(Scene& scene, const triangle& triangle);
-        bool zFrustrum(const triangle& triangle);
-        void ClipCullTriangle( std::unique_ptr<triangle> t );
+        void draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene);
+        bool visible(const Triangle<vertex>& triangle);
+        bool screenOutside(Scene& scene, const Triangle<vertex>& triangle);
+        bool zFrustrum(const Triangle<vertex>& triangle);
+        void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t );
 
-        void addTriangle(std::unique_ptr<triangle> triangle)
+        void addTriangle(std::unique_ptr<Triangle<vertex>> triangle)
         {
             triangles.push_back(std::move(triangle));
         }

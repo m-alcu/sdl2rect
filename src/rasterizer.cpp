@@ -17,12 +17,12 @@ The backface culling algorithm is used to determine if a triangle is facing the 
 If the triangle is facing away from the camera, we can skip the rasterization process.
 */
 
-bool Rasterizer::visible(const triangle& triangle) {
+bool Rasterizer::visible(const Triangle<vertex>& triangle) {
 
     return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) > 0;
 };
 
-bool Rasterizer::zFrustrum(const triangle& triangle) {
+bool Rasterizer::zFrustrum(const Triangle<vertex>& triangle) {
 
     return (triangle.p1.p_z > -1 && triangle.p2.p_z > -1 && triangle.p3.p_z > -1) &&
            (triangle.p1.p_z < 1 && triangle.p2.p_z < 1 && triangle.p3.p_z < 1);
@@ -35,7 +35,7 @@ Check if triangle is completely outside the screen.
 If all vertices are outside the screen, we can skip the rasterization process.
 */
 
-bool Rasterizer::screenOutside(Scene& scene, const triangle& triangle) {
+bool Rasterizer::screenOutside(Scene& scene, const Triangle<vertex>& triangle) {
 
     return ((triangle.p1.p_x < 0 && triangle.p2.p_x < 0 && triangle.p3.p_x < 0) || 
             (triangle.p1.p_x >= scene.screen.width && triangle.p2.p_x >= scene.screen.width && triangle.p3.p_x >= scene.screen.width) ||
@@ -75,7 +75,7 @@ inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& l
               p3                    p3
 */
 
-void Rasterizer::draw(triangle& tri, const Solid& solid, Scene& scene) {
+void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene) {
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -270,7 +270,7 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
+void Rasterizer::ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t )
 {
     // cull tests
     if( t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
@@ -322,13 +322,13 @@ void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
         const auto p1b = p1 + (p3 - p1) * alphaB;
         // draw triangles
         {
-            triangle tri(p1a, p2, p3, i);
-            addTriangle(std::make_unique<triangle>(tri));
+            Triangle tri(p1a, p2, p3, i);
+            addTriangle(std::make_unique<Triangle<vertex>>(tri));
 
         }
         {
-            triangle tri(p1b, p1a, p3, i);
-            addTriangle(std::make_unique<triangle>(tri));
+            Triangle tri(p1b, p1a, p3, i);
+            addTriangle(std::make_unique<Triangle<vertex>>(tri));
         }
     };
     const auto Clip2 = [this]( vertex& p1,vertex& p2,vertex& p3, int16_t i)
@@ -340,8 +340,8 @@ void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
         p1 = p1 + (p3 - p1) * alpha0;
         p2 = p2 + (p3 - p2) * alpha1;
         {
-            triangle tri(p1, p2, p3, i);
-            addTriangle(std::make_unique<triangle>(tri));
+            Triangle tri(p1, p2, p3, i);
+            addTriangle(std::make_unique<Triangle<vertex>>(tri));
         }
     };
 
@@ -379,8 +379,8 @@ void Rasterizer::ClipCullTriangle( std::unique_ptr<triangle> t )
     }
     else // no near clipping necessary
     {
-        triangle tri(t->p1, t->p2, t->p3, t->i);
-        addTriangle(std::make_unique<triangle>(tri));
+        Triangle tri(t->p1, t->p2, t->p3, t->i);
+        addTriangle(std::make_unique<Triangle<vertex>>(tri));
     }
 }
 
