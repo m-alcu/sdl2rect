@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
     float zNear = 100.0f; // Near plane distance
     float zFar  = 10000.0f; // Far plane distance
-    float viewAngle = 60.0f; // Field of view angle in degrees
+    float viewAngle = 45.0f; // Field of view angle in degrees
 
     // Renderer engine
     Renderer renderer;
