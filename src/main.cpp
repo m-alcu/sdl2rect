@@ -130,10 +130,10 @@ int main(int argc, char** argv)
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
-        /*
+        
         scene.solids[0]->position.xAngle += 0.5f;
         scene.solids[0]->position.yAngle += 1.0f;
-        */
+        
     }
 
     // Free resources.

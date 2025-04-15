@@ -213,9 +213,9 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
 
 inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
 
-    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255));
-    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255));
-    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds), 255));
+    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds) * 4, 255));
+    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds) * 4, 255));
+    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds) * 4, 255));
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
@@ -232,10 +232,10 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
     unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
     unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
-    /*
+    
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }*/
+    }
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
@@ -262,127 +262,109 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
     unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
-    /*
+    
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }*/
+    }
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t )
+void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
 {
-    // cull tests
-    if( t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
+    // Cull tests (unchanged)
+    if (t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
         t->p2.vertexPoint.x > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.x > t->p3.vertexPoint.w )
-    {
+        t->p3.vertexPoint.x > t->p3.vertexPoint.w)
         return;
-    }
-    if( t->p1.vertexPoint.x < -t->p1.vertexPoint.w &&
+
+    if (t->p1.vertexPoint.x < -t->p1.vertexPoint.w &&
         t->p2.vertexPoint.x < -t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.x < -t->p3.vertexPoint.w )
-    {
+        t->p3.vertexPoint.x < -t->p3.vertexPoint.w)
         return;
-    }
-    if( t->p1.vertexPoint.y > t->p1.vertexPoint.w &&
+
+    if (t->p1.vertexPoint.y > t->p1.vertexPoint.w &&
         t->p2.vertexPoint.y > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.y > t->p3.vertexPoint.w )
-    {
+        t->p3.vertexPoint.y > t->p3.vertexPoint.w)
         return;
-    }
-    if( t->p1.vertexPoint.y < - t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.y < - t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.y < - t->p3.vertexPoint.w )
-    {
+
+    if (t->p1.vertexPoint.y < -t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.y < -t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.y < -t->p3.vertexPoint.w)
         return;
-    }
-    if( t->p1.vertexPoint.z > t->p1.vertexPoint.w &&
+
+    if (t->p1.vertexPoint.z > t->p1.vertexPoint.w &&
         t->p2.vertexPoint.z > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.z > t->p3.vertexPoint.w )
-    {
+        t->p3.vertexPoint.z > t->p3.vertexPoint.w)
         return;
-    }
-    if( t->p1.vertexPoint.z < - t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.z < - t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
-    {
+
+    if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.z < -t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
         return;
-    }
 
-    // clipping routines
-    const auto Clip1 = [this]( vertex& p1, vertex& p2, vertex& p3 , int16_t i)
+    // Check most common case first: No near clipping necessary
+    if (t->p1.vertexPoint.z >= -t->p1.vertexPoint.w &&
+        t->p2.vertexPoint.z >= -t->p2.vertexPoint.w &&
+        t->p3.vertexPoint.z >= -t->p3.vertexPoint.w)
     {
-        // calculate alpha values for getting adjusted vertices
-        // t = (zA + wA) / ((zA + wA) - (zB + wB))
-        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
-        const float alphaB = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
-        // interpolate to get p1a and p1b
-        const auto p1a = p1 + (p2 - p1) * alphaA;
-        const auto p1b = p1 + (p3 - p1) * alphaB;
-        // draw triangles
-        {
-            Triangle tri(p1a, p2, p3, i);
-            addTriangle(std::make_unique<Triangle<vertex>>(tri));
-
-        }
-        {
-            Triangle tri(p1b, p1a, p3, i);
-            addTriangle(std::make_unique<Triangle<vertex>>(tri));
-        }
-    };
-    const auto Clip2 = [this]( vertex& p1,vertex& p2,vertex& p3, int16_t i)
-    {
-        // calculate alpha values for getting adjusted vertices
-        const float alpha0 = (p1.vertexPoint.z + p1.vertexPoint.w) / ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
-        const float alpha1 = (p2.vertexPoint.z + p2.vertexPoint.w) / ((p2.vertexPoint.z + p2.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
-        // interpolate to get p1a and p1b
-        p1 = p1 + (p3 - p1) * alpha0;
-        p2 = p2 + (p3 - p2) * alpha1;
-        {
-            Triangle tri(p1, p2, p3, i);
-            addTriangle(std::make_unique<Triangle<vertex>>(tri));
-        }
-    };
-
-    // near clipping tests
-    if( t->p1.vertexPoint.z < - t->p1.vertexPoint.w )
-    {
-        if( t->p2.vertexPoint.z < - t->p2.vertexPoint.w )
-        
-        {
-            Clip2( t->p1,t->p2,t->p3 , t->i);
-        }
-        else if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
-        {
-            Clip2( t->p1,t->p3,t->p2 , t->i);
-        }
-        else
-        {
-            Clip1( t->p1,t->p2,t->p3, t->i);
-        }
-    }
-    else if( t->p2.vertexPoint.z < - t->p2.vertexPoint.w )
-    {
-        if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
-        {
-            Clip2( t->p2,t->p3,t->p1, t->i);
-        }
-        else
-        {
-            Clip1( t->p2,t->p1,t->p3, t->i);
-        }
-    }
-    else if( t->p3.vertexPoint.z < - t->p3.vertexPoint.w )
-    {
-        Clip1( t->p3,t->p1,t->p2, t->i);
-    }
-    else // no near clipping necessary
-    {
+        // Directly draw the triangle without further clipping
         Triangle tri(t->p1, t->p2, t->p3, t->i);
         addTriangle(std::make_unique<Triangle<vertex>>(tri));
+        return;
+    }
+
+    // If near clipping might be necessary, proceed with clipping logic:
+    const auto Clip1 = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    {
+        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
+                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
+        const float alphaB = (p1.vertexPoint.z + p1.vertexPoint.w) /
+                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+        
+        const auto p1a = p1 + (p2 - p1) * alphaA;
+        const auto p1b = p1 + (p3 - p1) * alphaB;
+
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1a, p2, p3, i)));
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1b, p1a, p3, i)));
+    };
+
+    const auto Clip2 = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    {
+        const float alpha0 = (p1.vertexPoint.z + p1.vertexPoint.w) /
+                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+        const float alpha1 = (p2.vertexPoint.z + p2.vertexPoint.w) /
+                             ((p2.vertexPoint.z + p2.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+
+        p1 = p1 + (p3 - p1) * alpha0;
+        p2 = p2 + (p3 - p2) * alpha1;
+
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1, p2, p3, i)));
+    };
+
+    // Now proceed with detailed near-clipping logic:
+    if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w)
+    {
+        if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
+            Clip2(t->p1, t->p2, t->p3, t->i);
+        else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
+            Clip2(t->p1, t->p3, t->p2, t->i);
+        else
+            Clip1(t->p1, t->p2, t->p3, t->i);
+    }
+    else if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
+    {
+        if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
+            Clip2(t->p2, t->p3, t->p1, t->i);
+        else
+            Clip1(t->p2, t->p1, t->p3, t->i);
+    }
+    else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
+    {
+        Clip1(t->p3, t->p1, t->p2, t->i);
     }
 }
+
 
 
 

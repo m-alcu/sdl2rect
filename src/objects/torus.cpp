@@ -63,18 +63,18 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             face.vertex3 = idx0;
             MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
-            face.material.Ka = { getColorFromMaterial(properties.k_a * 0x00 / 256), getColorFromMaterial(properties.k_a * 0x58 / 256), getColorFromMaterial(properties.k_a * 0xfc / 256)};
-            face.material.Kd = { getColorFromMaterial(properties.k_d * 0x00 / 256), getColorFromMaterial(properties.k_d * 0x58 / 256), getColorFromMaterial(properties.k_d * 0xfc / 256)};
-            face.material.Ks = { getColorFromMaterial(properties.k_s * 0x00 / 256), getColorFromMaterial(properties.k_s * 0x58 / 256), getColorFromMaterial(properties.k_s * 0xfc / 256)};
+            face.material.Ka = { (int) (properties.k_a * 0x00), (int) (properties.k_a * 0x58), (int) (properties.k_a * 0xfc) };
+            face.material.Kd = { (int) (properties.k_d * 0x00), (int) (properties.k_d * 0x58), (int) (properties.k_d * 0xfc) };
+            face.material.Ks = { (int) (properties.k_s * 0x00), (int) (properties.k_s * 0x58), (int) (properties.k_s * 0xfc) };
             face.material.Ns = properties.shininess;
             faces.push_back(face);
 
             face.vertex1 = idx3;
             face.vertex2 = idx2; // wrap-around for the quad
             face.vertex3 = idx0;
-            face.material.Ka = { getColorFromMaterial(properties.k_a * 0xfe / 256), getColorFromMaterial(properties.k_a * 0xdd / 256), getColorFromMaterial(properties.k_a * 0x00 / 256)};
-            face.material.Kd = { getColorFromMaterial(properties.k_d * 0xfe / 256), getColorFromMaterial(properties.k_d * 0xdd / 256), getColorFromMaterial(properties.k_d * 0x00 / 256)};
-            face.material.Ks = { getColorFromMaterial(properties.k_s * 0xfe / 256), getColorFromMaterial(properties.k_s * 0xdd / 256), getColorFromMaterial(properties.k_s * 0x00 / 256)};
+            face.material.Ka = { (int) (properties.k_a * 0xfe), (int) (properties.k_a * 0xdd), (int) (properties.k_a * 0x00) };
+            face.material.Kd = { (int) (properties.k_d * 0xfe), (int) (properties.k_d * 0xdd), (int) (properties.k_d * 0x00) };
+            face.material.Ks = { (int) (properties.k_s * 0xfe), (int) (properties.k_s * 0xdd), (int) (properties.k_s * 0x00) };
             face.material.Ns = properties.shininess;
             faces.push_back(face);
         }
