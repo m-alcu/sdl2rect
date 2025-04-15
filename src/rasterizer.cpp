@@ -315,7 +315,8 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
     }
 
     // If near clipping might be necessary, proceed with clipping logic:
-    const auto Clip1 = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    // p1 out, p2 & p3 in
+    const auto Clip1Out2In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
     {
         const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
                              ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
@@ -329,15 +330,16 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1b, p1a, p3, i)));
     };
 
-    const auto Clip2 = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    // p1 & p2 out, p3 in
+    const auto Clip2Out1In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
     {
-        const float alpha0 = (p1.vertexPoint.z + p1.vertexPoint.w) /
+        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
                              ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
-        const float alpha1 = (p2.vertexPoint.z + p2.vertexPoint.w) /
+        const float alphaB = (p2.vertexPoint.z + p2.vertexPoint.w) /
                              ((p2.vertexPoint.z + p2.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
 
-        p1 = p1 + (p3 - p1) * alpha0;
-        p2 = p2 + (p3 - p2) * alpha1;
+        p1 = p1 + (p3 - p1) * alphaA;
+        p2 = p2 + (p3 - p2) * alphaB;
 
         addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1, p2, p3, i)));
     };
@@ -346,22 +348,22 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
     if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w)
     {
         if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
-            Clip2(t->p1, t->p2, t->p3, t->i);
+            Clip2Out1In(t->p1, t->p2, t->p3, t->i);
         else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2(t->p1, t->p3, t->p2, t->i);
+            Clip2Out1In(t->p1, t->p3, t->p2, t->i);
         else
-            Clip1(t->p1, t->p2, t->p3, t->i);
+            Clip1Out2In(t->p1, t->p2, t->p3, t->i);
     }
     else if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
     {
         if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2(t->p2, t->p3, t->p1, t->i);
+            Clip2Out1In(t->p2, t->p3, t->p1, t->i);
         else
-            Clip1(t->p2, t->p1, t->p3, t->i);
+            Clip1Out2In(t->p2, t->p1, t->p3, t->i);
     }
     else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
     {
-        Clip1(t->p3, t->p1, t->p2, t->i);
+        Clip1Out2In(t->p3, t->p1, t->p2, t->i);
     }
 }
 
