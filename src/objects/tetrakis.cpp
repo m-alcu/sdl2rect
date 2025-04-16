@@ -62,14 +62,14 @@ void Tetrakis::loadFaces() {
             MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
             if (j % 2 == 0) {
-                face.material.Ka = { getColorFromMaterial(properties.k_a * 0x00 / 256), getColorFromMaterial(properties.k_a * 0x58 / 256), getColorFromMaterial(properties.k_a * 0xfc / 256) };
-                face.material.Kd = { getColorFromMaterial(properties.k_d * 0x00 / 256), getColorFromMaterial(properties.k_d * 0x58 / 256), getColorFromMaterial(properties.k_d * 0xfc / 256) };
-                face.material.Ks = { getColorFromMaterial(properties.k_s * 0x00 / 256), getColorFromMaterial(properties.k_s * 0x58 / 256), getColorFromMaterial(properties.k_s * 0xfc / 256) };
+                face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+                face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+                face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
                 face.material.Ns = properties.shininess;
             } else {
-                face.material.Ka = { getColorFromMaterial(properties.k_a * 0xff / 256), getColorFromMaterial(properties.k_a * 0xff / 256), getColorFromMaterial(properties.k_a * 0xff / 256) };
-                face.material.Kd = { getColorFromMaterial(properties.k_d * 0xff / 256), getColorFromMaterial(properties.k_d * 0xff / 256), getColorFromMaterial(properties.k_d * 0xff / 256) };
-                face.material.Ks = { getColorFromMaterial(properties.k_s * 0xff / 256), getColorFromMaterial(properties.k_s * 0xff / 256), getColorFromMaterial(properties.k_s * 0xff / 256) };
+                face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+                face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+                face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
                 face.material.Ns = properties.shininess;
             }
 

@@ -32,36 +32,36 @@ void Test::loadFaces() {
     face.vertex1 = 0+4;
     face.vertex2 = 1+4;
     face.vertex3 = 2+4;
-    face.material.Ka = { getColorFromMaterial(properties.k_a * 0x00), getColorFromMaterial(properties.k_a * 0x58), getColorFromMaterial(properties.k_a * 0xfc) };
-    face.material.Kd = { getColorFromMaterial(properties.k_d * 0x00), getColorFromMaterial(properties.k_d * 0x58), getColorFromMaterial(properties.k_d * 0xfc) }; 
-    face.material.Ks = { getColorFromMaterial(properties.k_s * 0x00), getColorFromMaterial(properties.k_s * 0x58), getColorFromMaterial(properties.k_s * 0xfc) };
+    face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
+    face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
     face.material.Ns = properties.shininess;
     faces.push_back(face);
 
     face.vertex1 = 0+4;
     face.vertex2 = 2+4;
     face.vertex3 = 3+4;
-    face.material.Ka = { getColorFromMaterial(properties.k_a * 0xff), getColorFromMaterial(properties.k_a * 0xff), getColorFromMaterial(properties.k_a * 0xff) };
-    face.material.Kd = { getColorFromMaterial(properties.k_d * 0xff), getColorFromMaterial(properties.k_d * 0xff), getColorFromMaterial(properties.k_d * 0xff) };
-    face.material.Ks = { getColorFromMaterial(properties.k_s * 0xff), getColorFromMaterial(properties.k_s * 0xff), getColorFromMaterial(properties.k_s * 0xff) };
+    face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
     face.material.Ns = properties.shininess;
     faces.push_back(face);
 
     face.vertex1 = 0;
     face.vertex2 = 1;
     face.vertex3 = 2;
-    face.material.Ka = { getColorFromMaterial(properties.k_a * 0x00), getColorFromMaterial(properties.k_a * 0x58), getColorFromMaterial(properties.k_a * 0xfc) };
-    face.material.Kd = { getColorFromMaterial(properties.k_d * 0x00), getColorFromMaterial(properties.k_d * 0x58), getColorFromMaterial(properties.k_d * 0xfc) };
-    face.material.Ks = { getColorFromMaterial(properties.k_s * 0x00), getColorFromMaterial(properties.k_s * 0x58), getColorFromMaterial(properties.k_s * 0xfc) };
+    face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+    face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
     face.material.Ns = properties.shininess;
     faces.push_back(face);
 
     face.vertex1 = 0;
     face.vertex2 = 2;
     face.vertex3 = 3;
-    face.material.Ka = { getColorFromMaterial(properties.k_a * 0xff), getColorFromMaterial(properties.k_a * 0xff), getColorFromMaterial(properties.k_a * 0xff) };
-    face.material.Kd = { getColorFromMaterial(properties.k_d * 0xff), getColorFromMaterial(properties.k_d * 0xff), getColorFromMaterial(properties.k_d * 0xff) };
-    face.material.Ks = { getColorFromMaterial(properties.k_s * 0xff), getColorFromMaterial(properties.k_s * 0xff), getColorFromMaterial(properties.k_s * 0xff) };
+    face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
     face.material.Ns = properties.shininess;
     faces.push_back(face);
 

@@ -82,9 +82,9 @@ void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene) {
         slib::vec3 rotatedFacenormal;
         rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[tri.i], 0);
         float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
-        unsigned char r = std::max(0, std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * diff) * 4, 255));
-        unsigned char g = std::max(0, std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * diff) * 4, 255));
-        unsigned char b = std::max(0, std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * diff) * 4, 255));
+        unsigned char r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * diff), 255);
+        unsigned char g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * diff), 255);
+        unsigned char b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * diff), 255);
         flatColor = RGBAColor(b, g, r, 0xff).bgra_value; 
     } 
 
@@ -213,9 +213,9 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
 
 inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
 
-    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds) * 4, 255));
-    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds) * 4, 255));
-    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds) * 4, 255));
+    unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255);
+    unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255);
+    unsigned char b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds), 255);
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
@@ -228,14 +228,14 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
     float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
     float spec = std::pow(specAngle, face.material.Ns);
 
-    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255));
-    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
-    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
+    unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255);
+    unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255);
+    unsigned char b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255);
 
-    
-    if (diff > 0.99) { 
+    /*
+    if (diff > 0.995) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }
+    }*/
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
@@ -262,10 +262,10 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
     unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
     unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
-    
+    /*
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }
+    }*/
 
     return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }

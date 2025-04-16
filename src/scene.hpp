@@ -34,7 +34,6 @@ public:
 
     // Called to set up the Scene, including creation of Solids, etc.
     void setup();
-    void calculatePrecomputedShading(Solid& solid);
 
     // Add a solid to the scene's list of solids.
     // Using std::unique_ptr is a good practice for ownership.
