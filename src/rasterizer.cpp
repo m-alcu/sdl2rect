@@ -22,28 +22,6 @@ bool Rasterizer::visible(const Triangle<vertex>& triangle) {
     return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
 };
 
-bool Rasterizer::zFrustrum(const Triangle<vertex>& triangle) {
-
-    return (triangle.p1.p_z > -1 && triangle.p2.p_z > -1 && triangle.p3.p_z > -1) &&
-           (triangle.p1.p_z < 1 && triangle.p2.p_z < 1 && triangle.p3.p_z < 1);
-
-
-};
-
-/*
-Check if triangle is completely outside the screen.
-If all vertices are outside the screen, we can skip the rasterization process.
-*/
-
-bool Rasterizer::screenOutside(Scene& scene, const Triangle<vertex>& triangle) {
-
-    return ((triangle.p1.p_x < 0 && triangle.p2.p_x < 0 && triangle.p3.p_x < 0) || 
-            (triangle.p1.p_x >= scene.screen.width && triangle.p2.p_x >= scene.screen.width && triangle.p3.p_x >= scene.screen.width) ||
-            (triangle.p1.p_y < 0 && triangle.p2.p_y < 0 && triangle.p3.p_y < 0) ||
-            (triangle.p1.p_y >= scene.screen.height && triangle.p2.p_y >= scene.screen.height && triangle.p3.p_y >= scene.screen.height)
-            );
-};
-
 // Inline function for culling top pixels.
 inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& leftDy, vertex& right, vertex& rightDy) {
 // Culling the top pixels greater than the screen height.

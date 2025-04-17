@@ -61,8 +61,6 @@ class Rasterizer {
     
         void draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene);
         bool visible(const Triangle<vertex>& triangle);
-        bool screenOutside(Scene& scene, const Triangle<vertex>& triangle);
-        bool zFrustrum(const Triangle<vertex>& triangle);
         void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t );
 
         void addTriangle(std::unique_ptr<Triangle<vertex>> triangle)

@@ -7,7 +7,7 @@
 class ZBuffer
 {
 public:
-	ZBuffer( int width,int height )
+	ZBuffer( int width, int height )
 		:
 		width( width ),
 		height( height ),

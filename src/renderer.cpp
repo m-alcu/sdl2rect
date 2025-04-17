@@ -90,7 +90,6 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
         );
 
         if (rasterizer.visible(tri)) {
-            //rasterizer.addTriangle(std::make_unique<triangle>(tri));
             rasterizer.ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri));
         }
     }
