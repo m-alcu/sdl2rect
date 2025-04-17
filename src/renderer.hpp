@@ -13,7 +13,6 @@ class Renderer {
         void prepareRenderable(const Solid& solid, Scene& scene);
         void projectRotateAllPoints(Solid& solid, const Scene& scene, Rasterizer& rasterizer);            
         void drawRenderable(Solid& solid, Scene& scene);
-        void addFaces(Scene& scene, Rasterizer& rasterizer);
 };
 
 

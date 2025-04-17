@@ -45,7 +45,7 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
     prepareRenderable(solid, scene);
     Rasterizer rasterizer(&solid);
     projectRotateAllPoints(solid, scene, rasterizer);
-    addFaces(scene, rasterizer);
+    rasterizer.addFaces(scene);
 }
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
@@ -73,27 +73,6 @@ void Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene, Rasteriz
         }
 }
 
-void Renderer::addFaces(Scene& scene, Rasterizer& rasterizer) {
 
-
-    for (int i=0; i<rasterizer.solid->numFaces; i++) {
-
-        Triangle<vertex> tri(
-            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex1],
-            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex2],
-            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex3],
-            i
-        );
-
-        if (rasterizer.visible(tri)) {
-            rasterizer.ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri));
-        }
-    }
-    
-    for (auto& trianglePtr : rasterizer.triangles) {
-        rasterizer.draw(*trianglePtr, *rasterizer.solid, scene);
-    }
-
-}
 
 

@@ -6,6 +6,30 @@
 #include "smath.hpp"
 #include "color.hpp"
 
+
+void Rasterizer::addFaces(Scene& scene) {
+
+
+    for (int i=0; i<solid->numFaces; i++) {
+
+        Triangle<vertex> tri(
+            *projectedPoints[solid->faces[i].vertex1],
+            *projectedPoints[solid->faces[i].vertex2],
+            *projectedPoints[solid->faces[i].vertex3],
+            i
+        );
+
+        if (visible(tri)) {
+            ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri));
+        }
+    }
+    
+    for (auto& trianglePtr : triangles) {
+        draw(*trianglePtr, *solid, scene);
+    }
+
+}
+
 /*
 Check if triangle is visible.
 If the triangle is visible, we can proceed with the rasterization process.

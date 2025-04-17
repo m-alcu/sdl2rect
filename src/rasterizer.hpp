@@ -39,6 +39,7 @@ class Rasterizer {
         void draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene);
         bool visible(const Triangle<vertex>& triangle);
         void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t );
+        void addFaces(Scene& scene);
 
         void addTriangle(std::unique_ptr<Triangle<vertex>> triangle)
         {
