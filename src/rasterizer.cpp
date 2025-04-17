@@ -186,23 +186,22 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
         int32_t xFinal = std::min(right.p_x >> 16, scene.screen.width);
         
         for(int hx = xInitial; hx < xFinal; hx++) {
-            if (zBuffer[hy + hx] > vRaster.p_z) {
+            if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
                 switch (scene.shading) {
                     case Shading::Flat: 
-                        pixels[hy + hx] = flatColor;
+                        scene.pixels[hy + hx] = flatColor;
                         break;      
                     case Shading::Gouraud: 
-                        pixels[hy + hx] = gouraudShadingFragment(vRaster, scene, face);
+                        scene.pixels[hy + hx] = gouraudShadingFragment(vRaster, scene, face);
                         break;
                     case Shading::BlinnPhong:
-                        pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
+                        scene.pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
                         break;                                
                     case Shading::Phong:
-                        pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
+                        scene.pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
                         break;                         
-                    default: pixels[hy + hx] = flatColor;
+                    default: scene.pixels[hy + hx] = flatColor;
                 }
-                zBuffer[hy + hx] = vRaster.p_z;
             }
             vRaster += vDx;
         }

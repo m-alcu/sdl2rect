@@ -53,13 +53,11 @@ public:
 class Rasterizer {
     public:
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
-        uint32_t *pixels;
-        float *zBuffer;
         const Solid* solid;  // Pointer to the abstract Solid
     
         // Updated constructor that also accepts a Solid pointer.
-        Rasterizer(const Solid* solidPtr, uint32_t *pixelsAux, float *zBufferAux)
-          : solid(solidPtr), pixels(pixelsAux), zBuffer(zBufferAux) {}
+        Rasterizer(const Solid* solidPtr)
+          : solid(solidPtr) {}
     
         void draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene);
         bool visible(const Triangle<vertex>& triangle);

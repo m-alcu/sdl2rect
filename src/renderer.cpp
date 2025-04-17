@@ -21,20 +21,16 @@ Screen Space (pixels)
 
 void Renderer::drawScene(Scene& scene, float zNear, float zFar, float viewAngle) {
 
-    prepareScene(scene, zNear, zFar, viewAngle);
+    prepareFrame(scene, zNear, zFar, viewAngle);
     for (auto& solidPtr : scene.solids) {
         drawRenderable(*solidPtr, scene);
     }
 }
 
-void Renderer::prepareScene(Scene& scene, float zNear, float zFar, float viewAngle) {
+void Renderer::prepareFrame(Scene& scene, float zNear, float zFar, float viewAngle) {
 
     std::fill_n(scene.pixels, scene.screen.width * scene.screen.height, 0);
-    std::fill_n(
-        scene.zBuffer,
-        scene.screen.width * scene.screen.height,
-        std::numeric_limits<float>::max() // Initialize zBuffer to the maximum float value
-    );
+    scene.zBuffer->Clear(); // Clear the zBuffer
 
     //float zNear = 0.1f; // Near plane distance
     //float zFar  = 10000.0f; // Far plane distance
@@ -81,7 +77,7 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
 
 void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
 
-    Rasterizer rasterizer(&solid, scene.pixels, scene.zBuffer);
+    Rasterizer rasterizer(&solid);
 
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.

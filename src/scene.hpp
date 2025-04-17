@@ -8,6 +8,7 @@
 #include "space3d.hpp"
 #include "objects/solid.hpp"
 #include "smath.hpp"
+#include "ZBuffer.hpp"
 
 class Scene
 {
@@ -15,20 +16,18 @@ public:
     // Constructor that initializes the Screen and allocates zBuffer arrays.
     Scene(const Screen& scr)
         : screen(scr),
-          zBuffer(nullptr),
+          zBuffer( std::make_shared<ZBuffer>( scr.width,scr.height )),
           fullTransformMat(smath::identity()),
           normalTransformMat(smath::identity()),
           projectionMatrix(smath::identity())
     {
         // Allocate memory for zBufferInit and zBuffer.
-        zBuffer     = new float[scr.height * scr.width];
         pixels      = new uint32_t[scr.width * scr.height];
     }
 
     // Destructor to free the allocated memory.
     ~Scene()
     {
-        delete[] zBuffer;
         delete[] pixels;
     }
 
@@ -49,8 +48,7 @@ public:
     slib::mat4 fullTransformMat;
     slib::mat4 normalTransformMat;
     slib::mat4 projectionMatrix;
-    float* zBufferInit;
-    float* zBuffer;
+    std::shared_ptr<ZBuffer> zBuffer; // Use shared_ptr for zBuffer to manage its lifetime automatically.
     uint32_t* pixels;
 
     // Store solids in a vector of unique_ptr to handle memory automatically.
