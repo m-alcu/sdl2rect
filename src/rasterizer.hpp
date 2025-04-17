@@ -12,31 +12,7 @@
 #include "slib.hpp"
 #include "smath.hpp"
 
-class RGBAColor {
-    public:
-        union {
-            struct {
-                unsigned char blue;
-                unsigned char green;
-                unsigned char red;
-                unsigned char alpha;
-            } rgba;
-            uint32_t bgra_value;
-        };
-    
-        // Optionally, you can add constructors or member functions if needed.
-        RGBAColor(unsigned char blue, unsigned char green, unsigned char red, unsigned char alpha) {
-            rgba.blue = blue;
-            rgba.green = green;
-            rgba.red = red;
-            rgba.alpha = alpha;
-        }
 
-        RGBAColor(uint32_t value) {
-            bgra_value = value;
-        }
-
-    };
 
 
 template<class V>

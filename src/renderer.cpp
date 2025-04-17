@@ -63,7 +63,6 @@ vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
 
-        screenPoints[i].vtx = i;
         slib::vec4 point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
         screenPoints[i].vertexPoint = point * scene.projectionMatrix;
         screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);

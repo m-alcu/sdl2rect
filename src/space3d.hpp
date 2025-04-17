@@ -44,27 +44,26 @@ struct vertex {
     slib::vec4 vertexPoint;
     slib::zvec2 tex; // Texture coordinates
     float ds;
-    int16_t vtx;
 
     vertex() {}
 
-    vertex(int32_t px, int32_t py, float pz, int16_t vt, slib::vec3 n, slib::vec4 vp, float _ds, slib::zvec2 _tex) :
-    p_x(px), p_y(py), p_z(pz), vtx(vt), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
+    vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, float _ds, slib::zvec2 _tex) :
+    p_x(px), p_y(py), p_z(pz), normal(n), vertexPoint(vp), ds(_ds), tex(_tex) {}
 
     vertex operator+(const vertex &v) const {
-        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, vtx, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
+        return vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, vertexPoint + v.vertexPoint, ds + v.ds, tex + v.tex);
     }
 
     vertex operator-(const vertex &v) const {
-        return vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, vtx, normal - v.normal, vertexPoint - v.vertexPoint, ds - v.ds, tex - v.tex);
+        return vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, vertexPoint - v.vertexPoint, ds - v.ds, tex - v.tex);
     }
 
     vertex operator*(const float &rhs) const {
-        return vertex(p_x * rhs, p_y * rhs, p_z * rhs, vtx, normal * rhs, vertexPoint * rhs, ds * rhs, tex * rhs);
+        return vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, vertexPoint * rhs, ds * rhs, tex * rhs);
     }
 
     vertex operator/(const float &rhs) const {
-        return vertex(p_x / rhs, p_y / rhs, p_z / rhs, vtx, normal / rhs, vertexPoint / rhs, ds / rhs, tex / rhs);
+        return vertex(p_x / rhs, p_y / rhs, p_z / rhs, normal / rhs, vertexPoint / rhs, ds / rhs, tex / rhs);
     }
     
 

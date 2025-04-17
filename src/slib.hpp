@@ -118,28 +118,4 @@ namespace slib
         mat4 operator*(const mat4& rhs) const;
         vec4 operator*(const vec4& rhs) const;
     };
-
-    struct Color
-    {
-        int r, g, b;
-    };
-
-    struct vertex
-    {
-        vec3 position;
-        vec2 textureCoords;
-        vec3 normal;
-        vec4 projectedPoint;
-        vec3 screenPoint;
-    };
-
-    struct tri
-    {
-        bool skip = false;
-        vertex v1;
-        vertex v2;
-        vertex v3;
-        std::string material;
-    };
-
 } // namespace slib

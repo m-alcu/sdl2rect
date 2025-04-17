@@ -4,6 +4,7 @@
 #include "scene.hpp"
 #include "slib.hpp"
 #include "smath.hpp"
+#include "color.hpp"
 
 /*
 Check if triangle is visible.
@@ -63,7 +64,7 @@ void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene) {
         unsigned char r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * diff), 255);
         unsigned char g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * diff), 255);
         unsigned char b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * diff), 255);
-        flatColor = RGBAColor(b, g, r, 0xff).bgra_value; 
+        flatColor = Color(b, g, r, 0xff).bgra_value; 
     } 
 
     orderVertices(&tri.p1, &tri.p2, &tri.p3);
@@ -139,9 +140,9 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
         return (p2 - p1) / dy;
     } else {
         if (p2.p_x - p1.p_x > 0) {
-            return vertex(INT32_MAX, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         } else {
-            return vertex(INT32_MIN, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         }
     }
 };
@@ -193,7 +194,7 @@ inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene,
     unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255);
     unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255);
     unsigned char b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds), 255);
-    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, Face face) {
@@ -214,7 +215,7 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
         return 0xffffffff; // White point if the light is too close to the normal
     }*/
 
-    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face) {
@@ -244,7 +245,7 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& sce
         return 0xffffffff; // White point if the light is too close to the normal
     }*/
 
-    return RGBAColor(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
