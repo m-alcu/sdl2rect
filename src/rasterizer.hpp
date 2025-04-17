@@ -28,6 +28,7 @@ public:
 
 class Rasterizer {
     public:
+        std::vector<std::unique_ptr<vertex>> projectedPoints;
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         const Solid* solid;  // Pointer to the abstract Solid
     
@@ -43,7 +44,14 @@ class Rasterizer {
         {
             triangles.push_back(std::move(triangle));
         }
-    
+
+        void addPoint(std::unique_ptr<vertex> point)
+        {
+            projectedPoints.push_back(std::move(point));
+        }
+
+        
+
     private:
         void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, Scene& scene, const Face& face, uint32_t flatColor);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);

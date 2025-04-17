@@ -11,9 +11,9 @@ class Renderer {
         void drawScene(Scene& scene, float zNear, float zFar, float viewAngle);
         void prepareFrame(Scene& scene, float zNear, float zFar, float viewAngle);
         void prepareRenderable(const Solid& solid, Scene& scene);
-        vertex* projectRotateAllPoints(Solid& solid, const Scene& scene);            
+        void projectRotateAllPoints(Solid& solid, const Scene& scene, Rasterizer& rasterizer);            
         void drawRenderable(Solid& solid, Scene& scene);
-        void addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene);
+        void addFaces(Scene& scene, Rasterizer& rasterizer);
 };
 
 

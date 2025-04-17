@@ -43,9 +43,9 @@ void Renderer::prepareFrame(Scene& scene, float zNear, float zFar, float viewAng
 void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
-    vertex * projectedPoints = projectRotateAllPoints(solid, scene);
-    addFaces(projectedPoints, solid, scene);
-    delete[] projectedPoints;
+    Rasterizer rasterizer(&solid);
+    projectRotateAllPoints(solid, scene, rasterizer);
+    addFaces(scene, rasterizer);
 }
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
@@ -57,34 +57,31 @@ void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {
     scene.normalTransformMat = rotate;
 }
 
-vertex* Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene) {
+void Renderer::projectRotateAllPoints(Solid& solid, const Scene& scene, Rasterizer& rasterizer) {
     // Allocate an array of Pixels on the heap
-    vertex* screenPoints = new vertex[solid.numVertices];
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid.numVertices; i++) {
-
+        vertex screenPoint;
         slib::vec4 point = scene.fullTransformMat * slib::vec4(solid.vertices[i], 1);
-        screenPoints[i].vertexPoint = point * scene.projectionMatrix;
-        screenPoints[i].normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
-        screenPoints[i].ds = std::max(0.0f, smath::dot(screenPoints[i].normal, scene.lux)); // Calculate the dot product with the light direction
-        screenPoints[i].p_x = (int32_t) ((screenPoints[i].vertexPoint.x / screenPoints[i].vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoints[i].p_y = (int32_t) ((screenPoints[i].vertexPoint.y / screenPoints[i].vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoints[i].p_z = screenPoints[i].vertexPoint.z / screenPoints[i].vertexPoint.w; // Store the depth value in the z-buffer
+        screenPoint.vertexPoint = point * scene.projectionMatrix;
+        screenPoint.normal = scene.normalTransformMat * slib::vec4(solid.vertexNormals[i], 0);
+        screenPoint.ds = std::max(0.0f, smath::dot(screenPoint.normal, scene.lux)); // Calculate the dot product with the light direction
+        screenPoint.p_x = (int32_t) ((screenPoint.vertexPoint.x / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_y = (int32_t) ((screenPoint.vertexPoint.y / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_z = screenPoint.vertexPoint.z / screenPoint.vertexPoint.w; // Store the depth value in the z-buffer
+        rasterizer.addPoint(std::make_unique<vertex>(screenPoint)); // Add the point to the rasterizer
         }
-    return screenPoints;
 }
 
-void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scene) {
+void Renderer::addFaces(Scene& scene, Rasterizer& rasterizer) {
 
-    Rasterizer rasterizer(&solid);
 
-    for (int i=0; i<solid.numFaces; i++) {
-        // Pass the address of 'solid' since it is a reference to an abstract Solid.
+    for (int i=0; i<rasterizer.solid->numFaces; i++) {
 
         Triangle<vertex> tri(
-            projectedPoints[solid.faces[i].vertex1],
-            projectedPoints[solid.faces[i].vertex2],
-            projectedPoints[solid.faces[i].vertex3],
+            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex1],
+            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex2],
+            *rasterizer.projectedPoints[rasterizer.solid->faces[i].vertex3],
             i
         );
 
@@ -94,7 +91,7 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
     }
     
     for (auto& trianglePtr : rasterizer.triangles) {
-        rasterizer.draw(*trianglePtr, solid, scene);
+        rasterizer.draw(*trianglePtr, *rasterizer.solid, scene);
     }
 
 }
