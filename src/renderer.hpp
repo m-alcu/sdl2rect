@@ -10,8 +10,7 @@ class Renderer {
     public:
         void drawScene(Scene& scene, float zNear, float zFar, float viewAngle);
         void prepareFrame(Scene& scene, float zNear, float zFar, float viewAngle);
-        void prepareRenderable(const Solid& solid, Scene& scene);
-        void projectRotateAllPoints(Solid& solid, const Scene& scene, Rasterizer& rasterizer);            
+        void prepareRenderable(const Solid& solid, Scene& scene);           
         void drawRenderable(Solid& solid, Scene& scene);
 };
 

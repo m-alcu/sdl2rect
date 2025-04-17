@@ -36,10 +36,11 @@ class Rasterizer {
         Rasterizer(const Solid* solidPtr)
           : solid(solidPtr) {}
     
-        void draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene);
+        void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
         bool visible(const Triangle<vertex>& triangle);
         void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t );
-        void addFaces(Scene& scene);
+        void projectRotateAllPoints(const Scene& scene);
+        void addFaces(const Scene& scene);
 
         void addTriangle(std::unique_ptr<Triangle<vertex>> triangle)
         {
@@ -54,12 +55,12 @@ class Rasterizer {
         
 
     private:
-        void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, Scene& scene, const Face& face, uint32_t flatColor);
+        void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, const Scene& scene, const Face& face, uint32_t flatColor);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
         vertex gradientDy(vertex p1, vertex p2);
-        uint32_t gouraudShadingFragment(vertex gRaster, Scene& scene, Face face);
-        uint32_t phongShadingFragment(vertex gRaster, Scene& scene, Face face);
-        uint32_t blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face);
+        uint32_t gouraudShadingFragment(vertex gRaster, const Scene& scene, Face face);
+        uint32_t phongShadingFragment(vertex gRaster, const Scene& scene, Face face);
+        uint32_t blinnPhongShadingFragment(vertex gRaster, const Scene& scene, Face face);
         
     };
     

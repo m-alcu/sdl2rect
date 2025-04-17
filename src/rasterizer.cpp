@@ -7,7 +7,23 @@
 #include "color.hpp"
 
 
-void Rasterizer::addFaces(Scene& scene) {
+void Rasterizer::projectRotateAllPoints(const Scene& scene) {
+    // Allocate an array of Pixels on the heap
+    // Process each vertex and store the result in the allocated array
+    for (int i = 0; i < solid->numVertices; i++) {
+        vertex screenPoint;
+        slib::vec4 point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
+        screenPoint.vertexPoint = point * scene.projectionMatrix;
+        screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
+        screenPoint.ds = std::max(0.0f, smath::dot(screenPoint.normal, scene.lux)); // Calculate the dot product with the light direction
+        screenPoint.p_x = (int32_t) ((screenPoint.vertexPoint.x / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_y = (int32_t) ((screenPoint.vertexPoint.y / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_z = screenPoint.vertexPoint.z / screenPoint.vertexPoint.w; // Store the depth value in the z-buffer
+        addPoint(std::make_unique<vertex>(screenPoint)); // Add the point to the rasterizer
+        }
+}
+
+void Rasterizer::addFaces(const Scene& scene) {
 
 
     for (int i=0; i<solid->numFaces; i++) {
@@ -78,7 +94,7 @@ inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& l
               p3                    p3
 */
 
-void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, Scene& scene) {
+void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene) {
 
     uint32_t flatColor = 0x00000000;
     if (scene.shading == Shading::Flat) {
@@ -171,7 +187,7 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
     }
 };
 
-inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor) {
+inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         int16_t dx = (right.p_x - left.p_x) >> 16;
@@ -213,7 +229,7 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
     }
 };
 
-inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene, Face face) {
+inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, const Scene& scene, Face face) {
 
     unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255);
     unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255);
@@ -221,7 +237,7 @@ inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, Scene& scene,
     return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, Face face) {
+inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
@@ -242,7 +258,7 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, Scene& scene, F
     return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, Scene& scene, Face face) {
+inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
 
     // Normalize vectors
     slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
