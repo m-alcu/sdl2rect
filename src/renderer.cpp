@@ -86,7 +86,12 @@ void Renderer::addFaces(vertex *projectedPoints, const Solid& solid, Scene& scen
     for (int i=0; i<solid.numFaces; i++) {
         // Pass the address of 'solid' since it is a reference to an abstract Solid.
 
-        Triangle tri(projectedPoints[solid.faces[i].vertex1], projectedPoints[solid.faces[i].vertex2], projectedPoints[solid.faces[i].vertex3], i);
+        Triangle<vertex> tri(
+            projectedPoints[solid.faces[i].vertex1],
+            projectedPoints[solid.faces[i].vertex2],
+            projectedPoints[solid.faces[i].vertex3],
+            i
+        );
 
         if (rasterizer.visible(tri)) {
             //rasterizer.addTriangle(std::make_unique<triangle>(tri));

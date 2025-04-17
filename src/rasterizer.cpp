@@ -19,7 +19,7 @@ If the triangle is facing away from the camera, we can skip the rasterization pr
 
 bool Rasterizer::visible(const Triangle<vertex>& triangle) {
 
-    return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) > 0;
+    return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
 };
 
 bool Rasterizer::zFrustrum(const Triangle<vertex>& triangle) {
@@ -171,9 +171,8 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
 inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, Scene& scene, const Face& face, uint32_t flatColor) {
 
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
-        vertex vDx = vertex(0, 0, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
         int16_t dx = (right.p_x - left.p_x) >> 16;
-        if (dx != 0) vDx = (right - left) / dx;
+        vertex vDx = dx != 0 ? vDx = (right - left) / dx : vertex();
         vertex vRaster = left;
         int32_t xInitial = left.p_x >> 16;
         
@@ -185,6 +184,7 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
         }
         // Culling the right pixels greater than the screen width
         int32_t xFinal = std::min(right.p_x >> 16, scene.screen.width);
+        
         for(int hx = xInitial; hx < xFinal; hx++) {
             if (zBuffer[hy + hx] > vRaster.p_z) {
                 switch (scene.shading) {
@@ -309,7 +309,7 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         t->p3.vertexPoint.z >= -t->p3.vertexPoint.w)
     {
         // Directly draw the triangle without further clipping
-        Triangle tri(t->p1, t->p2, t->p3, t->i);
+        Triangle<vertex> tri(t->p1, t->p2, t->p3, t->i);
         addTriangle(std::make_unique<Triangle<vertex>>(tri));
         return;
     }
@@ -326,8 +326,8 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         const auto p1a = p1 + (p2 - p1) * alphaA;
         const auto p1b = p1 + (p3 - p1) * alphaB;
 
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1a, p2, p3, i)));
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1b, p1a, p3, i)));
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1a, p2, p3, i)));
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1b, p1a, p3, i)));
     };
 
     // p1 & p2 out, p3 in
@@ -341,7 +341,7 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         p1 = p1 + (p3 - p1) * alphaA;
         p2 = p2 + (p3 - p2) * alphaB;
 
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle(p1, p2, p3, i)));
+        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1, p2, p3, i)));
     };
 
     // Now proceed with detailed near-clipping logic:

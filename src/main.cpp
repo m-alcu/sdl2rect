@@ -22,8 +22,8 @@ int main(int argc, char** argv)
     }
 
     Scene scene({768, 1024});
-    scene.lux = {0, 0, -1};
-    scene.eye = {0, 0, -1};
+    scene.lux = {0, 0,  1};
+    scene.eye = {0, 0,  1};
     scene.shading = Shading::Flat;
     scene.setup();
 
