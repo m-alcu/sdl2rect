@@ -97,15 +97,31 @@ inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& l
 void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene) {
 
     uint32_t flatColor = 0x00000000;
+    uint16_t r, g, b;
     if (scene.shading == Shading::Flat) {
         slib::vec3 rotatedFacenormal;
         rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[tri.i], 0);
         float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
-        unsigned char r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * diff), 255);
-        unsigned char g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * diff), 255);
-        unsigned char b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * diff), 255);
-        flatColor = Color(b, g, r, 0xff).bgra_value; 
+        r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * diff), 255);
+        g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * diff), 255);
+        b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * diff), 255);
+        flatColor = Color(b, g, r).toScreen();
     } 
+
+    if (scene.shading == Shading::Gouraud) {
+        r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p1.ds), 255);
+        g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p1.ds), 255);
+        b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p1.ds), 255);
+        tri.p1.color = Color(b << 8, g << 8, r << 8);
+        r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p2.ds), 255);
+        g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p2.ds), 255);
+        b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p2.ds), 255);
+        tri.p2.color = Color(b << 8, g << 8, r << 8);
+        r = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p3.ds), 255);
+        g = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p3.ds), 255);
+        b = std::min(static_cast<int>(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p3.ds), 255);
+        tri.p3.color = Color(b << 8, g << 8, r << 8);
+    }
 
     orderVertices(&tri.p1, &tri.p2, &tri.p3);
     tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
@@ -180,9 +196,9 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
         return (p2 - p1) / dy;
     } else {
         if (p2.p_x - p1.p_x > 0) {
-            return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0}, {0,0,0});
         } else {
-            return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0});
+            return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0}, {0,0,0});
         }
     }
 };
@@ -236,7 +252,7 @@ inline uint32_t Rasterizer::gouraudShadingFragment(vertex vRaster, const Scene& 
     unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * vRaster.ds), 255);
     unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * vRaster.ds), 255);
     unsigned char b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * vRaster.ds), 255);
-    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r).toScreen();
 }
 
 inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
@@ -248,16 +264,16 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& sc
     float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
     float spec = std::pow(specAngle, face.material.Ns);
 
-    unsigned char r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255);
-    unsigned char g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255);
-    unsigned char b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255);
+    uint16_t r = std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255);
+    uint16_t g = std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255);
+    uint16_t b = std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255);
 
     /*
     if (diff > 0.995) { 
         return 0xffffffff; // White point if the light is too close to the normal
     }*/
 
-    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r).toScreen();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
@@ -278,16 +294,16 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     float spec = std::pow(specAngle, face.material.Ns * 4); // Blinn Phong shininess needs *4 to be like Phong
 
     // Calculate brightness
-    unsigned char r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255));
-    unsigned char g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
-    unsigned char b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
+    uint16_t r = std::max(0, std::min(static_cast<int>(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec), 255));
+    uint16_t g = std::max(0, std::min(static_cast<int>(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec), 255));
+    uint16_t b = std::max(0, std::min(static_cast<int>(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec), 255));
 
     /*
     if (diff > 0.99) { 
         return 0xffffffff; // White point if the light is too close to the normal
     }*/
 
-    return Color(b, g, r, 0xff).bgra_value; // Create a color object with the calculated RGB values and full alpha (255)
+    return Color(b, g, r).toScreen();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
 void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
