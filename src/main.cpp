@@ -113,8 +113,6 @@ int main(int argc, char** argv)
 
 
 
-        // Renderer the updated texture.
-        SDL_RenderClear(sdlRenderer);
         SDL_Texture* tex = SDL_CreateTextureFromSurface(sdlRenderer, scene.sdlSurface);
         SDL_RenderCopy(sdlRenderer, tex, nullptr, nullptr);
         SDL_DestroyTexture(tex);

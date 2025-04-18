@@ -9,7 +9,6 @@
                 "-g",
                 "src\\main.cpp",
                 "src\\renderer.cpp",
-                "src\\backgrounds\\background.cpp",
                 "src\\backgrounds\\backgroundFactory.cpp",
                 "src\\backgrounds\\desert.cpp",
                 "src\\backgrounds\\imagepng.cpp",
