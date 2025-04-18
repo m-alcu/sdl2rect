@@ -1,5 +1,5 @@
 #pragma once
-
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <cstdint>
 #include "space3d.hpp"

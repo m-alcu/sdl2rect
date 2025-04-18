@@ -21,7 +21,24 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Scene scene({480, 640});
+    int width = 640;
+    int height = 480;
+
+    // Renderer engine
+    Renderer renderer;
+
+    SDL_Window* window = SDL_CreateWindow("Poly3d", 
+                                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                                          width, height, 0);
+
+    SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 0);
+    if (sdlRenderer == nullptr)
+    {
+        std::cout << "Could not initialise SDL renderer. Exiting..." << std::endl;
+        exit(1);
+    }
+
+    Scene scene({height, width});
     scene.lux = {0, 0,  1};
     scene.eye = {0, 0,  1};
     scene.shading = Shading::Flat;
@@ -31,31 +48,12 @@ int main(int argc, char** argv)
     float zFar  = 10000.0f; // Far plane distance
     float viewAngle = 45.0f; // Field of view angle in degrees
 
-    // Renderer engine
-    Renderer renderer;
-
-    SDL_Window* window = SDL_CreateWindow("Poly3d", 
-                                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                                          scene.screen.width, scene.screen.height, 0);
-    SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 
-                                                SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-    // Use streaming texture for direct pixel access.
-    SDL_Texture* texture = SDL_CreateTexture(sdlRenderer,
-        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, scene.screen.width, scene.screen.height);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    
     //SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // Backgroud
     Uint32* back = new Uint32[scene.screen.width * scene.screen.height];
     auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
     background->draw(back, scene.screen.height, scene.screen.width);
-
-	// Create a texture for the background.
-	SDL_Texture* backgroundTexture = SDL_CreateTexture(sdlRenderer,
-    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, scene.screen.width, scene.screen.height);
-	SDL_UpdateTexture(backgroundTexture, NULL, back, scene.screen.width * sizeof(Uint32));
 
     // Main loop.
     while (isRunning)
@@ -96,7 +94,7 @@ int main(int argc, char** argv)
         }
 
         from = SDL_GetTicks();
-        renderer.drawScene(scene, zNear, zFar, viewAngle);
+        renderer.drawScene(scene, zNear, zFar, viewAngle, back);
         to = SDL_GetTicks();
 
         std::ostringstream oss;
@@ -113,20 +111,13 @@ int main(int argc, char** argv)
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        
 
-        // Lock the texture to update its pixel data.
-        void* texturePixels = nullptr;
-        int pitch = 0;
-        if (SDL_LockTexture(texture, NULL, &texturePixels, &pitch) == 0) {
-			memcpy(texturePixels, scene.pixels, scene.screen.width * scene.screen.height * sizeof(Uint32));
-			SDL_UnlockTexture(texture);
-        } else {
-            std::cerr << "SDL_LockTexture error: " << SDL_GetError() << std::endl;
-        }
+
 
         // Renderer the updated texture.
         SDL_RenderClear(sdlRenderer);
-        SDL_RenderCopy(sdlRenderer, backgroundTexture, NULL, NULL);
-        SDL_RenderCopy(sdlRenderer, texture, NULL, NULL);
+        SDL_Texture* tex = SDL_CreateTextureFromSurface(sdlRenderer, scene.sdlSurface);
+        SDL_RenderCopy(sdlRenderer, tex, nullptr, nullptr);
+        SDL_DestroyTexture(tex);
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
@@ -139,8 +130,6 @@ int main(int argc, char** argv)
     // Free resources.
     delete[] back;
 
-    SDL_DestroyTexture(texture);
-    SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyRenderer(sdlRenderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

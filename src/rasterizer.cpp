@@ -189,6 +189,8 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
 
 inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor) {
 
+    auto* pixels = static_cast<uint32_t*>(scene.sdlSurface->pixels);
+
     for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
         int16_t dx = (right.p_x - left.p_x) >> 16;
         vertex vDx = dx != 0 ? vDx = (right - left) / dx : vertex();
@@ -208,18 +210,18 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
             if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
                 switch (scene.shading) {
                     case Shading::Flat: 
-                        scene.pixels[hy + hx] = flatColor;
+                        pixels[hy + hx] = flatColor;
                         break;      
                     case Shading::Gouraud: 
-                        scene.pixels[hy + hx] = gouraudShadingFragment(vRaster, scene, face);
+                        pixels[hy + hx] = gouraudShadingFragment(vRaster, scene, face);
                         break;
                     case Shading::BlinnPhong:
-                        scene.pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
+                        pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
                         break;                                
                     case Shading::Phong:
-                        scene.pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
+                        pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
                         break;                         
-                    default: scene.pixels[hy + hx] = flatColor;
+                    default: pixels[hy + hx] = flatColor;
                 }
             }
             vRaster += vDx;

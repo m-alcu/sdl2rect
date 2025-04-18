@@ -1,5 +1,5 @@
 #pragma once
-
+#include <SDL2/SDL.h>
 #include <vector>
 #include <memory>    // for std::unique_ptr
 #include <algorithm> // for std::fill
@@ -21,14 +21,14 @@ public:
           normalTransformMat(smath::identity()),
           projectionMatrix(smath::identity())
     {
-        // Allocate memory for zBufferInit and zBuffer.
-        pixels      = new uint32_t[scr.width * scr.height];
+        sdlSurface = SDL_CreateRGBSurface(0, screen.width, screen.height, 32, 0, 0, 0, 0);
+        SDL_SetSurfaceBlendMode(sdlSurface, SDL_BLENDMODE_NONE);
     }
 
     // Destructor to free the allocated memory.
     ~Scene()
     {
-        delete[] pixels;
+        SDL_FreeSurface(sdlSurface);
     }
 
     // Called to set up the Scene, including creation of Solids, etc.
@@ -49,7 +49,7 @@ public:
     slib::mat4 normalTransformMat;
     slib::mat4 projectionMatrix;
     std::shared_ptr<ZBuffer> zBuffer; // Use shared_ptr for zBuffer to manage its lifetime automatically.
-    uint32_t* pixels;
+    SDL_Surface* sdlSurface = nullptr; // SDL surface for rendering.
 
     // Store solids in a vector of unique_ptr to handle memory automatically.
     std::vector<std::unique_ptr<Solid>> solids;

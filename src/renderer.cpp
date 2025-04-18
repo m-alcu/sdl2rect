@@ -19,17 +19,19 @@ Screen Space (pixels)
 */
 
 
-void Renderer::drawScene(Scene& scene, float zNear, float zFar, float viewAngle) {
+void Renderer::drawScene(Scene& scene, float zNear, float zFar, float viewAngle, uint32_t* back) {
 
-    prepareFrame(scene, zNear, zFar, viewAngle);
+    prepareFrame(scene, zNear, zFar, viewAngle, back);
     for (auto& solidPtr : scene.solids) {
         drawRenderable(*solidPtr, scene);
     }
 }
 
-void Renderer::prepareFrame(Scene& scene, float zNear, float zFar, float viewAngle) {
+void Renderer::prepareFrame(Scene& scene, float zNear, float zFar, float viewAngle, uint32_t* back) {
 
-    std::fill_n(scene.pixels, scene.screen.width * scene.screen.height, 0);
+    //std::fill_n(scene.pixels, scene.screen.width * scene.screen.height, 0);
+    auto* pixels = static_cast<uint32_t*>(scene.sdlSurface->pixels);
+    std::copy(back, back + scene.screen.width * scene.screen.height, pixels);
     scene.zBuffer->Clear(); // Clear the zBuffer
 
     //float zNear = 0.1f; // Near plane distance
