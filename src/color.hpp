@@ -3,25 +3,21 @@
 
 class Color {
     public:
-        uint16_t blue;
-        uint16_t green;
-        uint16_t red;
+        float blue;
+        float green;
+        float red;
 
         Color() : blue(0), green(0), red(0) {} // Default constructor initializes to black (0x00000000)
     
         // Optionally, you can add constructors or member functions if needed.
-        Color(uint16_t b, uint16_t g, uint16_t r) {
+        Color(float b, float g, float r) {
             blue = b;
             green = g;
             red = r;
         }
 
-        uint32_t toScreen() {
-            return 0xff000000 | red << 16 | green << 8 | blue; // BGRA format
-        }
-
-        uint32_t toScreenShifted() {
-            return 0xff000000 | (red >> 8) << 16 | (green >> 8) << 8 | blue >> 8; // BGRA format
+        uint32_t toBgra() {
+            return 0xff000000 | ((int) red) << 16 | ((int) green) << 8 | ((int) blue); // BGRA format
         }
 
         Color operator+(const Color &c) const {

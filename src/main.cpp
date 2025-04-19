@@ -21,8 +21,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    int width = 640;
-    int height = 480;
+    int width = 800;
+    int height = 600;
 
     // Renderer engine
     Renderer renderer;
@@ -100,12 +100,7 @@ int main(int argc, char** argv)
         std::ostringstream oss;
         oss << "xAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.xAngle
             << " yAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.yAngle
-            << " xPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.x
-            << " yPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.y
             << " zPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.z
-            << " zNear: " << std::fixed << std::setprecision(2) << zNear
-            << " zFar: " << std::fixed << std::setprecision(2) << zFar
-            << " ViewAngle: " << std::fixed << std::setprecision(2) << viewAngle
             << " zoom: " << scene.solids[0]->position.zoom
             << " frames (ms): " << (to - from);
         std::string title = oss.str();
