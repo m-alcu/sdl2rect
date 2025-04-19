@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <omp.h>
 #include "rasterizer.hpp"
 #include "scene.hpp"
 #include "slib.hpp"
@@ -24,7 +25,7 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
 
 void Rasterizer::DrawFaces(const Scene& scene) {
 
-
+    #pragma omp parallel for
     for (int i=0; i<solid->numFaces; i++) {
 
         Triangle<vertex> tri(

@@ -45,6 +45,7 @@ public:
     Shading shading;
     slib::vec3 lux;
     slib::vec3 eye;
+    slib::vec3 halfwayVector;
     slib::mat4 fullTransformMat;
     slib::mat4 normalTransformMat;
     slib::mat4 projectionMatrix;
