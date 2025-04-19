@@ -35,7 +35,7 @@ void Rasterizer::addFaces(const Scene& scene) {
         );
 
         if (visible(tri)) {
-            ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri), scene);
+            ClipCullTriangle(tri, scene);
         }
     }
 
@@ -299,47 +299,45 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t, const Scene& scene)
+void Rasterizer::ClipCullTriangle(Triangle<vertex>& t, const Scene& scene)
 {
     // Cull tests (unchanged)
-    if (t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.x > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.x > t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.x > t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.x > t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.x > t.p3.vertexPoint.w)
         return;
 
-    if (t->p1.vertexPoint.x < -t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.x < -t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.x < -t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.x < -t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.x < -t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.x < -t.p3.vertexPoint.w)
         return;
 
-    if (t->p1.vertexPoint.y > t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.y > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.y > t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.y > t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.y > t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.y > t.p3.vertexPoint.w)
         return;
 
-    if (t->p1.vertexPoint.y < -t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.y < -t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.y < -t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.y < -t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.y < -t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.y < -t.p3.vertexPoint.w)
         return;
 
-    if (t->p1.vertexPoint.z > t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.z > t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.z > t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.z > t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.z > t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.z > t.p3.vertexPoint.w)
         return;
 
-    if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.z < -t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.z < -t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.z < -t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
         return;
 
     // Check most common case first: No near clipping necessary
-    if (t->p1.vertexPoint.z >= -t->p1.vertexPoint.w &&
-        t->p2.vertexPoint.z >= -t->p2.vertexPoint.w &&
-        t->p3.vertexPoint.z >= -t->p3.vertexPoint.w)
+    if (t.p1.vertexPoint.z >= -t.p1.vertexPoint.w &&
+        t.p2.vertexPoint.z >= -t.p2.vertexPoint.w &&
+        t.p3.vertexPoint.z >= -t.p3.vertexPoint.w)
     {
-        // Directly draw the triangle without further clipping
-        Triangle<vertex> tri(t->p1, t->p2, t->p3, t->i);
-        draw(tri, *solid, scene);
+        draw(t, *solid, scene);
         return;
     }
 
@@ -377,25 +375,25 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t, const Sce
     };
 
     // Now proceed with detailed near-clipping logic:
-    if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w)
+    if (t.p1.vertexPoint.z < -t.p1.vertexPoint.w)
     {
-        if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
-            Clip2Out1In(t->p1, t->p2, t->p3, t->i, scene);
-        else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2Out1In(t->p1, t->p3, t->p2, t->i, scene);
+        if (t.p2.vertexPoint.z < -t.p2.vertexPoint.w)
+            Clip2Out1In(t.p1, t.p2, t.p3, t.i, scene);
+        else if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+            Clip2Out1In(t.p1, t.p3, t.p2, t.i, scene);
         else
-            Clip1Out2In(t->p1, t->p2, t->p3, t->i, scene);
+            Clip1Out2In(t.p1, t.p2, t.p3, t.i, scene);
     }
-    else if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
+    else if (t.p2.vertexPoint.z < -t.p2.vertexPoint.w)
     {
-        if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2Out1In(t->p2, t->p3, t->p1, t->i, scene);
+        if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+            Clip2Out1In(t.p2, t.p3, t.p1, t.i, scene);
         else
-            Clip1Out2In(t->p2, t->p1, t->p3, t->i, scene);
+            Clip1Out2In(t.p2, t.p1, t.p3, t.i, scene);
     }
-    else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
+    else if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
     {
-        Clip1Out2In(t->p3, t->p1, t->p2, t->i, scene);
+        Clip1Out2In(t.p3, t.p1, t.p2, t.i, scene);
     }
 }
 
