@@ -1,11 +1,13 @@
 #include <SDL2/SDL.h>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 #include "rasterizer.hpp"
 #include "renderer.hpp"
 #include "backgrounds/background.hpp"
 #include "backgrounds/backgroundFactory.hpp"
 #include "scene.hpp"
+#include "average.hpp"
 
 int main(int argc, char** argv)
 {
@@ -14,6 +16,7 @@ int main(int argc, char** argv)
     SDL_Event event;
     Uint32 from;
     Uint32 to;
+    static FrameTimeAverager frameTimeAvg;
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -97,16 +100,17 @@ int main(int argc, char** argv)
         renderer.drawScene(scene, zNear, zFar, viewAngle, back);
         to = SDL_GetTicks();
 
+        auto durationMs = std::chrono::duration<double, std::milli>(to - from).count();
+        double smoothedMs = frameTimeAvg.update(durationMs);
+
         std::ostringstream oss;
         oss << "xAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.xAngle
             << " yAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.yAngle
             << " zPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.z
             << " zoom: " << scene.solids[0]->position.zoom
-            << " frames (ms): " << (to - from);
+            << " frames/s: " << std::fixed << std::setprecision(2) << 1000/smoothedMs;
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        
-
-
 
         SDL_Texture* tex = SDL_CreateTextureFromSurface(sdlRenderer, scene.sdlSurface);
         SDL_RenderCopy(sdlRenderer, tex, nullptr, nullptr);
@@ -114,10 +118,8 @@ int main(int argc, char** argv)
         SDL_RenderPresent(sdlRenderer);
 
         // Update rotation angles.
-        
         scene.solids[0]->position.xAngle += 0.5f;
         scene.solids[0]->position.yAngle += 1.0f;
-        
     }
 
     // Free resources.

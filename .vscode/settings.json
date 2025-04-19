@@ -60,6 +60,8 @@
         "cstring": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "strstream": "cpp"
+        "strstream": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     }
 }

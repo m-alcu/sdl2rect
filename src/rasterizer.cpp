@@ -230,10 +230,10 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
                         pixels[hy + hx] = vRaster.color.toBgra();
                         break;
                     case Shading::BlinnPhong:
-                        pixels[hy + hx] = blinnPhongShadingFragment(vRaster, scene, face);
+                        pixels[hy + hx] = BlinnPhongPixelShading(vRaster, scene, face);
                         break;                                
                     case Shading::Phong:
-                        pixels[hy + hx] = phongShadingFragment(vRaster, scene, face);
+                        pixels[hy + hx] = PhongPixelShading(vRaster, scene, face);
                         break;                         
                     default: pixels[hy + hx] = flatColor;
                 }
@@ -245,10 +245,14 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
     }
 };
 
-inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
+inline uint32_t Rasterizer::PhongPixelShading(vertex gRaster, const Scene& scene, Face face) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
+
+    if (diff > 0.999) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
 
     slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
     float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
@@ -260,14 +264,10 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& sc
     g = std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f);
     b = std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f);
 
-    if (diff > 0.999) { 
-        return 0xffffffff; // White point if the light is too close to the normal
-    }
-
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scene& scene, Face face) {
+inline uint32_t Rasterizer::BlinnPhongPixelShading(vertex gRaster, const Scene& scene, Face face) {
 
     // Normalize vectors
     slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
@@ -277,22 +277,22 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     // Diffuse component
     float diff = std::max(0.0f, smath::dot(N,L));
 
+    if (diff > 0.999) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
+
     // Halfway vector H = normalize(L + V)
-    slib::vec3 H = smath::normalize(L + V);
+    //slib::vec3 H = smath::normalize(L + V);
 
     // Specular component: spec = (N · H)^shininess
-    float specAngle = std::max(0.0f, smath::dot(N,H));
-    float spec = std::pow(specAngle, face.material.Ns * 4); // Blinn Phong shininess needs *4 to be like Phong
+    float specAngle = std::max(0.0f, smath::dot(N,scene.halfwayVector)); // viewer
+    float spec = std::pow(specAngle, face.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
 
     float r, g, b;
     // Calculate brightness
     r = std::min(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec, 255.0f);
     g = std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f);
     b = std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f);
-
-    if (diff > 0.999) { 
-        return 0xffffffff; // White point if the light is too close to the normal
-    }
 
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }

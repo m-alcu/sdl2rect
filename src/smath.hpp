@@ -6,6 +6,7 @@
 #include "slib.hpp"
 #include <vector>
 
+
 namespace smath
 {
     float distance(const slib::vec3& vec);
