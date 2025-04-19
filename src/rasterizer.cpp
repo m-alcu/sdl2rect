@@ -35,12 +35,8 @@ void Rasterizer::addFaces(const Scene& scene) {
         );
 
         if (visible(tri)) {
-            ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri));
+            ClipCullTriangle(std::make_unique<Triangle<vertex>>(tri), scene);
         }
-    }
-    
-    for (auto& trianglePtr : triangles) {
-        draw(*trianglePtr, *solid, scene);
     }
 
 }
@@ -303,7 +299,7 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
+void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t, const Scene& scene)
 {
     // Cull tests (unchanged)
     if (t->p1.vertexPoint.x > t->p1.vertexPoint.w &&
@@ -343,13 +339,13 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
     {
         // Directly draw the triangle without further clipping
         Triangle<vertex> tri(t->p1, t->p2, t->p3, t->i);
-        addTriangle(std::make_unique<Triangle<vertex>>(tri));
+        draw(tri, *solid, scene);
         return;
     }
 
     // If near clipping might be necessary, proceed with clipping logic:
     // p1 out, p2 & p3 in
-    const auto Clip1Out2In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    const auto Clip1Out2In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
     {
         const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
                              ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
@@ -359,12 +355,14 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         const auto p1a = p1 + (p2 - p1) * alphaA;
         const auto p1b = p1 + (p3 - p1) * alphaB;
 
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1a, p2, p3, i)));
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1b, p1a, p3, i)));
+        Triangle<vertex> tri(p1a, p2, p3, i);
+        draw(tri, *solid, scene);
+        Triangle<vertex> tri2(p1b, p1a, p3, i);
+        draw(tri2, *solid, scene);
     };
 
     // p1 & p2 out, p3 in
-    const auto Clip2Out1In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i)
+    const auto Clip2Out1In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
     {
         const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
                              ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
@@ -374,29 +372,30 @@ void Rasterizer::ClipCullTriangle(std::unique_ptr<Triangle<vertex>> t)
         p1 = p1 + (p3 - p1) * alphaA;
         p2 = p2 + (p3 - p2) * alphaB;
 
-        addTriangle(std::make_unique<Triangle<vertex>>(Triangle<vertex>(p1, p2, p3, i)));
+        Triangle<vertex> tri(p1, p2, p3, i);
+        draw(tri, *solid, scene);
     };
 
     // Now proceed with detailed near-clipping logic:
     if (t->p1.vertexPoint.z < -t->p1.vertexPoint.w)
     {
         if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
-            Clip2Out1In(t->p1, t->p2, t->p3, t->i);
+            Clip2Out1In(t->p1, t->p2, t->p3, t->i, scene);
         else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2Out1In(t->p1, t->p3, t->p2, t->i);
+            Clip2Out1In(t->p1, t->p3, t->p2, t->i, scene);
         else
-            Clip1Out2In(t->p1, t->p2, t->p3, t->i);
+            Clip1Out2In(t->p1, t->p2, t->p3, t->i, scene);
     }
     else if (t->p2.vertexPoint.z < -t->p2.vertexPoint.w)
     {
         if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
-            Clip2Out1In(t->p2, t->p3, t->p1, t->i);
+            Clip2Out1In(t->p2, t->p3, t->p1, t->i, scene);
         else
-            Clip1Out2In(t->p2, t->p1, t->p3, t->i);
+            Clip1Out2In(t->p2, t->p1, t->p3, t->i, scene);
     }
     else if (t->p3.vertexPoint.z < -t->p3.vertexPoint.w)
     {
-        Clip1Out2In(t->p3, t->p1, t->p2, t->i);
+        Clip1Out2In(t->p3, t->p1, t->p2, t->i, scene);
     }
 }
 

@@ -38,7 +38,7 @@ class Rasterizer {
     
         void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
         bool visible(const Triangle<vertex>& triangle);
-        void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t );
+        void ClipCullTriangle( std::unique_ptr<Triangle<vertex>> t , const Scene& scene);
         void projectRotateAllPoints(const Scene& scene);
         void addFaces(const Scene& scene);
 
