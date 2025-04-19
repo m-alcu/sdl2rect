@@ -260,10 +260,9 @@ inline uint32_t Rasterizer::phongShadingFragment(vertex gRaster, const Scene& sc
     g = std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f);
     b = std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f);
 
-    /*
-    if (diff > 0.995) { 
+    if (diff > 0.999) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }*/
+    }
 
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
@@ -291,10 +290,9 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     g = std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f);
     b = std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f);
 
-    /*
-    if (diff > 0.99) { 
+    if (diff > 0.999) { 
         return 0xffffffff; // White point if the light is too close to the normal
-    }*/
+    }
 
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
