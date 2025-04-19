@@ -15,7 +15,6 @@ void Rasterizer::projectRotateAllPoints(const Scene& scene) {
         slib::vec4 point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
         screenPoint.vertexPoint = point * scene.projectionMatrix;
         screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
-        screenPoint.ds = std::max(0.0f, smath::dot(screenPoint.normal, scene.lux)); // Calculate the dot product with the light direction
         screenPoint.p_x = (int32_t) ((screenPoint.vertexPoint.x / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
         screenPoint.p_y = (int32_t) ((screenPoint.vertexPoint.y / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
         screenPoint.p_z = screenPoint.vertexPoint.z / screenPoint.vertexPoint.w; // Store the depth value in the z-buffer
@@ -97,7 +96,7 @@ inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& l
 void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene) {
 
     uint32_t flatColor = 0x00000000;
-    float r, g, b;
+    float r, g, b, ds;
     if (scene.shading == Shading::Flat) {
         slib::vec3 rotatedFacenormal;
         rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[tri.i], 0);
@@ -109,17 +108,20 @@ void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, const Scene& sc
     } 
 
     if (scene.shading == Shading::Gouraud) {
-        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p1.ds, 255.0f);
-        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p1.ds, 255.0f);
-        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p1.ds, 255.0f);
+        ds = std::max(0.0f, smath::dot(tri.p1.normal, scene.lux));
+        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * ds, 255.0f);
+        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * ds, 255.0f);
+        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * ds, 255.0f);
         tri.p1.color = Color(b, g, r);
-        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p2.ds, 255.0f);
-        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p2.ds, 255.0f);
-        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p2.ds, 255.0f);
+        ds = std::max(0.0f, smath::dot(tri.p2.normal, scene.lux));
+        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * ds, 255.0f);
+        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * ds, 255.0f);
+        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * ds, 255.0f);
         tri.p2.color = Color(b, g, r);
-        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * tri.p3.ds, 255.0f);
-        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * tri.p3.ds, 255.0f);
-        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * tri.p3.ds, 255.0f);
+        ds = std::max(0.0f, smath::dot(tri.p3.normal, scene.lux));
+        r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * ds, 255.0f);
+        g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * ds, 255.0f);
+        b = std::min(solid.faces[tri.i].material.Ka[2] + solid.faces[tri.i].material.Kd[2] * ds, 255.0f);
         tri.p3.color = Color(b, g, r);
     }
 
@@ -196,9 +198,9 @@ inline vertex Rasterizer::gradientDy(vertex p1, vertex p2) {
         return (p2 - p1) / dy;
     } else {
         if (p2.p_x - p1.p_x > 0) {
-            return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0}, {0,0,0});
+            return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, {0,0,0}, {0,0,0});
         } else {
-            return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, 0, {0,0,0}, {0,0,0});
+            return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, {0,0,0}, {0,0,0});
         }
     }
 };
