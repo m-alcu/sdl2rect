@@ -46,8 +46,8 @@ void Renderer::drawRenderable(Solid& solid, Scene& scene) {
 
     prepareRenderable(solid, scene);
     Rasterizer rasterizer(&solid);
-    rasterizer.projectRotateAllPoints(scene);
-    rasterizer.addFaces(scene);
+    rasterizer.ProcessVertex(scene);
+    rasterizer.DrawFaces(scene);
 }
 
 void Renderer::prepareRenderable(const Solid& solid, Scene& scene) {

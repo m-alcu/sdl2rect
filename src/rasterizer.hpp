@@ -36,23 +36,9 @@ class Rasterizer {
         Rasterizer(const Solid* solidPtr)
           : solid(solidPtr) {}
     
-        void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
-        bool visible(const Triangle<vertex>& triangle);
-        void ClipCullTriangle(Triangle<vertex>& triangle , const Scene& scene);
-        void projectRotateAllPoints(const Scene& scene);
-        void addFaces(const Scene& scene);
 
-        void addTriangle(std::unique_ptr<Triangle<vertex>> triangle)
-        {
-            triangles.push_back(std::move(triangle));
-        }
-
-        void addPoint(std::unique_ptr<vertex> point)
-        {
-            projectedPoints.push_back(std::move(point));
-        }
-
-        
+        void ProcessVertex(const Scene& scene);
+        void DrawFaces(const Scene& scene);
 
     private:
         void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, const Scene& scene, const Face& face, uint32_t flatColor);
@@ -60,6 +46,13 @@ class Rasterizer {
         vertex gradientDy(vertex p1, vertex p2);
         uint32_t phongShadingFragment(vertex gRaster, const Scene& scene, Face face);
         uint32_t blinnPhongShadingFragment(vertex gRaster, const Scene& scene, Face face);
+        void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
+        bool Visible(const Triangle<vertex>& triangle);
+        void ClipCullDrawTriangle(Triangle<vertex>& triangle , const Scene& scene);
+        void addPoint(std::unique_ptr<vertex> point)
+        {
+            projectedPoints.push_back(std::move(point));
+        }
         
     };
     

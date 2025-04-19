@@ -7,7 +7,7 @@
 #include "color.hpp"
 
 
-void Rasterizer::projectRotateAllPoints(const Scene& scene) {
+void Rasterizer::ProcessVertex(const Scene& scene) {
     // Allocate an array of Pixels on the heap
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid->numVertices; i++) {
@@ -22,7 +22,7 @@ void Rasterizer::projectRotateAllPoints(const Scene& scene) {
         }
 }
 
-void Rasterizer::addFaces(const Scene& scene) {
+void Rasterizer::DrawFaces(const Scene& scene) {
 
 
     for (int i=0; i<solid->numFaces; i++) {
@@ -34,8 +34,8 @@ void Rasterizer::addFaces(const Scene& scene) {
             i
         );
 
-        if (visible(tri)) {
-            ClipCullTriangle(tri, scene);
+        if (Visible(tri)) {
+            ClipCullDrawTriangle(tri, scene);
         }
     }
 
@@ -53,7 +53,7 @@ The backface culling algorithm is used to determine if a triangle is facing the 
 If the triangle is facing away from the camera, we can skip the rasterization process.
 */
 
-bool Rasterizer::visible(const Triangle<vertex>& triangle) {
+bool Rasterizer::Visible(const Triangle<vertex>& triangle) {
 
     return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
 };
@@ -299,7 +299,7 @@ inline uint32_t Rasterizer::blinnPhongShadingFragment(vertex gRaster, const Scen
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullTriangle(Triangle<vertex>& t, const Scene& scene)
+void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
 {
     // Cull tests (unchanged)
     if (t.p1.vertexPoint.x > t.p1.vertexPoint.w &&
