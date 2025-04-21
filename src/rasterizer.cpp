@@ -14,11 +14,11 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
     for (int i = 0; i < solid->numVertices; i++) {
         vertex screenPoint;
         screenPoint.point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
-        screenPoint.vertexPoint = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+        screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
         screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
-        screenPoint.p_x = (int32_t) ((screenPoint.vertexPoint.x / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoint.p_y = (int32_t) ((screenPoint.vertexPoint.y / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoint.p_z = screenPoint.vertexPoint.z / screenPoint.vertexPoint.w; // Store the depth value in the z-buffer
+        screenPoint.p_x = (int32_t) ((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_y = (int32_t) ((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w; // Store the depth value in the z-buffer
         addPoint(std::make_unique<vertex>(screenPoint)); // Add the point to the rasterizer
         }
 }
@@ -303,40 +303,40 @@ inline uint32_t Rasterizer::BlinnPhongPixelShading(const vertex& gRaster, const 
 void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
 {
     // Cull tests (unchanged)
-    if (t.p1.vertexPoint.x > t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.x > t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.x > t.p3.vertexPoint.w)
+    if (t.p1.ndc.x > t.p1.ndc.w &&
+        t.p2.ndc.x > t.p2.ndc.w &&
+        t.p3.ndc.x > t.p3.ndc.w)
         return;
 
-    if (t.p1.vertexPoint.x < -t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.x < -t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.x < -t.p3.vertexPoint.w)
+    if (t.p1.ndc.x < -t.p1.ndc.w &&
+        t.p2.ndc.x < -t.p2.ndc.w &&
+        t.p3.ndc.x < -t.p3.ndc.w)
         return;
 
-    if (t.p1.vertexPoint.y > t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.y > t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.y > t.p3.vertexPoint.w)
+    if (t.p1.ndc.y > t.p1.ndc.w &&
+        t.p2.ndc.y > t.p2.ndc.w &&
+        t.p3.ndc.y > t.p3.ndc.w)
         return;
 
-    if (t.p1.vertexPoint.y < -t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.y < -t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.y < -t.p3.vertexPoint.w)
+    if (t.p1.ndc.y < -t.p1.ndc.w &&
+        t.p2.ndc.y < -t.p2.ndc.w &&
+        t.p3.ndc.y < -t.p3.ndc.w)
         return;
 
-    if (t.p1.vertexPoint.z > t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.z > t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.z > t.p3.vertexPoint.w)
+    if (t.p1.ndc.z > t.p1.ndc.w &&
+        t.p2.ndc.z > t.p2.ndc.w &&
+        t.p3.ndc.z > t.p3.ndc.w)
         return;
 
-    if (t.p1.vertexPoint.z < -t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.z < -t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+    if (t.p1.ndc.z < -t.p1.ndc.w &&
+        t.p2.ndc.z < -t.p2.ndc.w &&
+        t.p3.ndc.z < -t.p3.ndc.w)
         return;
 
     // Check most common case first: No near clipping necessary
-    if (t.p1.vertexPoint.z >= -t.p1.vertexPoint.w &&
-        t.p2.vertexPoint.z >= -t.p2.vertexPoint.w &&
-        t.p3.vertexPoint.z >= -t.p3.vertexPoint.w)
+    if (t.p1.ndc.z >= -t.p1.ndc.w &&
+        t.p2.ndc.z >= -t.p2.ndc.w &&
+        t.p3.ndc.z >= -t.p3.ndc.w)
     {
         draw(t, *solid, scene);
         return;
@@ -346,10 +346,10 @@ void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
     // p1 out, p2 & p3 in
     const auto Clip1Out2In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
     {
-        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
-                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p2.vertexPoint.z + p2.vertexPoint.w));
-        const float alphaB = (p1.vertexPoint.z + p1.vertexPoint.w) /
-                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+        const float alphaA = (p1.ndc.z + p1.ndc.w) /
+                             ((p1.ndc.z + p1.ndc.w) - (p2.ndc.z + p2.ndc.w));
+        const float alphaB = (p1.ndc.z + p1.ndc.w) /
+                             ((p1.ndc.z + p1.ndc.w) - (p3.ndc.z + p3.ndc.w));
         
         const auto p1a = p1 + (p2 - p1) * alphaA;
         const auto p1b = p1 + (p3 - p1) * alphaB;
@@ -363,10 +363,10 @@ void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
     // p1 & p2 out, p3 in
     const auto Clip2Out1In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
     {
-        const float alphaA = (p1.vertexPoint.z + p1.vertexPoint.w) /
-                             ((p1.vertexPoint.z + p1.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
-        const float alphaB = (p2.vertexPoint.z + p2.vertexPoint.w) /
-                             ((p2.vertexPoint.z + p2.vertexPoint.w) - (p3.vertexPoint.z + p3.vertexPoint.w));
+        const float alphaA = (p1.ndc.z + p1.ndc.w) /
+                             ((p1.ndc.z + p1.ndc.w) - (p3.ndc.z + p3.ndc.w));
+        const float alphaB = (p2.ndc.z + p2.ndc.w) /
+                             ((p2.ndc.z + p2.ndc.w) - (p3.ndc.z + p3.ndc.w));
 
         p1 = p1 + (p3 - p1) * alphaA;
         p2 = p2 + (p3 - p2) * alphaB;
@@ -376,23 +376,23 @@ void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
     };
 
     // Now proceed with detailed near-clipping logic:
-    if (t.p1.vertexPoint.z < -t.p1.vertexPoint.w)
+    if (t.p1.ndc.z < -t.p1.ndc.w)
     {
-        if (t.p2.vertexPoint.z < -t.p2.vertexPoint.w)
+        if (t.p2.ndc.z < -t.p2.ndc.w)
             Clip2Out1In(t.p1, t.p2, t.p3, t.i, scene);
-        else if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+        else if (t.p3.ndc.z < -t.p3.ndc.w)
             Clip2Out1In(t.p1, t.p3, t.p2, t.i, scene);
         else
             Clip1Out2In(t.p1, t.p2, t.p3, t.i, scene);
     }
-    else if (t.p2.vertexPoint.z < -t.p2.vertexPoint.w)
+    else if (t.p2.ndc.z < -t.p2.ndc.w)
     {
-        if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+        if (t.p3.ndc.z < -t.p3.ndc.w)
             Clip2Out1In(t.p2, t.p3, t.p1, t.i, scene);
         else
             Clip1Out2In(t.p2, t.p1, t.p3, t.i, scene);
     }
-    else if (t.p3.vertexPoint.z < -t.p3.vertexPoint.w)
+    else if (t.p3.ndc.z < -t.p3.ndc.w)
     {
         Clip1Out2In(t.p3, t.p1, t.p2, t.i, scene);
     }
