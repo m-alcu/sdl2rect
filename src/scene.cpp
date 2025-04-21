@@ -7,7 +7,7 @@ void Scene::setup() {
     halfwayVector = smath::normalize(lux + eye);
 
 
-    
+    /*
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -20,14 +20,14 @@ void Scene::setup() {
     torus->position.zAngle = 0.0f;
     
     addSolid(std::move(torus));
-    
+    */
     
 
-    /*
+    
     auto ascLoader = std::make_unique<AscLoader>();
     ascLoader->setup("resources/knot.asc");
 
-    ascLoader->position.z = -5000;   
+    ascLoader->position.z = -1000;   
     ascLoader->position.x = 0;
     ascLoader->position.y = 0;
     ascLoader->position.zoom = 1;
@@ -35,9 +35,8 @@ void Scene::setup() {
     ascLoader->position.yAngle = 0.0f;
     ascLoader->position.zAngle = 0.0f;
     
-    calculatePrecomputedShading(*ascLoader);
     addSolid(std::move(ascLoader));
-    */
+    
 
     /*
     auto obj = std::make_unique<ObjLoader>();

@@ -80,9 +80,9 @@ void AscLoader::loadVertices(const std::string& filename) {
                 std::smatch match;
 
                 if (std::regex_search(line, match, faceRegex)) {
-                    face.vertex1 = std::stoi(match[3]);
+                    face.vertex1 = std::stoi(match[1]);
                     face.vertex2 = std::stoi(match[2]);
-                    face.vertex3 = std::stoi(match[1]);
+                    face.vertex3 = std::stoi(match[3]);
                     face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
                     face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
                     face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
