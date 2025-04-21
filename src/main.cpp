@@ -42,8 +42,8 @@ int main(int argc, char** argv)
     }
 
     Scene scene({height, width});
-    scene.lux = {0, 0,  1};
-    scene.eye = {0, 0,  1};
+    scene.lux = smath::normalize(slib::vec3{0, 1, 1});;
+    scene.eye = {0, 0, 1};
     scene.shading = Shading::Flat;
     scene.setup();
 

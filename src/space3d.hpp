@@ -38,11 +38,12 @@ typedef struct Face
 } Face;
 
 struct vertex {
+    slib::vec3 point;
+    slib::vec4 vertexPoint;
     int32_t p_x;
     int32_t p_y;
     float p_z; 
     slib::vec3 normal;
-    slib::vec4 vertexPoint;
     slib::zvec2 tex; // Texture coordinates
     Color color;
 

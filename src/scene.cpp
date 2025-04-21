@@ -6,6 +6,8 @@ void Scene::setup() {
 
     halfwayVector = smath::normalize(lux + eye);
 
+
+    
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -18,7 +20,7 @@ void Scene::setup() {
     torus->position.zAngle = 0.0f;
     
     addSolid(std::move(torus));
-
+    
     
 
     /*
@@ -60,7 +62,7 @@ void Scene::setup() {
     tetrakis->position.z = -5000;   
     tetrakis->position.x = 0;
     tetrakis->position.y = 0;
-    tetrakis->position.zoom = 1;
+    tetrakis->position.zoom = 25;
     tetrakis->position.xAngle = 90.0f;
     tetrakis->position.yAngle = 0.0f;
     tetrakis->position.zAngle = 0.0f;

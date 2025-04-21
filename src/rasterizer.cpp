@@ -13,8 +13,8 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
     // Process each vertex and store the result in the allocated array
     for (int i = 0; i < solid->numVertices; i++) {
         vertex screenPoint;
-        slib::vec4 point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
-        screenPoint.vertexPoint = point * scene.projectionMatrix;
+        screenPoint.point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
+        screenPoint.vertexPoint = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
         screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
         screenPoint.p_x = (int32_t) ((screenPoint.vertexPoint.x / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
         screenPoint.p_y = (int32_t) ((screenPoint.vertexPoint.y / screenPoint.vertexPoint.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
@@ -25,7 +25,7 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
 
 void Rasterizer::DrawFaces(const Scene& scene) {
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int i=0; i<solid->numFaces; i++) {
 
         Triangle<vertex> tri(
@@ -57,6 +57,8 @@ If the triangle is facing away from the camera, we can skip the rasterization pr
 bool Rasterizer::Visible(const Triangle<vertex>& triangle) {
 
     return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
+    //return (triangle.p3.point.x-triangle.p2.point.x)*(triangle.p2.point.y-triangle.p1.point.y) - (triangle.p2.point.x-triangle.p1.point.x)*(triangle.p3.point.y-triangle.p2.point.y) < 0;
+
 };
 
 // Inline function for culling top pixels.
@@ -246,18 +248,18 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
     }
 };
 
-inline uint32_t Rasterizer::PhongPixelShading(vertex gRaster, const Scene& scene, Face face) {
+inline uint32_t Rasterizer::PhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face) {
 
     slib::vec3 normal = smath::normalize(gRaster.normal);
     float diff = std::max(0.0f, smath::dot(normal,scene.lux));
 
-    if (diff > 0.999) { 
-        return 0xffffffff; // White point if the light is too close to the normal
-    }
-
     slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
     float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
     float spec = std::pow(specAngle, face.material.Ns);
+
+    if (spec > 0.95) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
 
     float r, g, b;
     // Calculate brightness
@@ -268,7 +270,7 @@ inline uint32_t Rasterizer::PhongPixelShading(vertex gRaster, const Scene& scene
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-inline uint32_t Rasterizer::BlinnPhongPixelShading(vertex gRaster, const Scene& scene, Face face) {
+inline uint32_t Rasterizer::BlinnPhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face) {
 
     // Normalize vectors
     slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
@@ -278,16 +280,16 @@ inline uint32_t Rasterizer::BlinnPhongPixelShading(vertex gRaster, const Scene& 
     // Diffuse component
     float diff = std::max(0.0f, smath::dot(N,L));
 
-    if (diff > 0.999) { 
-        return 0xffffffff; // White point if the light is too close to the normal
-    }
-
     // Halfway vector H = normalize(L + V)
     //slib::vec3 H = smath::normalize(L + V);
 
     // Specular component: spec = (N · H)^shininess
     float specAngle = std::max(0.0f, smath::dot(N,scene.halfwayVector)); // viewer
     float spec = std::pow(specAngle, face.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
+
+    if (spec > 0.95) { 
+        return 0xffffffff; // White point if the light is too close to the normal
+    }
 
     float r, g, b;
     // Calculate brightness

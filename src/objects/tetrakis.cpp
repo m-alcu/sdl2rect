@@ -55,8 +55,8 @@ void Tetrakis::loadFaces() {
             uint32_t color = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
 
             Face face;
-            face.vertex1 = quads[i][j];
-            face.vertex2 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            face.vertex1 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            face.vertex2 = quads[i][j];
             face.vertex3 = centers[i];
 
             MaterialProperties properties = getMaterialProperties(MaterialType::Metal);

@@ -41,12 +41,11 @@ class Rasterizer {
         void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, const Scene& scene, const Face& face, uint32_t flatColor);
         void orderVertices(vertex *p1, vertex *p2, vertex *p3);
         vertex gradientDy(vertex p1, vertex p2);
-        uint32_t PhongPixelShading(vertex gRaster, const Scene& scene, Face face);
-        uint32_t BlinnPhongPixelShading(vertex gRaster, const Scene& scene, Face face);
+        uint32_t PhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face);
+        uint32_t BlinnPhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face);
         void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
         bool Visible(const Triangle<vertex>& triangle);
         void ClipCullDrawTriangle(Triangle<vertex>& triangle , const Scene& scene);
-        float fastSpecular(float dotNH, const std::vector<float>& table);
         void addPoint(std::unique_ptr<vertex> point)
         {
             projectedPoints.push_back(std::move(point));
