@@ -36,7 +36,7 @@ void Rasterizer::DrawFaces(const Scene& scene) {
         );
 
         if (Visible(tri)) {
-            ClipCullDrawTriangle(tri, scene);
+            ClipCullDrawTriangleSutherland(tri, scene);
         }
     }
 
@@ -300,103 +300,87 @@ inline uint32_t Rasterizer::BlinnPhongPixelShading(const vertex& gRaster, const 
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-void Rasterizer::ClipCullDrawTriangle(Triangle<vertex>& t, const Scene& scene)
-{
-    // Cull tests (unchanged)
-    if (t.p1.ndc.x > t.p1.ndc.w &&
-        t.p2.ndc.x > t.p2.ndc.w &&
-        t.p3.ndc.x > t.p3.ndc.w)
-        return;
+enum class ClipPlane {
+    Left, Right, Bottom, Top, Near, Far
+};
 
-    if (t.p1.ndc.x < -t.p1.ndc.w &&
-        t.p2.ndc.x < -t.p2.ndc.w &&
-        t.p3.ndc.x < -t.p3.ndc.w)
-        return;
+bool IsInside(const vertex& v, ClipPlane plane) {
+    const auto& p = v.ndc;
+    switch (plane) {
+        case ClipPlane::Left:   return p.x >= -p.w;
+        case ClipPlane::Right:  return p.x <=  p.w;
+        case ClipPlane::Bottom: return p.y >= -p.w;
+        case ClipPlane::Top:    return p.y <=  p.w;
+        case ClipPlane::Near:   return p.z >= -p.w;
+        case ClipPlane::Far:    return p.z <=  p.w;
+    }
+    return false;
+}
 
-    if (t.p1.ndc.y > t.p1.ndc.w &&
-        t.p2.ndc.y > t.p2.ndc.w &&
-        t.p3.ndc.y > t.p3.ndc.w)
-        return;
+float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
+    const auto& pa = a.ndc;
+    const auto& pb = b.ndc;
+    float num, denom;
 
-    if (t.p1.ndc.y < -t.p1.ndc.w &&
-        t.p2.ndc.y < -t.p2.ndc.w &&
-        t.p3.ndc.y < -t.p3.ndc.w)
-        return;
-
-    if (t.p1.ndc.z > t.p1.ndc.w &&
-        t.p2.ndc.z > t.p2.ndc.w &&
-        t.p3.ndc.z > t.p3.ndc.w)
-        return;
-
-    if (t.p1.ndc.z < -t.p1.ndc.w &&
-        t.p2.ndc.z < -t.p2.ndc.w &&
-        t.p3.ndc.z < -t.p3.ndc.w)
-        return;
-
-    // Check most common case first: No near clipping necessary
-    if (t.p1.ndc.z >= -t.p1.ndc.w &&
-        t.p2.ndc.z >= -t.p2.ndc.w &&
-        t.p3.ndc.z >= -t.p3.ndc.w)
-    {
-        draw(t, *solid, scene);
-        return;
+    switch (plane) {
+        case ClipPlane::Left:
+            num = pa.x + pa.w; denom = (pa.x + pa.w) - (pb.x + pb.w); break;
+        case ClipPlane::Right:
+            num = pa.x - pa.w; denom = (pa.x - pa.w) - (pb.x - pb.w); break;
+        case ClipPlane::Bottom:
+            num = pa.y + pa.w; denom = (pa.y + pa.w) - (pb.y + pb.w); break;
+        case ClipPlane::Top:
+            num = pa.y - pa.w; denom = (pa.y - pa.w) - (pb.y - pb.w); break;
+        case ClipPlane::Near:
+            num = pa.z + pa.w; denom = (pa.z + pa.w) - (pb.z + pb.w); break;
+        case ClipPlane::Far:
+            num = pa.z - pa.w; denom = (pa.z - pa.w) - (pb.z - pb.w); break;
     }
 
-    // If near clipping might be necessary, proceed with clipping logic:
-    // p1 out, p2 & p3 in
-    const auto Clip1Out2In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
-    {
-        const float alphaA = (p1.ndc.z + p1.ndc.w) /
-                             ((p1.ndc.z + p1.ndc.w) - (p2.ndc.z + p2.ndc.w));
-        const float alphaB = (p1.ndc.z + p1.ndc.w) /
-                             ((p1.ndc.z + p1.ndc.w) - (p3.ndc.z + p3.ndc.w));
-        
-        const auto p1a = p1 + (p2 - p1) * alphaA;
-        const auto p1b = p1 + (p3 - p1) * alphaB;
+    return denom != 0.0f ? num / denom : 0.0f;
+}
 
-        Triangle<vertex> tri(p1a, p2, p3, i);
+std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane) {
+    std::vector<vertex> output;
+    if (poly.empty()) return output;
+
+    vertex prev = poly.back();
+    bool prevInside = IsInside(prev, plane);
+
+    for (const auto& curr : poly) {
+        bool currInside = IsInside(curr, plane);
+
+        if (currInside != prevInside) {
+            float alpha = ComputeAlpha(prev, curr, plane);
+            output.push_back(prev + (curr - prev) * alpha);
+        }
+
+        if (currInside)
+            output.push_back(curr);
+
+        prev = curr;
+        prevInside = currInside;
+    }
+
+    return output;
+}
+
+void Rasterizer::ClipCullDrawTriangleSutherland(const Triangle<vertex>& t, const Scene& scene) {
+    std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };
+
+    for (ClipPlane plane : {ClipPlane::Left, ClipPlane::Right, ClipPlane::Bottom, 
+                            ClipPlane::Top, ClipPlane::Near, ClipPlane::Far}) {
+        polygon = ClipAgainstPlane(polygon, plane);
+        if (polygon.empty()) return; // Completely outside
+    }
+
+    // Triangulate fan-style and draw
+    for (size_t i = 1; i + 1 < polygon.size(); ++i) {
+        Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
         draw(tri, *solid, scene);
-        Triangle<vertex> tri2(p1b, p1a, p3, i);
-        draw(tri2, *solid, scene);
-    };
-
-    // p1 & p2 out, p3 in
-    const auto Clip2Out1In = [this](vertex &p1, vertex &p2, vertex &p3, int16_t i, const Scene& scene)
-    {
-        const float alphaA = (p1.ndc.z + p1.ndc.w) /
-                             ((p1.ndc.z + p1.ndc.w) - (p3.ndc.z + p3.ndc.w));
-        const float alphaB = (p2.ndc.z + p2.ndc.w) /
-                             ((p2.ndc.z + p2.ndc.w) - (p3.ndc.z + p3.ndc.w));
-
-        p1 = p1 + (p3 - p1) * alphaA;
-        p2 = p2 + (p3 - p2) * alphaB;
-
-        Triangle<vertex> tri(p1, p2, p3, i);
-        draw(tri, *solid, scene);
-    };
-
-    // Now proceed with detailed near-clipping logic:
-    if (t.p1.ndc.z < -t.p1.ndc.w)
-    {
-        if (t.p2.ndc.z < -t.p2.ndc.w)
-            Clip2Out1In(t.p1, t.p2, t.p3, t.i, scene);
-        else if (t.p3.ndc.z < -t.p3.ndc.w)
-            Clip2Out1In(t.p1, t.p3, t.p2, t.i, scene);
-        else
-            Clip1Out2In(t.p1, t.p2, t.p3, t.i, scene);
-    }
-    else if (t.p2.ndc.z < -t.p2.ndc.w)
-    {
-        if (t.p3.ndc.z < -t.p3.ndc.w)
-            Clip2Out1In(t.p2, t.p3, t.p1, t.i, scene);
-        else
-            Clip1Out2In(t.p2, t.p1, t.p3, t.i, scene);
-    }
-    else if (t.p3.ndc.z < -t.p3.ndc.w)
-    {
-        Clip1Out2In(t.p3, t.p1, t.p2, t.i, scene);
     }
 }
+
 
 
 
