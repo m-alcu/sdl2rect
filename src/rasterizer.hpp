@@ -45,7 +45,7 @@ class Rasterizer {
         uint32_t BlinnPhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face);
         void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
         bool Visible(const Triangle<vertex>& triangle);
-        void ClipCullDrawTriangleSutherland(const Triangle<vertex>& t, const Scene& scene);
+        void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene);
         void addPoint(std::unique_ptr<vertex> point)
         {
             projectedPoints.push_back(std::move(point));

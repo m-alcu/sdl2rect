@@ -18,7 +18,7 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
         screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
         screenPoint.p_x = (int32_t) ((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
         screenPoint.p_y = (int32_t) ((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w; // Store the depth value in the z-buffer
+        screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w; // Store the depth value in the z-buffer        
         addPoint(std::make_unique<vertex>(screenPoint)); // Add the point to the rasterizer
         }
 }
@@ -36,7 +36,7 @@ void Rasterizer::DrawFaces(const Scene& scene) {
         );
 
         if (Visible(tri)) {
-            ClipCullDrawTriangleSutherland(tri, scene);
+            ClipCullDrawTriangleSutherlandHodgman(tri, scene);
         }
     }
 
@@ -134,51 +134,13 @@ void Rasterizer::draw(Triangle<vertex>& tri, const Solid& solid, const Scene& sc
 
     vertex left = tri.p1, right = tri.p1;
     if(tri.edge13.p_x < tri.edge12.p_x) {
-        if (tri.p2.p_y < scene.screen.height) {
-            if (tri.p2.p_y < 0) {
-                //Culling the entire top triangle
-                left += tri.edge13 * (tri.p2.p_y - tri.p1.p_y);
-                right = tri.p2;
-                //Culling the bottom pixels of the bottom triangle
-                cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge13, right, tri.edge23);
-                tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
-            } else {
-                //This triangle finishes in the screen (but needs culling top pixels)
-                cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge13, right, tri.edge12);
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
-                right = tri.p2;
-                //Culling the bottom pixels of the bottom triangle
-                tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
-            }
-        } else {
-            //Needs to cull the top and the bottom pixels 
-            cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge13, right, tri.edge12);
-            tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
-        };
+        drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
+        right = tri.p2;
+        drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
     } else {
-        if  (tri.p2.p_y < scene.screen.height) {
-            if (tri.p2.p_y < 0) {
-                right = right + (tri.edge13 * (tri.p2.p_y - tri.p1.p_y));
-                left = tri.p2;
-                cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge23, right, tri.edge13);
-                tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
-            } else {
-                cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge12, right, tri.edge13);
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
-                left = tri.p2;
-                cullTopPixels(tri.p2.p_y, tri.p3.p_y, left, tri.edge23, right, tri.edge13);
-                tri.p3.p_y = std::min(tri.p3.p_y, scene.screen.height);
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
-            }
-        } else {
-            cullTopPixels(tri.p1.p_y, tri.p2.p_y, left, tri.edge12, right, tri.edge13);
-            tri.p2.p_y = std::min(tri.p2.p_y, scene.screen.height);
-            drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
-        };
+        drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
+        left = tri.p2;
+        drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
     }
 };
 
@@ -212,18 +174,8 @@ inline void Rasterizer::drawTriHalf(int32_t top, int32_t bottom, vertex& left, v
         int16_t dx = (right.p_x - left.p_x) >> 16;
         vertex vDx = dx != 0 ? vDx = (right - left) / dx : vertex();
         vertex vRaster = left;
-        int32_t xInitial = left.p_x >> 16;
         
-        // Culling the left pixels less than 0
-        if (xInitial < 0) {
-            int32_t xFinal = std::min(right.p_x >> 16, 0);
-            vRaster = vRaster + vDx * (xFinal - xInitial);
-            xInitial = xFinal;
-        }
-        // Culling the right pixels greater than the screen width
-        int32_t xFinal = std::min(right.p_x >> 16, scene.screen.width);
-        
-        for(int hx = xInitial; hx < xFinal; hx++) {
+        for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
             if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
                 switch (scene.shading) {
                     case Shading::Flat: 
@@ -340,7 +292,7 @@ float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
     return denom != 0.0f ? num / denom : 0.0f;
 }
 
-std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane) {
+std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
     std::vector<vertex> output;
     if (poly.empty()) return output;
 
@@ -352,7 +304,11 @@ std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane 
 
         if (currInside != prevInside) {
             float alpha = ComputeAlpha(prev, curr, plane);
-            output.push_back(prev + (curr - prev) * alpha);
+            vertex interpolated = prev + (curr - prev) * alpha;
+            interpolated.p_x = (int32_t) ((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+            interpolated.p_y = (int32_t) ((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+            interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
+            output.push_back(interpolated);
         }
 
         if (currInside)
@@ -365,12 +321,12 @@ std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane 
     return output;
 }
 
-void Rasterizer::ClipCullDrawTriangleSutherland(const Triangle<vertex>& t, const Scene& scene) {
+void Rasterizer::ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene) {
     std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };
 
     for (ClipPlane plane : {ClipPlane::Left, ClipPlane::Right, ClipPlane::Bottom, 
                             ClipPlane::Top, ClipPlane::Near, ClipPlane::Far}) {
-        polygon = ClipAgainstPlane(polygon, plane);
+        polygon = ClipAgainstPlane(polygon, plane, scene);
         if (polygon.empty()) return; // Completely outside
     }
 
