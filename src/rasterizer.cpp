@@ -16,8 +16,8 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
         screenPoint.point = scene.fullTransformMat * slib::vec4(solid->vertices[i], 1);
         screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
         screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexNormals[i], 0);
-        screenPoint.p_x = (int32_t) ((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
-        screenPoint.p_y = (int32_t) ((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+        screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+        screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
         screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w; // Store the depth value in the z-buffer        
         addPoint(std::make_unique<vertex>(screenPoint)); // Add the point to the rasterizer
         }
@@ -25,7 +25,7 @@ void Rasterizer::ProcessVertex(const Scene& scene) {
 
 void Rasterizer::DrawFaces(const Scene& scene) {
 
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int i=0; i<solid->numFaces; i++) {
 
         Triangle<vertex> tri(
@@ -57,19 +57,6 @@ If the triangle is facing away from the camera, we can skip the rasterization pr
 bool Rasterizer::Visible(const Triangle<vertex>& triangle) {
 
     return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
-    //return (triangle.p3.point.x-triangle.p2.point.x)*(triangle.p2.point.y-triangle.p1.point.y) - (triangle.p2.point.x-triangle.p1.point.x)*(triangle.p3.point.y-triangle.p2.point.y) < 0;
-
-};
-
-// Inline function for culling top pixels.
-inline void cullTopPixels(int32_t& top, int32_t& bottom, vertex& left, vertex& leftDy, vertex& right, vertex& rightDy) {
-// Culling the top pixels greater than the screen height.
-    if (top < 0) {
-        int32_t final = std::min(bottom, 0);
-        left += leftDy * (final - top);
-        right += rightDy * (final - top);
-        top = final;
-    }
 };
 
 /*
@@ -252,11 +239,7 @@ inline uint32_t Rasterizer::BlinnPhongPixelShading(const vertex& gRaster, const 
     return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 }
 
-enum class ClipPlane {
-    Left, Right, Bottom, Top, Near, Far
-};
-
-bool IsInside(const vertex& v, ClipPlane plane) {
+bool Rasterizer::IsInside(const vertex& v, ClipPlane plane) {
     const auto& p = v.ndc;
     switch (plane) {
         case ClipPlane::Left:   return p.x >= -p.w;
@@ -269,7 +252,7 @@ bool IsInside(const vertex& v, ClipPlane plane) {
     return false;
 }
 
-float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
+float Rasterizer::ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
     const auto& pa = a.ndc;
     const auto& pb = b.ndc;
     float num, denom;
@@ -292,7 +275,7 @@ float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
     return denom != 0.0f ? num / denom : 0.0f;
 }
 
-std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
+std::vector<vertex> Rasterizer::ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
     std::vector<vertex> output;
     if (poly.empty()) return output;
 
@@ -305,8 +288,8 @@ std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane 
         if (currInside != prevInside) {
             float alpha = ComputeAlpha(prev, curr, plane);
             vertex interpolated = prev + (curr - prev) * alpha;
-            interpolated.p_x = (int32_t) ((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
-            interpolated.p_y = (int32_t) ((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+            interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+            interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
             interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
             output.push_back(interpolated);
         }
@@ -320,6 +303,15 @@ std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane 
 
     return output;
 }
+/*
+Clipping is done using the Sutherland-Hodgman algorithm (1974) in the ndc space.
+The Sutherland-Hodgman algorithm is a polygon clipping algorithm that clips a polygon against a convex clipping region.
+The algorithm works by iterating through each edge of the polygon and checking if the vertices are inside or outside the clipping plane.
+If a vertex is inside, it is added to the output polygon. If a vertex is outside, the algorithm checks if the previous vertex was inside. If it was, the edge between the two vertices is clipped and the intersection point is added to the output polygon.
+The algorithm continues until all edges have been processed.
+https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
+*/
+
 
 void Rasterizer::ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene) {
     std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };

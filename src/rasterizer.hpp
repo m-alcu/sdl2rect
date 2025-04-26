@@ -23,6 +23,10 @@ public:
     Triangle(const V& _p1, const V& _p2, const V& _p3, int16_t _i) : p1(_p1), p2(_p2), p3(_p3), i(_i) {};
 };
 
+enum class ClipPlane {
+    Left, Right, Bottom, Top, Near, Far
+};
+
 class Rasterizer {
     public:
         std::vector<std::unique_ptr<vertex>> projectedPoints;
@@ -36,6 +40,7 @@ class Rasterizer {
 
         void ProcessVertex(const Scene& scene);
         void DrawFaces(const Scene& scene);
+        
 
     private:
         void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftEdge, vertex rightEdge, const Scene& scene, const Face& face, uint32_t flatColor);
@@ -45,6 +50,9 @@ class Rasterizer {
         uint32_t BlinnPhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face);
         void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene);
         bool Visible(const Triangle<vertex>& triangle);
+        std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene);
+        float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane);
+        bool IsInside(const vertex& v, ClipPlane plane);
         void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene);
         void addPoint(std::unique_ptr<vertex> point)
         {
