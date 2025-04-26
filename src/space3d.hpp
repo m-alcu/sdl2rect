@@ -38,7 +38,7 @@ typedef struct Face
 } Face;
 
 struct vertex {
-    slib::vec3 point;
+    slib::vec4 point;
     slib::vec4 ndc;
     int32_t p_x;
     int32_t p_y;
