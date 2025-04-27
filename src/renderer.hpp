@@ -36,9 +36,10 @@ class Renderer {
         void drawRenderable(Solid& solid, Scene& scene) {
 
             rasterizer.setRenderable(&solid);
-            rasterizer.prepareRenderable(&solid);
-            rasterizer.ProcessVertex(scene);
-            rasterizer.DrawFaces(scene);
+            rasterizer.setScene(&scene);
+            rasterizer.prepareRenderable();
+            rasterizer.ProcessVertex();
+            rasterizer.DrawFaces();
         }
         
         Rasterizer rasterizer;

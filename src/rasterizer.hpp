@@ -22,6 +22,7 @@ class Rasterizer {
         std::vector<std::unique_ptr<vertex>> projectedPoints;
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         Solid* solid;  // Pointer to the abstract Solid
+        Scene* scene; // Pointer to the Scene
         slib::mat4 fullTransformMat;
         slib::mat4 normalTransformMat;
     
@@ -35,7 +36,12 @@ class Rasterizer {
             solid = solidPtr;
         }
 
-        void prepareRenderable(Solid* solidPtr) {
+        
+        void setScene(Scene* scenePtr) {
+            scene = scenePtr;
+        }
+
+        void prepareRenderable() {
         
             slib::mat4 rotate = smath::rotation(slib::vec3({solid->position.xAngle, solid->position.yAngle, solid->position.zAngle}));
             slib::mat4 translate = smath::translation(slib::vec3({solid->position.x, solid->position.y, solid->position.z}));
@@ -45,7 +51,7 @@ class Rasterizer {
         }
 
 
-        void ProcessVertex(const Scene& scene)
+        void ProcessVertex()
         {
             projectedPoints.resize(solid->numVertices);
         
@@ -54,24 +60,24 @@ class Rasterizer {
                 solid->vertexData.end(),
                 projectedPoints.begin(),
                 [&](const auto& vData) {
-                    return VertexShader(scene, vData);
+                    return VertexShader(vData);
                 }
             );
         }
 
-        std::unique_ptr<vertex> VertexShader(const Scene& scene, const VertexData& vData)
+        std::unique_ptr<vertex> VertexShader(const VertexData& vData)
         {
             vertex screenPoint;
             screenPoint.point = fullTransformMat * slib::vec4(vData.vertex, 1);
             screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
-            screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
-            screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f);
-            screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f);
+            screenPoint.ndc = screenPoint.point * scene->projectionMatrix;
+            screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene->screen.width / 2.0f) - 0.5f);
+            screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene->screen.height / 2.0f) - 0.5f);
             screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w;
             return std::make_unique<vertex>(screenPoint);
         }
 
-        void DrawFaces(const Scene& scene) {
+        void DrawFaces() {
 
             #pragma omp parallel for
             for (int i=0; i<solid->numFaces; i++) {
@@ -84,7 +90,7 @@ class Rasterizer {
                 );
         
                 if (Visible(tri)) {
-                    ClipCullDrawTriangleSutherlandHodgman(tri, scene);
+                    ClipCullDrawTriangleSutherlandHodgman(tri, *scene);
                 }
             }
         
