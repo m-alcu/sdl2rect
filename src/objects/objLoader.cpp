@@ -27,8 +27,8 @@ void ObjLoader::loadVertices(const std::string& filename) {
     bool readingVertices = false;
     bool readingFaces = false;
 
-    std::vector<slib::vec3> vertices;
-    std::vector<Face> faces;
+    std::vector<VertexData> vertices;
+    std::vector<FaceData> faces;
 
     MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
@@ -44,14 +44,14 @@ void ObjLoader::loadVertices(const std::string& filename) {
 
         if (line.find("v") != std::string::npos) {
             // Example line: v -43.592037 7.219297 -21.717901
-            slib::vec3 vertex;
+            VertexData vertex;
             std::regex vertexRegex(R"(^v\s+([-+\.\dEe]+)\s+([-+\.\dEe]+)\s+([-+\.\dEe]+))");
             std::smatch match;
 
             if (std::regex_search(line, match, vertexRegex)) {
-                vertex.x = std::stof(match[1]);
-                vertex.y = std::stof(match[2]);
-                vertex.z = std::stof(match[3]);
+                vertex.vertices.x = std::stof(match[1]);
+                vertex.vertices.y = std::stof(match[2]);
+                vertex.vertices.z = std::stof(match[3]);
 
                 vertices.push_back(vertex);
             }
@@ -59,18 +59,18 @@ void ObjLoader::loadVertices(const std::string& filename) {
 
         if (line.find("f") != std::string::npos) {
             // Example line: f 791 763 645
-            Face face;
+            FaceData face;
             std::regex faceRegex(R"(^f\s+(\d+)\s+(\d+)\s+(\d+)$)");
             std::smatch match;
 
             if (std::regex_search(line, match, faceRegex)) {
-                face.vertex1 = std::stoi(match[3])-1;
-                face.vertex2 = std::stoi(match[2])-1;
-                face.vertex3 = std::stoi(match[1])-1;
-                face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-                face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-                face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-                face.material.Ns = properties.shininess;
+                face.faces.vertex1 = std::stoi(match[3])-1;
+                face.faces.vertex2 = std::stoi(match[2])-1;
+                face.faces.vertex3 = std::stoi(match[1])-1;
+                face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+                face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+                face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+                face.faces.material.Ns = properties.shininess;
 
                 faces.push_back(face);
             }
@@ -87,10 +87,10 @@ void ObjLoader::loadVertices(const std::string& filename) {
     std::cout << "Total faces: " << num_faces << "\n";
 
     // Store vertices and faces in the class members
-    ObjLoader::vertexData.vertices = vertices;
-    ObjLoader::faceData.faces = faces;
-    ObjLoader::vertexData.numVertices = num_vertex;
-    ObjLoader::faceData.numFaces = num_faces;
+    ObjLoader::vertexData = vertices;
+    ObjLoader::faceData = faces;
+    ObjLoader::numVertices = num_vertex;
+    ObjLoader::numFaces = num_faces;
 }
 
 void ObjLoader::loadFaces() {

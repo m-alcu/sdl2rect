@@ -6,25 +6,25 @@
 #include "../constants.hpp"
 
 struct VertexData {
-    std::vector<slib::vec3> vertices;
-    std::vector<slib::vec3> vertexNormals;
-    int numVertices;
+    slib::vec3 vertices;
+    slib::vec3 vertexNormals;
 };
 
 struct FaceData {
-    std::vector<Face> faces;
-    std::vector<slib::vec3> faceNormals;
-    int numFaces;
+    Face faces;
+    slib::vec3 faceNormals;
 };
 
 class Solid {
 public:
-    VertexData vertexData;
-    FaceData faceData;
+    std::vector<VertexData> vertexData;
+    std::vector<FaceData> faceData;
     Shading shading;
     Position position;
     slib::mat4 fullTransformMat;
     slib::mat4 normalTransformMat;
+    int numVertices;
+    int numFaces;
  
 public:
     // Base constructor that initializes common data members.

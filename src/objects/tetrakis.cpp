@@ -7,7 +7,7 @@ void Tetrakis::loadVertices() {
     const float half = 50.f;
     const float axisDist = half * std::sqrt(3.f);  
 
-    std::vector<slib::vec3> vertices;
+    std::vector<VertexData> vertices;
 
     int index = 0;
     // Generate the 8 cube vertices with explicit sign choices
@@ -28,13 +28,13 @@ void Tetrakis::loadVertices() {
     vertices.push_back({ 0, -axisDist, 0 });
     vertices.push_back({ 0, 0, -axisDist });
 
-    Tetrakis::vertexData.vertices = vertices;
-    Tetrakis::vertexData.numVertices = vertices.size();
+    Tetrakis::vertexData = vertices;
+    Tetrakis::numVertices = vertices.size();
 }
 
 void Tetrakis::loadFaces() {
 
-    std::vector<Face> faces;
+    std::vector<FaceData> faces;
 
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
@@ -54,29 +54,29 @@ void Tetrakis::loadFaces() {
             // Directly assign values to the face.
             uint32_t color = ((j % 2 == 0) ? 0xff0058fc : 0Xffffffff);
 
-            Face face;
-            face.vertex1 = quads[i][(j + 1) % 4]; // wrap-around for the quad
-            face.vertex2 = quads[i][j];
-            face.vertex3 = centers[i];
+            FaceData face;
+            face.faces.vertex1 = quads[i][(j + 1) % 4]; // wrap-around for the quad
+            face.faces.vertex2 = quads[i][j];
+            face.faces.vertex3 = centers[i];
 
             MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
             if (j % 2 == 0) {
-                face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-                face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-                face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-                face.material.Ns = properties.shininess;
+                face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+                face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+                face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+                face.faces.material.Ns = properties.shininess;
             } else {
-                face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
-                face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
-                face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
-                face.material.Ns = properties.shininess;
+                face.faces.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+                face.faces.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+                face.faces.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
+                face.faces.material.Ns = properties.shininess;
             }
 
             faces.push_back(face);
         }
     }
 
-    Tetrakis::faceData.faces = faces;
-    Tetrakis::faceData.numFaces = faces.size();
+    Tetrakis::faceData = faces;
+    Tetrakis::numFaces = faces.size();
 }

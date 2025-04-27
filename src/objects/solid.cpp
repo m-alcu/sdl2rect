@@ -5,44 +5,34 @@
 
 void Solid::calculateNormals() {
 
-    // Calculate face normals
-    std::vector<slib::vec3> faceNormals;
-
-    for (int i = 0; i < faceData.numFaces; i++) {
-        const Face &face = Solid::faceData.faces[i];
-        slib::vec3 v1 = Solid::vertexData.vertices[face.vertex1];
-        slib::vec3 v2 = Solid::vertexData.vertices[face.vertex2];
-        slib::vec3 v3 = Solid::vertexData.vertices[face.vertex3];
+    for (int i = 0; i < numFaces; i++) {
+        const Face &face = Solid::faceData[i].faces;
+        slib::vec3 v1 = Solid::vertexData[face.vertex1].vertices;
+        slib::vec3 v2 = Solid::vertexData[face.vertex2].vertices;
+        slib::vec3 v3 = Solid::vertexData[face.vertex3].vertices;
 
         // Calculate the edge vectors.
         slib::vec3 v21 = v2 - v1;
         slib::vec3 v32 = v3 - v2;
 
-        faceNormals.push_back(smath::normalize(smath::cross(v21, v32)));
+        Solid::faceData[i].faceNormals = smath::normalize(smath::cross(v21, v32));
     }
-
-    Solid::faceData.faceNormals = faceNormals;
-
 }
 
 void Solid::calculateVertexNormals() {
 
-    std::vector<slib::vec3> vertexNormals;
-
-    for (int i = 0; i < vertexData.numVertices; i++) { 
+    for (int i = 0; i < numVertices; i++) { 
         slib::vec3 vertexNormal = { 0, 0, 0 };
-        for(int j = 0; j < faceData.numFaces; j++) {
-            if (Solid::faceData.faces[j].vertex1 == i || 
-                Solid::faceData.faces[j].vertex2 == i || 
-                Solid::faceData.faces[j].vertex3 == i) {
-                    vertexNormal += Solid::faceData.faceNormals[j];
+        for(int j = 0; j < numFaces; j++) {
+            if (Solid::faceData[j].faces.vertex1 == i || 
+                Solid::faceData[j].faces.vertex2 == i || 
+                Solid::faceData[j].faces.vertex3 == i) {
+                    vertexNormal += Solid::faceData[j].faceNormals;
             }
         }
-        // Normalize the vertex normal
-        vertexNormals.push_back(smath::normalize(vertexNormal));
+        Solid::vertexData[i].vertexNormals = smath::normalize(vertexNormal);
     }
 
-    Solid::vertexData.vertexNormals = vertexNormals;
 }
 
 // Function returning MaterialProperties struct
