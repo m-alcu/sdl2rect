@@ -59,10 +59,9 @@ public:
 	class PixelShader
 	{
 	public:
-		template<class I>
-		Color operator()( const I& in ) const
+		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
 		{
-			return in.color;
+			return vRaster.color.toBgra();
 		}
 	};
 public:
