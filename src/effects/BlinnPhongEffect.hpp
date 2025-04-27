@@ -3,43 +3,45 @@
 #include "../color.hpp"
 
 // solid color attribute not interpolated
-class PhongEffect
+class BlinnPhongEffect
 {
 public:
 	// the vertex type that will be input into the pipeline
 	class Vertex
 	{
 	public:
-        Vertex() {}
+    Vertex() {}
 
-        Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, float _ds) :
-        p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), ds(_ds) {}
+    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, slib::zvec2 _tex, Color _color) :
+    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), tex(_tex), color(_color) {}
 
-        Vertex operator+(const Vertex &v) const {
-            return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, ds + v.ds);
-        }
+    Vertex operator+(const Vertex &v) const {
+        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, tex + v.tex, color + v.color);
+    }
 
-        Vertex operator-(const Vertex &v) const {
-            return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, ds - v.ds);
-        }
+    Vertex operator-(const Vertex &v) const {
+        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, tex - v.tex, color - v.color);
+    }
 
-        Vertex operator*(const float &rhs) const {
-            return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, ds * rhs);
-        }
+    Vertex operator*(const float &rhs) const {
+        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs, color * rhs);
+    }
 
-        Vertex operator/(const float &rhs) const {
-            return Vertex(p_x / rhs, p_y / rhs, p_z / rhs, normal / rhs, ndc / rhs, ds / rhs);
-        }
+    Vertex operator/(const float &rhs) const {
+        return Vertex(p_x / rhs, p_y / rhs, p_z / rhs, normal / rhs, ndc / rhs, tex / rhs, color / rhs);
+    }
+    
 
-        Vertex& operator+=(const Vertex &v) {
-            p_x += v.p_x;
-            p_y += v.p_y;
-            p_z += v.p_z;
-            normal += v.normal;
-            ndc += v.ndc;
-            ds += v.ds;
-            return *this;
-        }
+    Vertex& operator+=(const Vertex &v) {
+        p_x += v.p_x;
+        p_y += v.p_y;
+        p_z += v.p_z;
+        normal += v.normal;
+        ndc += v.ndc;
+        tex += v.tex;
+        color += v.color;
+        return *this;
+    }
         
 	public:
         int32_t p_x;
@@ -47,7 +49,8 @@ public:
         float p_z; 
         slib::vec3 normal;
         slib::vec4 ndc;
-        float ds;
+        slib::zvec2 tex; // Texture coordinates
+        Color color;
 	};
 	class PixelShader
 	{
