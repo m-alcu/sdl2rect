@@ -220,21 +220,7 @@ class Rasterizer {
                 
                 for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
                     if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
-                        switch (shading) {
-                            case Shading::Flat: 
-                                pixels[hy + hx] = flatColor;
-                                break;      
-                            case Shading::Gouraud: 
-                                pixels[hy + hx] = vRaster.color.toBgra();
-                                break;
-                            case Shading::BlinnPhong:
-                                pixels[hy + hx] = BlinnPhongPixelShader(vRaster, scene, face);
-                                break;                                
-                            case Shading::Phong:
-                                pixels[hy + hx] = PhongPixelShader(vRaster, scene, face);
-                                break;                         
-                            default: pixels[hy + hx] = flatColor;
-                        }
+                        pixels[hy + hx] = effect.ps(vRaster, scene, face, flatColor);
                     }
                     vRaster += vDx;
                 }
