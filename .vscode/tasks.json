@@ -18,7 +18,6 @@
                 "src\\objects\\test.cpp",      
                 "src\\objects\\ascLoader.cpp",      
                 "src\\objects\\objLoader.cpp",                       
-                "src\\rasterizer.cpp",
                 "src\\slib.cpp",
                 "src\\smath.cpp",
                 "src\\scene.cpp",
