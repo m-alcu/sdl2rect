@@ -33,7 +33,7 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
             float x = (R + r * cosV) * cosU;
             float y = (R + r * cosV) * sinU;
             float z = r * sinV;
-            Torus::vertexData[i * vSteps + j].vertices = { x, y, z };
+            Torus::vertexData[i * vSteps + j].vertex = { x, y, z };
         }
     }
 
@@ -58,24 +58,24 @@ void Torus::loadFaces(int uSteps, int vSteps) {
             int idx3 = i * vSteps + nextJ;
 
             FaceData face;
-            face.faces.vertex1 = idx0;
-            face.faces.vertex2 = idx1; // wrap-around for the quad
-            face.faces.vertex3 = idx2;
+            face.face.vertex1 = idx0;
+            face.face.vertex2 = idx1; // wrap-around for the quad
+            face.face.vertex3 = idx2;
             MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
-            face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-            face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-            face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-            face.faces.material.Ns = properties.shininess;
+            face.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+            face.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+            face.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+            face.face.material.Ns = properties.shininess;
             faces.push_back(face);
 
-            face.faces.vertex1 = idx0;
-            face.faces.vertex2 = idx2; // wrap-around for the quad
-            face.faces.vertex3 = idx3;
-            face.faces.material.Ka = { properties.k_a * 0xfe, properties.k_a * 0xdd, properties.k_a * 0x00 };
-            face.faces.material.Kd = { properties.k_d * 0xfe, properties.k_d * 0xdd, properties.k_d * 0x00 };
-            face.faces.material.Ks = { properties.k_s * 0xfe, properties.k_s * 0xdd, properties.k_s * 0x00 };
-            face.faces.material.Ns = properties.shininess;
+            face.face.vertex1 = idx0;
+            face.face.vertex2 = idx2; // wrap-around for the quad
+            face.face.vertex3 = idx3;
+            face.face.material.Ka = { properties.k_a * 0xfe, properties.k_a * 0xdd, properties.k_a * 0x00 };
+            face.face.material.Kd = { properties.k_d * 0xfe, properties.k_d * 0xdd, properties.k_d * 0x00 };
+            face.face.material.Ks = { properties.k_s * 0xfe, properties.k_s * 0xdd, properties.k_s * 0x00 };
+            face.face.material.Ns = properties.shininess;
             faces.push_back(face);
         }
     }

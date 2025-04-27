@@ -6,13 +6,13 @@
 #include "../constants.hpp"
 
 struct VertexData {
-    slib::vec3 vertices;
-    slib::vec3 vertexNormals;
+    slib::vec3 vertex;
+    slib::vec3 normal;
 };
 
 struct FaceData {
-    Face faces;
-    slib::vec3 faceNormals;
+    Face face;
+    slib::vec3 faceNormal;
 };
 
 class Solid {

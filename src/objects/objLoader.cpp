@@ -44,35 +44,35 @@ void ObjLoader::loadVertices(const std::string& filename) {
 
         if (line.find("v") != std::string::npos) {
             // Example line: v -43.592037 7.219297 -21.717901
-            VertexData vertex;
+            VertexData vertexData;
             std::regex vertexRegex(R"(^v\s+([-+\.\dEe]+)\s+([-+\.\dEe]+)\s+([-+\.\dEe]+))");
             std::smatch match;
 
             if (std::regex_search(line, match, vertexRegex)) {
-                vertex.vertices.x = std::stof(match[1]);
-                vertex.vertices.y = std::stof(match[2]);
-                vertex.vertices.z = std::stof(match[3]);
+                vertexData.vertex.x = std::stof(match[1]);
+                vertexData.vertex.y = std::stof(match[2]);
+                vertexData.vertex.z = std::stof(match[3]);
 
-                vertices.push_back(vertex);
+                vertices.push_back(vertexData);
             }
         }
 
         if (line.find("f") != std::string::npos) {
             // Example line: f 791 763 645
-            FaceData face;
+            FaceData faceData;
             std::regex faceRegex(R"(^f\s+(\d+)\s+(\d+)\s+(\d+)$)");
             std::smatch match;
 
             if (std::regex_search(line, match, faceRegex)) {
-                face.faces.vertex1 = std::stoi(match[3])-1;
-                face.faces.vertex2 = std::stoi(match[2])-1;
-                face.faces.vertex3 = std::stoi(match[1])-1;
-                face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-                face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-                face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-                face.faces.material.Ns = properties.shininess;
+                faceData.face.vertex1 = std::stoi(match[3])-1;
+                faceData.face.vertex2 = std::stoi(match[2])-1;
+                faceData.face.vertex3 = std::stoi(match[1])-1;
+                faceData.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+                faceData.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+                faceData.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+                faceData.face.material.Ns = properties.shininess;
 
-                faces.push_back(face);
+                faces.push_back(faceData);
             }
         }
     }

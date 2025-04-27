@@ -29,40 +29,40 @@ void Test::loadFaces() {
 
     FaceData face;
 
-    face.faces.vertex1 = 0+4;
-    face.faces.vertex2 = 1+4;
-    face.faces.vertex3 = 2+4;
-    face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-    face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
-    face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-    face.faces.material.Ns = properties.shininess;
+    face.face.vertex1 = 0+4;
+    face.face.vertex2 = 1+4;
+    face.face.vertex3 = 2+4;
+    face.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    face.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
+    face.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+    face.face.material.Ns = properties.shininess;
     faces.push_back(face);
 
-    face.faces.vertex1 = 0+4;
-    face.faces.vertex2 = 2+4;
-    face.faces.vertex3 = 3+4;
-    face.faces.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
-    face.faces.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
-    face.faces.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
-    face.faces.material.Ns = properties.shininess;
+    face.face.vertex1 = 0+4;
+    face.face.vertex2 = 2+4;
+    face.face.vertex3 = 3+4;
+    face.face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    face.face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    face.face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
+    face.face.material.Ns = properties.shininess;
     faces.push_back(face);
 
-    face.faces.vertex1 = 0;
-    face.faces.vertex2 = 1;
-    face.faces.vertex3 = 2;
-    face.faces.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-    face.faces.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-    face.faces.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-    face.faces.material.Ns = properties.shininess;
+    face.face.vertex1 = 0;
+    face.face.vertex2 = 1;
+    face.face.vertex3 = 2;
+    face.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    face.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
+    face.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+    face.face.material.Ns = properties.shininess;
     faces.push_back(face);
 
-    face.faces.vertex1 = 0;
-    face.faces.vertex2 = 2;
-    face.faces.vertex3 = 3;
-    face.faces.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
-    face.faces.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
-    face.faces.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
-    face.faces.material.Ns = properties.shininess;
+    face.face.vertex1 = 0;
+    face.face.vertex2 = 2;
+    face.face.vertex3 = 3;
+    face.face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    face.face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    face.face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
+    face.face.material.Ns = properties.shininess;
     faces.push_back(face);
 
     //faces.push_back({ 0+4, 1+4, 2+4, { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)} });
