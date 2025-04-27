@@ -205,11 +205,7 @@ class Rasterizer {
             if (dy > 0) {
                 return (p2 - p1) / dy;
             } else {
-                if (p2.p_x - p1.p_x > 0) {
-                    return vertex(INT32_MAX, 0, 0, {0,0,0}, {0,0,0,0}, {0,0,0}, {0,0,0});
-                } else {
-                    return vertex(INT32_MIN, 0, 0, {0,0,0}, {0,0,0,0}, {0,0,0}, {0,0,0});
-                }
+                return p2.p_x - p1.p_x > 0 ? vertex(INT32_MAX) : vertex(INT32_MIN);
             }
         };
 
