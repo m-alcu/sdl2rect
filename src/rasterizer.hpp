@@ -32,19 +32,30 @@ class Rasterizer {
             solid = solidPtr;
         }
 
-        void ProcessVertex(const Scene& scene) {
-            // Allocate an array of Pixels on the heap
-            // Process each vertex and store the result in the allocated array
-            for (int i = 0; i < solid->numVertices; i++) {
-                vertex screenPoint;
-                screenPoint.point = solid->fullTransformMat * slib::vec4(solid->vertexData[i].vertex, 1);
-                screenPoint.normal = solid->normalTransformMat * slib::vec4(solid->vertexData[i].normal, 0);
-                screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
-                screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w; // Store the depth value in the z-buffer        
-                projectedPoints[i] = std::make_unique<vertex>(screenPoint);
+        void ProcessVertex(const Scene& scene)
+        {
+            projectedPoints.resize(solid->numVertices);
+        
+            std::transform(
+                solid->vertexData.begin(),
+                solid->vertexData.end(),
+                projectedPoints.begin(),
+                [&](const auto& vData) {
+                    return VertexShader(scene, solid, vData);
                 }
+            );
+        }
+
+        std::unique_ptr<vertex> VertexShader(const Scene& scene, const Solid* solid, const VertexData& vData)
+        {
+            vertex screenPoint;
+            screenPoint.point = solid->fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.normal = solid->normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
+            screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f);
+            screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f);
+            screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w;
+            return std::make_unique<vertex>(screenPoint);
         }
 
         void DrawFaces(const Scene& scene) {
