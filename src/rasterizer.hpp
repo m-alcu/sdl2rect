@@ -17,14 +17,17 @@ enum class ClipPlane {
     Left, Right, Bottom, Top, Near, Far
 };
 
+template<class Effect>
 class Rasterizer {
     public:
+        typedef typename Effect::Vertex vertex;
         std::vector<std::unique_ptr<vertex>> projectedPoints;
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         Solid* solid;  // Pointer to the abstract Solid
         Scene* scene; // Pointer to the Scene
         slib::mat4 fullTransformMat;
         slib::mat4 normalTransformMat;
+        Effect effect;
     
         Rasterizer() :  fullTransformMat(smath::identity()), 
                         normalTransformMat(smath::identity())

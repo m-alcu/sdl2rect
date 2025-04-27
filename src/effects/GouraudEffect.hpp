@@ -3,7 +3,7 @@
 #include "../color.hpp"
 
 // solid color attribute not interpolated
-class PhongEffect
+class GouraudEffect
 {
 public:
 	// the vertex type that will be input into the pipeline

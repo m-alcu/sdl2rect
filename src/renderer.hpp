@@ -5,6 +5,10 @@
 #include "space3d.hpp"
 #include "objects/solid.hpp"
 #include "rasterizer.hpp"
+#include "effects/flatEffect.hpp"
+#include "effects/gouraudEffect.hpp"
+#include "effects/phongEffect.hpp"
+#include "effects/blinnPhongEffect.hpp"
 
 class Renderer {
 
@@ -14,7 +18,21 @@ class Renderer {
 
             prepareFrame(scene, zNear, zFar, viewAngle, back);
             for (auto& solidPtr : scene.solids) {
-                rasterizer.drawRenderable(*solidPtr, scene);
+                switch (solidPtr->shading) {
+                    case Shading::Flat: 
+                        flatRasterizer.drawRenderable(*solidPtr, scene);
+                        break;      
+                    case Shading::Gouraud: 
+                        gouraudRasterizer.drawRenderable(*solidPtr, scene);
+                        break;
+                    case Shading::BlinnPhong:
+                        blinnPhongRasterizer.drawRenderable(*solidPtr, scene);
+                        break;                                
+                    case Shading::Phong:
+                        phongRasterizer.drawRenderable(*solidPtr, scene);
+                        break;                         
+                    default: flatRasterizer.drawRenderable(*solidPtr, scene);
+                }
             }
         }
 
@@ -33,7 +51,10 @@ class Renderer {
             scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
         }
         
-        Rasterizer rasterizer;
+        Rasterizer<FlatEffect> flatRasterizer;
+        Rasterizer<GouraudEffect> gouraudRasterizer;
+        Rasterizer<PhongEffect> phongRasterizer;
+        Rasterizer<BlinnPhongEffect> blinnPhongRasterizer;
 };
 
 

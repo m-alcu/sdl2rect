@@ -47,6 +47,7 @@ public:
         int32_t p_x;
         int32_t p_y;
         float p_z; 
+        slib::vec4 point;
         slib::vec3 normal;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
