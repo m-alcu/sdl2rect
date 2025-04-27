@@ -17,8 +17,8 @@ void Test::loadVertices() {
     vertices.push_back({  -axisDist,  axisDist, -axisDist });
     vertices.push_back({  -axisDist, -axisDist, -axisDist });
     vertices.push_back({   axisDist, -axisDist, -axisDist });
-    this->vertices = vertices;
-    this->numVertices = vertices.size();
+    this->vertexData.vertices = vertices;
+    this->vertexData.numVertices = vertices.size();
 }
 
 void Test::loadFaces() {
@@ -69,7 +69,7 @@ void Test::loadFaces() {
     //faces.push_back({ 0+4, 2+4, 3+4, { 0xffffffff, 0xffffffff, 0xffffffff, getMaterialProperties(MaterialType::Metal)} });
     //faces.push_back({ 0, 1, 2, { 0xff0058fc, 0xff0058fc, 0xff0058fc, getMaterialProperties(MaterialType::Metal)} });
     //faces.push_back({ 0, 2, 3, { 0xffffffff, 0xffffffff, 0xffffffff, getMaterialProperties(MaterialType::Metal)} });
-    this->faces = faces;
-    this->numFaces = faces.size();
+    this->faceData.faces = faces;
+    this->faceData.numFaces = faces.size();
 
 }

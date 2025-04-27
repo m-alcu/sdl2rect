@@ -87,10 +87,10 @@ void ObjLoader::loadVertices(const std::string& filename) {
     std::cout << "Total faces: " << num_faces << "\n";
 
     // Store vertices and faces in the class members
-    ObjLoader::vertices = vertices;
-    ObjLoader::faces = faces;
-    ObjLoader::numVertices = num_vertex;
-    ObjLoader::numFaces = num_faces;
+    ObjLoader::vertexData.vertices = vertices;
+    ObjLoader::faceData.faces = faces;
+    ObjLoader::vertexData.numVertices = num_vertex;
+    ObjLoader::faceData.numFaces = num_faces;
 }
 
 void ObjLoader::loadFaces() {

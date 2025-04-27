@@ -104,10 +104,10 @@ void AscLoader::loadVertices(const std::string& filename) {
     std::cout << "Total faces: " << num_faces << "\n";
 
     // Store vertices and faces in the class members
-    AscLoader::vertices = vertices;
-    AscLoader::faces = faces;
-    AscLoader::numVertices = num_vertex;
-    AscLoader::numFaces = num_faces;
+    AscLoader::vertexData.vertices = vertices;
+    AscLoader::faceData.faces = faces;
+    AscLoader::vertexData.numVertices = num_vertex;
+    AscLoader::faceData.numFaces = num_faces;
 }
 
 void AscLoader::loadFaces() {

@@ -20,7 +20,7 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
 
     std::vector<slib::vec3> vertices;
     vertices.resize(uSteps * vSteps);
-    Torus::vertices = vertices;
+    Torus::vertexData.vertices = vertices;
 
     for (int i = 0; i < uSteps; i++) {
         float u = i * 2 * PI / uSteps;
@@ -33,11 +33,11 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
             float x = (R + r * cosV) * cosU;
             float y = (R + r * cosV) * sinU;
             float z = r * sinV;
-            Torus::vertices[i * vSteps + j] = { x, y, z };
+            Torus::vertexData.vertices[i * vSteps + j] = { x, y, z };
         }
     }
 
-    Torus::numVertices = vertices.size();
+    Torus::vertexData.numVertices = vertices.size();
 }
 
 void Torus::loadFaces(int uSteps, int vSteps) {
@@ -80,6 +80,6 @@ void Torus::loadFaces(int uSteps, int vSteps) {
         }
     }
 
-    Torus::faces = faces;
-    Torus::numFaces = faces.size();
+    Torus::faceData.faces = faces;
+    Torus::faceData.numFaces = faces.size();
 }

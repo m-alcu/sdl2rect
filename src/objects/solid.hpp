@@ -5,17 +5,25 @@
 #include "../slib.hpp"
 #include "../constants.hpp"
 
-class Solid {
-public:
+struct VertexData {
     std::vector<slib::vec3> vertices;
+    std::vector<slib::vec3> vertexNormals;
+    int numVertices;
+};
+
+struct FaceData {
     std::vector<Face> faces;
     std::vector<slib::vec3> faceNormals;
-    std::vector<slib::vec3> vertexNormals;
-    Position position;
-    int numVertices;
     int numFaces;
-    Shading shading;
+};
 
+class Solid {
+public:
+    VertexData vertexData;
+    FaceData faceData;
+    Shading shading;
+    Position position;
+ 
 public:
     // Base constructor that initializes common data members.
     Solid()

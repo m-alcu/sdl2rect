@@ -36,7 +36,7 @@ class Renderer {
         void drawRenderable(Solid& solid, Scene& scene) {
 
             prepareRenderable(solid, scene);
-            rasterizer = Rasterizer(&solid);
+            rasterizer.setSolid(&solid);
             rasterizer.ProcessVertex(scene);
             rasterizer.DrawFaces(scene);
         }

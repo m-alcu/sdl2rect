@@ -28,8 +28,8 @@ void Tetrakis::loadVertices() {
     vertices.push_back({ 0, -axisDist, 0 });
     vertices.push_back({ 0, 0, -axisDist });
 
-    Tetrakis::vertices = vertices;
-    Tetrakis::numVertices = vertices.size();
+    Tetrakis::vertexData.vertices = vertices;
+    Tetrakis::vertexData.numVertices = vertices.size();
 }
 
 void Tetrakis::loadFaces() {
@@ -77,6 +77,6 @@ void Tetrakis::loadFaces() {
         }
     }
 
-    Tetrakis::faces = faces;
-    Tetrakis::numFaces = faces.size();
+    Tetrakis::faceData.faces = faces;
+    Tetrakis::faceData.numFaces = faces.size();
 }

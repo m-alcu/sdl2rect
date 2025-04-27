@@ -8,11 +8,11 @@ void Solid::calculateNormals() {
     // Calculate face normals
     std::vector<slib::vec3> faceNormals;
 
-    for (int i = 0; i < numFaces; i++) {
-        const Face &face = Solid::faces[i];
-        slib::vec3 v1 = Solid::vertices[face.vertex1];
-        slib::vec3 v2 = Solid::vertices[face.vertex2];
-        slib::vec3 v3 = Solid::vertices[face.vertex3];
+    for (int i = 0; i < faceData.numFaces; i++) {
+        const Face &face = Solid::faceData.faces[i];
+        slib::vec3 v1 = Solid::vertexData.vertices[face.vertex1];
+        slib::vec3 v2 = Solid::vertexData.vertices[face.vertex2];
+        slib::vec3 v3 = Solid::vertexData.vertices[face.vertex3];
 
         // Calculate the edge vectors.
         slib::vec3 v21 = v2 - v1;
@@ -21,7 +21,7 @@ void Solid::calculateNormals() {
         faceNormals.push_back(smath::normalize(smath::cross(v21, v32)));
     }
 
-    Solid::faceNormals = faceNormals;
+    Solid::faceData.faceNormals = faceNormals;
 
 }
 
@@ -29,20 +29,20 @@ void Solid::calculateVertexNormals() {
 
     std::vector<slib::vec3> vertexNormals;
 
-    for (int i = 0; i < numVertices; i++) { 
+    for (int i = 0; i < vertexData.numVertices; i++) { 
         slib::vec3 vertexNormal = { 0, 0, 0 };
-        for(int j = 0; j < numFaces; j++) {
-            if (Solid::faces[j].vertex1 == i || 
-                Solid::faces[j].vertex2 == i || 
-                Solid::faces[j].vertex3 == i) {
-                    vertexNormal += Solid::faceNormals[j];
+        for(int j = 0; j < faceData.numFaces; j++) {
+            if (Solid::faceData.faces[j].vertex1 == i || 
+                Solid::faceData.faces[j].vertex2 == i || 
+                Solid::faceData.faces[j].vertex3 == i) {
+                    vertexNormal += Solid::faceData.faceNormals[j];
             }
         }
         // Normalize the vertex normal
         vertexNormals.push_back(smath::normalize(vertexNormal));
     }
 
-    Solid::vertexNormals = vertexNormals;
+    Solid::vertexData.vertexNormals = vertexNormals;
 }
 
 // Function returning MaterialProperties struct
