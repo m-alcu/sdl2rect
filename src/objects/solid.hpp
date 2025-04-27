@@ -14,6 +14,7 @@ public:
     Position position;
     int numVertices;
     int numFaces;
+    Shading shading;
 
 public:
     // Base constructor that initializes common data members.

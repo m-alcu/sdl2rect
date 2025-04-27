@@ -42,7 +42,7 @@ public:
     }
 
     Screen screen;
-    Shading shading;
+   
     slib::vec3 lux;
     slib::vec3 eye;
     slib::vec3 halfwayVector;

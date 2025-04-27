@@ -44,7 +44,6 @@ int main(int argc, char** argv)
     Scene scene({height, width});
     scene.lux = smath::normalize(slib::vec3{0, 1, 1});;
     scene.eye = {0, 0, 1};
-    scene.shading = Shading::Flat;
     scene.setup();
 
     float zNear = 100.0f; // Near plane distance
@@ -77,13 +76,13 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
                 scene.solids[0]->position.yAngle = scene.solids[0]->position.yAngle - 1;         
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
-                scene.shading = Shading::Gouraud;
+                scene.solids[0]->shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
-                scene.shading = Shading::Flat;
+                scene.solids[0]->shading = Shading::Flat;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
-                scene.shading = Shading::BlinnPhong;                 
+                scene.solids[0]->shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
-                scene.shading = Shading::Phong;                                 
+                scene.solids[0]->shading = Shading::Phong;                                 
             } else if (event.type == SDL_MOUSEMOTION) {
                 scene.solids[0]->position.x = event.motion.x*2 - scene.screen.width;
                 scene.solids[0]->position.y = event.motion.y*2 - scene.screen.height;

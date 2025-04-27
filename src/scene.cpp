@@ -18,6 +18,7 @@ void Scene::setup() {
     torus->position.xAngle = 90.0f;
     torus->position.yAngle = 0.0f;
     torus->position.zAngle = 0.0f;
+    torus->shading = Shading::Flat;
     
     addSolid(std::move(torus));
     
