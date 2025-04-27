@@ -56,6 +56,23 @@ public:
         slib::zvec2 tex; // Texture coordinates
         Color color;
 	};
+
+    class VertexShader
+	{
+	public:
+        std::unique_ptr<Vertex> operator()(const VertexData& vData, const slib::mat4& fullTransformMat, const slib::mat4& normalTransformMat, const Scene& scene) const
+		{
+            Vertex screenPoint;
+            screenPoint.point = fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
+            screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f);
+            screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f);
+            screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w;
+            return std::make_unique<Vertex>(screenPoint);
+		}
+	};   
+
 	class PixelShader
 	{
 	public:
@@ -65,5 +82,6 @@ public:
 		}
 	};
 public:
+    VertexShader vs;
 	PixelShader ps;
 };
