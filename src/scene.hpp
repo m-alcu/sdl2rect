@@ -17,8 +17,6 @@ public:
     Scene(const Screen& scr)
         : screen(scr),
           zBuffer( std::make_shared<ZBuffer>( scr.width,scr.height )),
-          fullTransformMat(smath::identity()),
-          normalTransformMat(smath::identity()),
           projectionMatrix(smath::identity())
     {
         sdlSurface = SDL_CreateRGBSurface(0, screen.width, screen.height, 32, 0, 0, 0, 0);
@@ -46,8 +44,6 @@ public:
     slib::vec3 lux;
     slib::vec3 eye;
     slib::vec3 halfwayVector;
-    slib::mat4 fullTransformMat;
-    slib::mat4 normalTransformMat;
     slib::mat4 projectionMatrix;
     std::shared_ptr<ZBuffer> zBuffer; // Use shared_ptr for zBuffer to manage its lifetime automatically.
     SDL_Surface* sdlSurface = nullptr; // SDL surface for rendering.

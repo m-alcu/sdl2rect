@@ -37,8 +37,8 @@ class Rasterizer {
             // Process each vertex and store the result in the allocated array
             for (int i = 0; i < solid->vertexData.numVertices; i++) {
                 vertex screenPoint;
-                screenPoint.point = scene.fullTransformMat * slib::vec4(solid->vertexData.vertices[i], 1);
-                screenPoint.normal = scene.normalTransformMat * slib::vec4(solid->vertexData.vertexNormals[i], 0);
+                screenPoint.point = solid->fullTransformMat * slib::vec4(solid->vertexData.vertices[i], 1);
+                screenPoint.normal = solid->normalTransformMat * slib::vec4(solid->vertexData.vertexNormals[i], 0);
                 screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
                 screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
                 screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
@@ -112,7 +112,7 @@ class Rasterizer {
             float r, g, b, ds;
             if (solid.shading == Shading::Flat) {
                 slib::vec3 rotatedFacenormal;
-                rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceData.faceNormals[tri.i], 0);
+                rotatedFacenormal = solid.normalTransformMat * slib::vec4(solid.faceData.faceNormals[tri.i], 0);
                 float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
                 r = std::min(solid.faceData.faces[tri.i].material.Ka[0] + solid.faceData.faces[tri.i].material.Kd[0] * diff, 255.0f);
                 g = std::min(solid.faceData.faces[tri.i].material.Ka[1] + solid.faceData.faces[tri.i].material.Kd[1] * diff, 255.0f);

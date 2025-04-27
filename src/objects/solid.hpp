@@ -23,10 +23,13 @@ public:
     FaceData faceData;
     Shading shading;
     Position position;
+    slib::mat4 fullTransformMat;
+    slib::mat4 normalTransformMat;
  
 public:
     // Base constructor that initializes common data members.
-    Solid()
+    Solid() : fullTransformMat(smath::identity()),
+            normalTransformMat(smath::identity())
     {
     }
 
