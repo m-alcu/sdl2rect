@@ -26,7 +26,7 @@ class Rasterizer {
         Rasterizer()
           {}
 
-        void setSolid(Solid* solidPtr) {
+        void setRenderable(Solid* solidPtr) {
             projectedPoints.clear();
             projectedPoints.resize(solidPtr->vertexData.numVertices);
             solid = solidPtr;
