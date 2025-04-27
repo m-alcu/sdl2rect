@@ -14,7 +14,7 @@ class Renderer {
 
             prepareFrame(scene, zNear, zFar, viewAngle, back);
             for (auto& solidPtr : scene.solids) {
-                drawRenderable(*solidPtr, scene);
+                rasterizer.drawRenderable(*solidPtr, scene);
             }
         }
 
@@ -31,15 +31,6 @@ class Renderer {
             float fovRadians = viewAngle * (PI / 180.0f);
         
             scene.projectionMatrix = smath::perspective(zFar, zNear, aspectRatio, fovRadians);
-        }
-
-        void drawRenderable(Solid& solid, Scene& scene) {
-
-            rasterizer.setRenderable(&solid);
-            rasterizer.setScene(&scene);
-            rasterizer.prepareRenderable();
-            rasterizer.ProcessVertex();
-            rasterizer.DrawFaces();
         }
         
         Rasterizer rasterizer;

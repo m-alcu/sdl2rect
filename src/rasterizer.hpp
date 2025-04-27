@@ -36,20 +36,21 @@ class Rasterizer {
             solid = solidPtr;
         }
 
-        
-        void setScene(Scene* scenePtr) {
-            scene = scenePtr;
+        void drawRenderable(Solid& solid, Scene& scn) {
+            setRenderable(&solid);
+            scene = &scn;
+            prepareRenderable();
+            ProcessVertex();
+            DrawFaces();
         }
-
+     
         void prepareRenderable() {
-        
             slib::mat4 rotate = smath::rotation(slib::vec3({solid->position.xAngle, solid->position.yAngle, solid->position.zAngle}));
             slib::mat4 translate = smath::translation(slib::vec3({solid->position.x, solid->position.y, solid->position.z}));
             slib::mat4 scale = smath::scale(slib::vec3({solid->position.zoom, solid->position.zoom, solid->position.zoom}));
             fullTransformMat = translate * rotate * scale;
             normalTransformMat = rotate;
         }
-
 
         void ProcessVertex()
         {
