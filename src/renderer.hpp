@@ -9,6 +9,7 @@
 class Renderer {
 
     public:
+
         void drawScene(Scene& scene, float zNear, float zFar, float viewAngle, uint32_t* back) {
 
             prepareFrame(scene, zNear, zFar, viewAngle, back);
@@ -35,7 +36,7 @@ class Renderer {
         void drawRenderable(Solid& solid, Scene& scene) {
 
             prepareRenderable(solid, scene);
-            Rasterizer rasterizer(&solid);
+            rasterizer = Rasterizer(&solid);
             rasterizer.ProcessVertex(scene);
             rasterizer.DrawFaces(scene);
         }
@@ -48,6 +49,8 @@ class Renderer {
             scene.fullTransformMat = translate * rotate * scale;
             scene.normalTransformMat = rotate;
         }
+
+        Rasterizer rasterizer;
 };
 
 

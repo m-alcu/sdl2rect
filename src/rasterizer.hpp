@@ -23,6 +23,9 @@ class Rasterizer {
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         const Solid* solid;  // Pointer to the abstract Solid
     
+        Rasterizer()
+          {}
+
         // Updated constructor that also accepts a Solid pointer.
         Rasterizer(const Solid* solidPtr)
           : solid(solidPtr) {}
@@ -105,7 +108,7 @@ class Rasterizer {
 
             uint32_t flatColor = 0x00000000;
             float r, g, b, ds;
-            if (scene.shading == Shading::Flat) {
+            if (solid.shading == Shading::Flat) {
                 slib::vec3 rotatedFacenormal;
                 rotatedFacenormal = scene.normalTransformMat * slib::vec4(solid.faceNormals[tri.i], 0);
                 float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
@@ -115,7 +118,7 @@ class Rasterizer {
                 flatColor = Color(b, g, r).toBgra();
             } 
 
-            if (scene.shading == Shading::Gouraud) {
+            if (solid.shading == Shading::Gouraud) {
                 ds = std::max(0.0f, smath::dot(tri.p1.normal, scene.lux));
                 r = std::min(solid.faces[tri.i].material.Ka[0] + solid.faces[tri.i].material.Kd[0] * ds, 255.0f);
                 g = std::min(solid.faces[tri.i].material.Ka[1] + solid.faces[tri.i].material.Kd[1] * ds, 255.0f);
@@ -143,13 +146,13 @@ class Rasterizer {
 
             vertex left = tri.p1, right = tri.p1;
             if(tri.edge13.p_x < tri.edge12.p_x) {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faces[tri.i], flatColor, solid.shading);
                 right = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faces[tri.i], flatColor, solid.shading);
             } else {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.shading);
                 left = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faces[tri.i], flatColor, solid.shading);
             }
         };
 
@@ -174,7 +177,7 @@ class Rasterizer {
             }
         };
 
-        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor) {
+        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor, Shading shading) {
 
             auto* pixels = static_cast<uint32_t*>(scene.sdlSurface->pixels);
         
@@ -185,7 +188,7 @@ class Rasterizer {
                 
                 for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
                     if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
-                        switch (scene.shading) {
+                        switch (shading) {
                             case Shading::Flat: 
                                 pixels[hy + hx] = flatColor;
                                 break;      
