@@ -209,10 +209,10 @@ class Rasterizer {
                                 pixels[hy + hx] = vRaster.color.toBgra();
                                 break;
                             case Shading::BlinnPhong:
-                                pixels[hy + hx] = BlinnPhongPixelShading(vRaster, scene, face);
+                                pixels[hy + hx] = BlinnPhongPixelShader(vRaster, scene, face);
                                 break;                                
                             case Shading::Phong:
-                                pixels[hy + hx] = PhongPixelShading(vRaster, scene, face);
+                                pixels[hy + hx] = PhongPixelShader(vRaster, scene, face);
                                 break;                         
                             default: pixels[hy + hx] = flatColor;
                         }
@@ -224,7 +224,7 @@ class Rasterizer {
             }
         };
 
-        inline uint32_t PhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face) {
+        inline uint32_t PhongPixelShader(const vertex& gRaster, const Scene& scene, const Face& face) {
 
             slib::vec3 normal = smath::normalize(gRaster.normal);
             float diff = std::max(0.0f, smath::dot(normal,scene.lux));
@@ -246,7 +246,7 @@ class Rasterizer {
             return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
         }
         
-        inline uint32_t BlinnPhongPixelShading(const vertex& gRaster, const Scene& scene, const Face& face) {
+        inline uint32_t BlinnPhongPixelShader(const vertex& gRaster, const Scene& scene, const Face& face) {
         
             // Normalize vectors
             slib::vec3 N = smath::normalize(gRaster.normal); // Normal at the fragment
