@@ -35,21 +35,12 @@ class Renderer {
 
         void drawRenderable(Solid& solid, Scene& scene) {
 
-            prepareRenderable(solid);
             rasterizer.setRenderable(&solid);
+            rasterizer.prepareRenderable(&solid);
             rasterizer.ProcessVertex(scene);
             rasterizer.DrawFaces(scene);
         }
         
-        void prepareRenderable(Solid& solid) {
-        
-            slib::mat4 rotate = smath::rotation(slib::vec3({solid.position.xAngle, solid.position.yAngle, solid.position.zAngle}));
-            slib::mat4 translate = smath::translation(slib::vec3({solid.position.x, solid.position.y, solid.position.z}));
-            slib::mat4 scale = smath::scale(slib::vec3({solid.position.zoom, solid.position.zoom, solid.position.zoom}));
-            solid.fullTransformMat = translate * rotate * scale;
-            solid.normalTransformMat = rotate;
-        }
-
         Rasterizer rasterizer;
 };
 

@@ -22,8 +22,11 @@ class Rasterizer {
         std::vector<std::unique_ptr<vertex>> projectedPoints;
         std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
         Solid* solid;  // Pointer to the abstract Solid
+        slib::mat4 fullTransformMat;
+        slib::mat4 normalTransformMat;
     
-        Rasterizer()
+        Rasterizer() :  fullTransformMat(smath::identity()), 
+                        normalTransformMat(smath::identity())
           {}
 
         void setRenderable(Solid* solidPtr) {
@@ -31,6 +34,16 @@ class Rasterizer {
             projectedPoints.resize(solidPtr->numVertices);
             solid = solidPtr;
         }
+
+        void prepareRenderable(Solid* solidPtr) {
+        
+            slib::mat4 rotate = smath::rotation(slib::vec3({solid->position.xAngle, solid->position.yAngle, solid->position.zAngle}));
+            slib::mat4 translate = smath::translation(slib::vec3({solid->position.x, solid->position.y, solid->position.z}));
+            slib::mat4 scale = smath::scale(slib::vec3({solid->position.zoom, solid->position.zoom, solid->position.zoom}));
+            fullTransformMat = translate * rotate * scale;
+            normalTransformMat = rotate;
+        }
+
 
         void ProcessVertex(const Scene& scene)
         {
@@ -41,16 +54,16 @@ class Rasterizer {
                 solid->vertexData.end(),
                 projectedPoints.begin(),
                 [&](const auto& vData) {
-                    return VertexShader(scene, solid, vData);
+                    return VertexShader(scene, vData);
                 }
             );
         }
 
-        std::unique_ptr<vertex> VertexShader(const Scene& scene, const Solid* solid, const VertexData& vData)
+        std::unique_ptr<vertex> VertexShader(const Scene& scene, const VertexData& vData)
         {
             vertex screenPoint;
-            screenPoint.point = solid->fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.normal = solid->normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.point = fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
             screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f);
             screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f);
@@ -123,7 +136,7 @@ class Rasterizer {
             float r, g, b, ds;
             if (solid.shading == Shading::Flat) {
                 slib::vec3 rotatedFacenormal;
-                rotatedFacenormal = solid.normalTransformMat * slib::vec4(solid.faceData[tri.i].faceNormal, 0);
+                rotatedFacenormal = normalTransformMat * slib::vec4(solid.faceData[tri.i].faceNormal, 0);
                 float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
                 r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * diff, 255.0f);
                 g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * diff, 255.0f);

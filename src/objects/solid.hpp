@@ -21,15 +21,13 @@ public:
     std::vector<FaceData> faceData;
     Shading shading;
     Position position;
-    slib::mat4 fullTransformMat;
-    slib::mat4 normalTransformMat;
+
     int numVertices;
     int numFaces;
  
 public:
     // Base constructor that initializes common data members.
-    Solid() : fullTransformMat(smath::identity()),
-            normalTransformMat(smath::identity())
+    Solid() 
     {
     }
 
