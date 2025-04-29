@@ -20,24 +20,9 @@ enum class ClipPlane {
 template<class Effect>
 class Rasterizer {
     public:
-        typedef typename Effect::Vertex vertex;
-        std::vector<std::unique_ptr<vertex>> projectedPoints;
-        std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
-        Solid* solid;  // Pointer to the abstract Solid
-        Scene* scene; // Pointer to the Scene
-        slib::mat4 fullTransformMat;
-        slib::mat4 normalTransformMat;
-        Effect effect;
-    
         Rasterizer() :  fullTransformMat(smath::identity()), 
                         normalTransformMat(smath::identity())
           {}
-
-        void setRenderable(Solid* solidPtr) {
-            projectedPoints.clear();
-            projectedPoints.resize(solidPtr->numVertices);
-            solid = solidPtr;
-        }
 
         void drawRenderable(Solid& solid, Scene& scn) {
             setRenderable(&solid);
@@ -46,7 +31,23 @@ class Rasterizer {
             ProcessVertex();
             DrawFaces();
         }
-     
+
+    private:
+        typedef typename Effect::Vertex vertex;
+        std::vector<std::unique_ptr<vertex>> projectedPoints;
+        std::vector<std::unique_ptr<Triangle<vertex>>> triangles;
+        Solid* solid;  // Pointer to the abstract Solid
+        Scene* scene; // Pointer to the Scene
+        slib::mat4 fullTransformMat;
+        slib::mat4 normalTransformMat;
+        Effect effect;    
+        
+        void setRenderable(Solid* solidPtr) {
+            projectedPoints.clear();
+            projectedPoints.resize(solidPtr->numVertices);
+            solid = solidPtr;
+        }
+
         void prepareRenderable() {
             slib::mat4 rotate = smath::rotation(slib::vec3({solid->position.xAngle, solid->position.yAngle, solid->position.zAngle}));
             slib::mat4 translate = smath::translation(slib::vec3({solid->position.x, solid->position.y, solid->position.z}));
@@ -87,9 +88,6 @@ class Rasterizer {
             }
         
         }
-        
-
-    private:
 
         /*
         Check if triangle is visible.
@@ -109,6 +107,101 @@ class Rasterizer {
         };
 
         /*
+        Clipping is done using the Sutherland-Hodgman algorithm (1974) in the ndc space.
+        The Sutherland-Hodgman algorithm is a polygon clipping algorithm that clips a polygon against a convex clipping region.
+        The algorithm works by iterating through each edge of the polygon and checking if the vertices are inside or outside the clipping plane.
+        If a vertex is inside, it is added to the output polygon. If a vertex is outside, the algorithm checks if the previous vertex was inside. If it was, the edge between the two vertices is clipped and the intersection point is added to the output polygon.
+        The algorithm continues until all edges have been processed.
+        https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
+        */
+
+        void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene) {
+            std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };
+
+            for (ClipPlane plane : {ClipPlane::Left, ClipPlane::Right, ClipPlane::Bottom, 
+                                    ClipPlane::Top, ClipPlane::Near, ClipPlane::Far}) {
+                polygon = ClipAgainstPlane(polygon, plane, scene);
+                if (polygon.empty()) return; // Completely outside
+            }
+
+            // Triangulate fan-style and draw
+            for (size_t i = 1; i + 1 < polygon.size(); ++i) {
+                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
+                draw(tri, *solid, scene);
+            }
+        }
+
+        std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
+            std::vector<vertex> output;
+            if (poly.empty()) return output;
+        
+            vertex prev = poly.back();
+            bool prevInside = IsInside(prev, plane);
+        
+            for (const auto& curr : poly) {
+                bool currInside = IsInside(curr, plane);
+        
+                if (currInside != prevInside) {
+                    float alpha = ComputeAlpha(prev, curr, plane);
+                    vertex interpolated = prev + (curr - prev) * alpha;
+                    interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+                    interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+                    interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
+                    output.push_back(interpolated);
+                }
+        
+                if (currInside)
+                    output.push_back(curr);
+        
+                prev = curr;
+                prevInside = currInside;
+            }
+        
+            return output;
+        } 
+        
+        bool IsInside(const vertex& v, ClipPlane plane) {
+            const auto& p = v.ndc;
+            switch (plane) {
+                case ClipPlane::Left:   return p.x >= -p.w;
+                case ClipPlane::Right:  return p.x <=  p.w;
+                case ClipPlane::Bottom: return p.y >= -p.w;
+                case ClipPlane::Top:    return p.y <=  p.w;
+                case ClipPlane::Near:   return p.z >= -p.w;
+                case ClipPlane::Far:    return p.z <=  p.w;
+            }
+            return false;
+        }
+        
+        float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
+            const auto& pa = a.ndc;
+            const auto& pb = b.ndc;
+            float num, denom;
+        
+            switch (plane) {
+                case ClipPlane::Left:
+                    num = pa.x + pa.w; denom = (pa.x + pa.w) - (pb.x + pb.w); break;
+                case ClipPlane::Right:
+                    num = pa.x - pa.w; denom = (pa.x - pa.w) - (pb.x - pb.w); break;
+                case ClipPlane::Bottom:
+                    num = pa.y + pa.w; denom = (pa.y + pa.w) - (pb.y + pb.w); break;
+                case ClipPlane::Top:
+                    num = pa.y - pa.w; denom = (pa.y - pa.w) - (pb.y - pb.w); break;
+                case ClipPlane::Near:
+                    num = pa.z + pa.w; denom = (pa.z + pa.w) - (pb.z + pb.w); break;
+                case ClipPlane::Far:
+                    num = pa.z - pa.w; denom = (pa.z - pa.w) - (pb.z - pb.w); break;
+            }
+        
+            return denom != 0.0f ? num / denom : 0.0f;
+        }
+        
+        /*
+        Drawing a triangle with edges 12, 13 and 23.
+        The triangle is divided into two halves, one for each edge.
+        The left edge is the one with the smallest x coordinate, and the right edge is the one with the largest x coordinate.
+        The left edge is drawn first, and then the right edge is drawn.
+
             edge13.p_x > edge12.p_x    edge13.p_x < edge12.p_x
                     p1                     p1
                     /|                      |\
@@ -188,96 +281,6 @@ class Rasterizer {
                 right += rightDy;
             }
         };
-        
-        bool IsInside(const vertex& v, ClipPlane plane) {
-            const auto& p = v.ndc;
-            switch (plane) {
-                case ClipPlane::Left:   return p.x >= -p.w;
-                case ClipPlane::Right:  return p.x <=  p.w;
-                case ClipPlane::Bottom: return p.y >= -p.w;
-                case ClipPlane::Top:    return p.y <=  p.w;
-                case ClipPlane::Near:   return p.z >= -p.w;
-                case ClipPlane::Far:    return p.z <=  p.w;
-            }
-            return false;
-        }
-
-        float ComputeAlpha(const vertex& a, const vertex& b, ClipPlane plane) {
-            const auto& pa = a.ndc;
-            const auto& pb = b.ndc;
-            float num, denom;
-        
-            switch (plane) {
-                case ClipPlane::Left:
-                    num = pa.x + pa.w; denom = (pa.x + pa.w) - (pb.x + pb.w); break;
-                case ClipPlane::Right:
-                    num = pa.x - pa.w; denom = (pa.x - pa.w) - (pb.x - pb.w); break;
-                case ClipPlane::Bottom:
-                    num = pa.y + pa.w; denom = (pa.y + pa.w) - (pb.y + pb.w); break;
-                case ClipPlane::Top:
-                    num = pa.y - pa.w; denom = (pa.y - pa.w) - (pb.y - pb.w); break;
-                case ClipPlane::Near:
-                    num = pa.z + pa.w; denom = (pa.z + pa.w) - (pb.z + pb.w); break;
-                case ClipPlane::Far:
-                    num = pa.z - pa.w; denom = (pa.z - pa.w) - (pb.z - pb.w); break;
-            }
-        
-            return denom != 0.0f ? num / denom : 0.0f;
-        }
-
-        std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
-            std::vector<vertex> output;
-            if (poly.empty()) return output;
-        
-            vertex prev = poly.back();
-            bool prevInside = IsInside(prev, plane);
-        
-            for (const auto& curr : poly) {
-                bool currInside = IsInside(curr, plane);
-        
-                if (currInside != prevInside) {
-                    float alpha = ComputeAlpha(prev, curr, plane);
-                    vertex interpolated = prev + (curr - prev) * alpha;
-                    interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                    interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                    interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
-                    output.push_back(interpolated);
-                }
-        
-                if (currInside)
-                    output.push_back(curr);
-        
-                prev = curr;
-                prevInside = currInside;
-            }
-        
-            return output;
-        }
-
-        /*
-        Clipping is done using the Sutherland-Hodgman algorithm (1974) in the ndc space.
-        The Sutherland-Hodgman algorithm is a polygon clipping algorithm that clips a polygon against a convex clipping region.
-        The algorithm works by iterating through each edge of the polygon and checking if the vertices are inside or outside the clipping plane.
-        If a vertex is inside, it is added to the output polygon. If a vertex is outside, the algorithm checks if the previous vertex was inside. If it was, the edge between the two vertices is clipped and the intersection point is added to the output polygon.
-        The algorithm continues until all edges have been processed.
-        https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
-        */
-
-        void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene) {
-            std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };
-
-            for (ClipPlane plane : {ClipPlane::Left, ClipPlane::Right, ClipPlane::Bottom, 
-                                    ClipPlane::Top, ClipPlane::Near, ClipPlane::Far}) {
-                polygon = ClipAgainstPlane(polygon, plane, scene);
-                if (polygon.empty()) return; // Completely outside
-            }
-
-            // Triangulate fan-style and draw
-            for (size_t i = 1; i + 1 < polygon.size(); ++i) {
-                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
-                draw(tri, *solid, scene);
-            }
-        }
         
     };
     
