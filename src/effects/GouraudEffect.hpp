@@ -71,7 +71,32 @@ public:
             screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w;
             return std::make_unique<Vertex>(screenPoint);
 		}
-	};   
+	};
+    
+    class GeometryShader
+	{
+	public:
+    
+        void operator()(Triangle<Vertex>& tri, const Solid& solid, const Scene& scene, const slib::mat4& normalTransformMat) const
+		{
+            float r, g, b, ds;
+            ds = std::max(0.0f, smath::dot(tri.p1.normal, scene.lux));
+            r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
+            g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
+            b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
+            tri.p1.color = Color(b, g, r);
+            ds = std::max(0.0f, smath::dot(tri.p2.normal, scene.lux));
+            r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
+            g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
+            b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
+            tri.p2.color = Color(b, g, r);
+            ds = std::max(0.0f, smath::dot(tri.p3.normal, scene.lux));
+            r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
+            g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
+            b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
+            tri.p3.color = Color(b, g, r);
+		}
+	};    
 
 	class PixelShader
 	{
@@ -83,5 +108,6 @@ public:
 	};
 public:
     VertexShader vs;
+    GeometryShader gs;
 	PixelShader ps;
 };

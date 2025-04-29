@@ -70,6 +70,23 @@ public:
 		}
 	};
 
+    class GeometryShader
+	{
+	public:
+    
+        void operator()(Triangle<Vertex>& tri, const Solid& solid, const Scene& scene, const slib::mat4& normalTransformMat) const
+		{
+            slib::vec3 rotatedFacenormal;
+            float r, g, b;
+            rotatedFacenormal = normalTransformMat * slib::vec4(solid.faceData[tri.i].faceNormal, 0);
+            float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
+            r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * diff, 255.0f);
+            g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * diff, 255.0f);
+            b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * diff, 255.0f);
+            tri.flatColor = Color(b, g, r).toBgra();
+		}
+	};
+
 	class PixelShader
 	{
 	public:
@@ -80,5 +97,6 @@ public:
 	};
 public:
     VertexShader vs;
+    GeometryShader gs;
 	PixelShader ps;
 };

@@ -73,6 +73,15 @@ public:
 		}
 	};
 
+    class GeometryShader
+	{
+	public:
+    
+        void operator()(Triangle<Vertex>& tri, const Solid& solid, const Scene& scene, const slib::mat4& normalTransformMat) const
+		{
+		}
+	};  
+
 	class PixelShader
 	{
 	public:
@@ -100,5 +109,6 @@ public:
 	};
 public:
     VertexShader vs;
+    GeometryShader gs;
 	PixelShader ps;
 };

@@ -130,35 +130,7 @@ class Rasterizer {
 
         void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene) {
 
-            uint32_t flatColor = 0x00000000;
-            float r, g, b, ds;
-            if (solid.shading == Shading::Flat) {
-                slib::vec3 rotatedFacenormal;
-                rotatedFacenormal = normalTransformMat * slib::vec4(solid.faceData[tri.i].faceNormal, 0);
-                float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
-                r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * diff, 255.0f);
-                g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * diff, 255.0f);
-                b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * diff, 255.0f);
-                flatColor = Color(b, g, r).toBgra();
-            } 
-
-            if (solid.shading == Shading::Gouraud) {
-                ds = std::max(0.0f, smath::dot(tri.p1.normal, scene.lux));
-                r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
-                g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
-                b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
-                tri.p1.color = Color(b, g, r);
-                ds = std::max(0.0f, smath::dot(tri.p2.normal, scene.lux));
-                r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
-                g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
-                b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
-                tri.p2.color = Color(b, g, r);
-                ds = std::max(0.0f, smath::dot(tri.p3.normal, scene.lux));
-                r = std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * ds, 255.0f);
-                g = std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * ds, 255.0f);
-                b = std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * ds, 255.0f);
-                tri.p3.color = Color(b, g, r);
-            }
+            effect.gs(tri, solid, scene, normalTransformMat);
 
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
@@ -170,13 +142,13 @@ class Rasterizer {
 
             vertex left = tri.p1, right = tri.p1;
             if(tri.edge13.p_x < tri.edge12.p_x) {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faceData[tri.i].face, flatColor, solid.shading);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faceData[tri.i].face, tri.flatColor);
                 right = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faceData[tri.i].face, flatColor, solid.shading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faceData[tri.i].face, tri.flatColor);
             } else {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faceData[tri.i].face, flatColor, solid.shading);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faceData[tri.i].face, tri.flatColor);
                 left = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faceData[tri.i].face, flatColor, solid.shading);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faceData[tri.i].face, tri.flatColor);
             }
         };
 
@@ -197,7 +169,7 @@ class Rasterizer {
             }
         };
 
-        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor, Shading shading) {
+        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor) {
 
             auto* pixels = static_cast<uint32_t*>(scene.sdlSurface->pixels);
         
