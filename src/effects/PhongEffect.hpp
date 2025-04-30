@@ -99,13 +99,10 @@ public:
                 return 0xffffffff; // White point if the light is too close to the normal
             }
         
-            float r, g, b;
-            // Calculate brightness
-            r = std::min(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec, 255.0f);
-            g = std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f);
-            b = std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f);
-        
-            return Color(b, g, r).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
+            return Color(
+                std::min(face.material.Ka[2] + face.material.Kd[2] * diff + face.material.Ks[2] * spec, 255.0f),
+                std::min(face.material.Ka[1] + face.material.Kd[1] * diff + face.material.Ks[1] * spec, 255.0f),
+                std::min(face.material.Ka[0] + face.material.Kd[0] * diff + face.material.Ks[0] * spec, 255.0f)).toBgra();  // Create a color object with the calculated RGB values and full alpha (255)
 		}
 	};
 public:
