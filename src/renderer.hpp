@@ -2,7 +2,6 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <cstdint>
-#include "space3d.hpp"
 #include "objects/solid.hpp"
 #include "rasterizer.hpp"
 #include "effects/flatEffect.hpp"

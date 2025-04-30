@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "solid.hpp"
 
 class AscLoader : public Solid {

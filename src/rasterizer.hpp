@@ -2,7 +2,6 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <cstdint>
-#include "space3d.hpp"
 #include "objects/tetrakis.hpp"
 #include "objects/torus.hpp"
 #include "objects/test.hpp"

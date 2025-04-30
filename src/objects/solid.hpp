@@ -1,19 +1,62 @@
 #pragma once
-
+#include <cstdint>
 #include <vector>
-#include "../space3d.hpp"
 #include "../slib.hpp"
 #include "../constants.hpp"
+
+enum class Shading {
+    Flat,
+    Gouraud,
+    BlinnPhong,
+    Phong
+};
 
 struct VertexData {
     slib::vec3 vertex;
     slib::vec3 normal;
 };
 
+typedef struct Face
+{
+    int16_t vertex1;
+    int16_t vertex2;
+    int16_t vertex3;
+    slib::material material;
+} Face;
+
 struct FaceData {
     Face face;
     slib::vec3 faceNormal;
 };
+
+typedef struct Position
+{
+    float x;
+    float y;
+    float z;
+    float zoom;
+    float xAngle;
+    float yAngle;
+    float zAngle;    
+} Position;
+
+enum class MaterialType {
+    Rubber,
+    Plastic,
+    Wood,
+    Marble,
+    Glass,
+    Metal,
+    Mirror 
+};
+
+// Struct to hold k_s, k_a, and k_d values
+typedef struct MaterialProperties {
+    float k_s; // Specular reflection coefficient
+    float k_a; // Ambient reflection coefficient
+    float k_d; // Diffuse reflection coefficient
+    float shininess;
+} MaterialProperties;
 
 class Solid {
 public:

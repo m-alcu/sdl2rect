@@ -6,7 +6,8 @@
 #include <vector>
 #include <string>
 #include <regex>
-#include "../rasterizer.hpp"
+#include <cstdint>
+#include "objLoader.hpp"
 
 void ObjLoader::setup(const std::string& filename) {
     loadVertices(filename);

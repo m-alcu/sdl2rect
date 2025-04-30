@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
-#include "../rasterizer.hpp"
+#include <cstdint>
+#include "torus.hpp"
 #include "../constants.hpp"
 
 void Torus::loadVertices() {

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
-#include "../rasterizer.hpp"
-
+#include <cstdint>
+#include "tetrakis.hpp"
 
 void Tetrakis::loadVertices() {
     const float half = 50.f;

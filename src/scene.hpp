@@ -5,10 +5,15 @@
 #include <algorithm> // for std::fill
 #include <cstdint>   // for uint32_t
 
-#include "space3d.hpp"
 #include "objects/solid.hpp"
 #include "smath.hpp"
 #include "ZBuffer.hpp"
+
+typedef struct Screen
+{
+    int32_t height;
+    int32_t width;
+} Screen;
 
 class Scene
 {

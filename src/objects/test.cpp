@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
-#include "../rasterizer.hpp"
+#include <cstdint>
+#include "test.hpp"
 
 
 void Test::loadVertices() {

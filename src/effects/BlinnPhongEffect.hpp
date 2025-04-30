@@ -1,5 +1,5 @@
 #pragma once
-#include "../rasterizer.hpp"
+#include <cmath>
 #include "../slib.hpp"
 #include "../color.hpp"
 
