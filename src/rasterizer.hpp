@@ -83,7 +83,7 @@ class Rasterizer {
                 );
         
                 if (Visible(tri)) {
-                    ClipCullDrawTriangleSutherlandHodgman(tri, *scene);
+                    ClipCullDrawTriangleSutherlandHodgman(tri);
                 }
             }
         
@@ -115,23 +115,23 @@ class Rasterizer {
         https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
         */
 
-        void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t, const Scene& scene) {
+        void ClipCullDrawTriangleSutherlandHodgman(const Triangle<vertex>& t) {
             std::vector<vertex> polygon = { t.p1, t.p2, t.p3 };
 
             for (ClipPlane plane : {ClipPlane::Left, ClipPlane::Right, ClipPlane::Bottom, 
                                     ClipPlane::Top, ClipPlane::Near, ClipPlane::Far}) {
-                polygon = ClipAgainstPlane(polygon, plane, scene);
+                polygon = ClipAgainstPlane(polygon, plane);
                 if (polygon.empty()) return; // Completely outside
             }
 
             // Triangulate fan-style and draw
             for (size_t i = 1; i + 1 < polygon.size(); ++i) {
                 Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
-                draw(tri, *solid, scene);
+                draw(tri);
             }
         }
 
-        std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane, const Scene& scene) {
+        std::vector<vertex> ClipAgainstPlane(const std::vector<vertex>& poly, ClipPlane plane) {
             std::vector<vertex> output;
             if (poly.empty()) return output;
         
@@ -144,8 +144,8 @@ class Rasterizer {
                 if (currInside != prevInside) {
                     float alpha = ComputeAlpha(prev, curr, plane);
                     vertex interpolated = prev + (curr - prev) * alpha;
-                    interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                    interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+                    interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene->screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
+                    interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene->screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
                     interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
                     output.push_back(interpolated);
                 }
@@ -221,9 +221,9 @@ class Rasterizer {
                     p3                    p3
         */
 
-        void draw(Triangle<vertex>& tri, const Solid& solid, const Scene& scene) {
+        void draw(Triangle<vertex>& tri) {
 
-            effect.gs(tri, solid, scene, normalTransformMat);
+            effect.gs(tri, *solid, *scene, normalTransformMat);
 
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
@@ -235,13 +235,13 @@ class Rasterizer {
 
             vertex left = tri.p1, right = tri.p1;
             if(tri.edge13.p_x < tri.edge12.p_x) {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, scene, solid.faceData[tri.i].face, tri.flatColor);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, solid->faceData[tri.i].face, tri.flatColor);
                 right = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, scene, solid.faceData[tri.i].face, tri.flatColor);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, solid->faceData[tri.i].face, tri.flatColor);
             } else {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, scene, solid.faceData[tri.i].face, tri.flatColor);
+                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, solid->faceData[tri.i].face, tri.flatColor);
                 left = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, scene, solid.faceData[tri.i].face, tri.flatColor);
+                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, solid->faceData[tri.i].face, tri.flatColor);
             }
         };
 
@@ -262,21 +262,23 @@ class Rasterizer {
             }
         };
 
-        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Scene& scene, const Face& face, uint32_t flatColor) {
+        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Face& face, uint32_t flatColor) {
 
-            auto* pixels = static_cast<uint32_t*>(scene.sdlSurface->pixels);
+            auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
         
-            for(int hy=(top * scene.screen.width); hy<(bottom * scene.screen.width); hy+=scene.screen.width) {
+            for(int hy=(top * scene->screen.width); hy<(bottom * scene->screen.width); hy+=scene->screen.width) {
                 int16_t dx = (right.p_x - left.p_x) >> 16;
-                vertex vDx = dx != 0 ? vDx = (right - left) / dx : vertex();
-                vertex vRaster = left;
-                
-                for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
-                    if (scene.zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
-                        pixels[hy + hx] = effect.ps(vRaster, scene, face, flatColor);
+
+                if (dx != 0) {
+                    vertex vRaster = left, vDx = (right - left) / dx;
+                    for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
+                        if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
+                            pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
+                        }
+                        vRaster += vDx;
                     }
-                    vRaster += vDx;
                 }
+
                 left += leftDy;
                 right += rightDy;
             }
