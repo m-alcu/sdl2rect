@@ -99,10 +99,10 @@ namespace smath
         slib::vec3 zaxis = {sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw};
 
         slib::mat4 viewMatrix(
-            {{xaxis.x, yaxis.x, zaxis.x, 0},
-             {xaxis.y, yaxis.y, zaxis.y, 0},
-             {xaxis.z, yaxis.z, zaxis.z, 0},
-             {-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1}});
+            {{xaxis.x, yaxis.x, zaxis.x, -dot(xaxis, eye) },
+             {xaxis.y, yaxis.y, zaxis.y, -dot(yaxis, eye)},
+             {xaxis.z, yaxis.z, zaxis.z, -dot(zaxis, eye)},
+             {0, 0, 0, 1}});
 
         return viewMatrix;
     }

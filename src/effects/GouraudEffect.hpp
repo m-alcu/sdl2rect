@@ -50,7 +50,7 @@ public:
         int32_t p_x;
         int32_t p_y;
         float p_z; 
-        slib::vec4 point;
+        slib::vec3 point;
         slib::vec3 normal;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
@@ -60,15 +60,16 @@ public:
     class VertexShader
 	{
 	public:
-        std::unique_ptr<Vertex> operator()(const VertexData& vData, const slib::mat4& fullTransformMat, const slib::mat4& normalTransformMat, const Scene& scene) const
+        std::unique_ptr<Vertex> operator()(const VertexData& vData, const slib::mat4& fullTransformMat, const slib::mat4& viewMatrix, const slib::mat4& normalTransformMat, const Scene& scene) const
 		{
             Vertex screenPoint;
-            screenPoint.point = fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.point = viewMatrix * fullTransformMat * slib::vec4(vData.vertex, 1);
             screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
-            screenPoint.ndc = screenPoint.point * scene.projectionMatrix;
-            screenPoint.p_x = (int32_t) ceil((screenPoint.ndc.x / screenPoint.ndc.w + 1.0f) * (scene.screen.width / 2.0f) - 0.5f);
-            screenPoint.p_y = (int32_t) ceil((screenPoint.ndc.y / screenPoint.ndc.w + 1.0f) * (scene.screen.height / 2.0f) - 0.5f);
-            screenPoint.p_z = screenPoint.ndc.z / screenPoint.ndc.w;
+            screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+            float oneOverW = 1.0f / screenPoint.ndc.w;
+            screenPoint.p_x = (int32_t) ((screenPoint.ndc.x * oneOverW + 1.0f) * (scene.screen.width / 2.0f));
+            screenPoint.p_y = (int32_t) ((screenPoint.ndc.y * oneOverW + 1.0f) * (scene.screen.height / 2.0f));
+            screenPoint.p_z = screenPoint.ndc.z * oneOverW;
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};

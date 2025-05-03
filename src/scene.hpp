@@ -7,7 +7,20 @@
 
 #include "objects/solid.hpp"
 #include "smath.hpp"
+#include "slib.hpp"
 #include "ZBuffer.hpp"
+
+
+struct Camera
+{
+    slib::vec3 pos;
+    slib::vec3 rotation;    
+    slib::vec3 eye;
+    slib::vec3 target;
+    slib::vec3 up;
+    float pitch;
+    float yaw;
+};
 
 typedef struct Screen
 {
@@ -26,6 +39,9 @@ public:
     {
         sdlSurface = SDL_CreateRGBSurface(0, screen.width, screen.height, 32, 0, 0, 0, 0);
         SDL_SetSurfaceBlendMode(sdlSurface, SDL_BLENDMODE_NONE);
+        camera.eye = {0.0f, 0.0f, 0.0f};          // Camera position
+        camera.target = {0.0f, 0.0f, -1.0f};      // Point to look at (in -Z)
+        camera.up = {0.0f, 1.0f, 0.0f};           // Up vector (typically +Y)
     }
 
     // Destructor to free the allocated memory.
@@ -53,6 +69,7 @@ public:
     std::shared_ptr<ZBuffer> zBuffer; // Use shared_ptr for zBuffer to manage its lifetime automatically.
     SDL_Surface* sdlSurface = nullptr; // SDL surface for rendering.
 
+    Camera camera; // Camera object to manage camera properties.
     // Store solids in a vector of unique_ptr to handle memory automatically.
     std::vector<std::unique_ptr<Solid>> solids;
 };

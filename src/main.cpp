@@ -57,6 +57,8 @@ int main(int argc, char** argv)
     auto background = BackgroundFactory::createBackground(BackgroundType::DESERT);
     background->draw(back, scene.screen.height, scene.screen.width);
 
+    float mouseSensitivity = 0.1f;
+    float cameraSpeed = 100.0f;
     // Main loop.
     while (isRunning)
     {
@@ -67,14 +69,26 @@ int main(int argc, char** argv)
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_LEFT) {
+                scene.camera.yaw = scene.camera.yaw - 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RIGHT) {
+                scene.camera.yaw = scene.camera.yaw + 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP) {
+                scene.camera.pitch = scene.camera.pitch + 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN) {
+                scene.camera.pitch = scene.camera.pitch - 1;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z + 10;
+                scene.camera.pos.y = scene.camera.pos.y + 100;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.solids[0]->position.z = scene.solids[0]->position.z - 10; 
+                scene.camera.pos.y = scene.camera.pos.y - 100;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
+                scene.camera.pos.x = scene.camera.pos.x + 100;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                scene.camera.pos.x = scene.camera.pos.x - 100; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                scene.solids[0]->position.xAngle = scene.solids[0]->position.xAngle + 1;
+                scene.camera.pos.z = scene.camera.pos.z - 100;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                scene.solids[0]->position.yAngle = scene.solids[0]->position.yAngle - 1;         
+                scene.camera.pos.z = scene.camera.pos.z + 100;                                         
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.solids[0]->shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
@@ -83,15 +97,6 @@ int main(int argc, char** argv)
                 scene.solids[0]->shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
                 scene.solids[0]->shading = Shading::Phong;                                 
-            } else if (event.type == SDL_MOUSEMOTION) {
-                scene.solids[0]->position.x = event.motion.x*2 - scene.screen.width;
-                scene.solids[0]->position.y = event.motion.y*2 - scene.screen.height;
-            } else if (event.type == SDL_MOUSEWHEEL) {
-                if (event.wheel.y > 0) {
-                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom * 1.01;
-                } else {
-                    scene.solids[0]->position.zoom = scene.solids[0]->position.zoom / 1.01;
-                }
             }
         }
 
@@ -103,10 +108,9 @@ int main(int argc, char** argv)
         double smoothedMs = frameTimeAvg.update(durationMs);
 
         std::ostringstream oss;
-        oss << "xAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.xAngle
-            << " yAngle: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.yAngle
-            << " zPos: " << std::fixed << std::setprecision(2) << scene.solids[0]->position.z
-            << " zoom: " << scene.solids[0]->position.zoom
+        oss << "pos.x: " << std::fixed << std::setprecision(2) << scene.camera.pos.x
+            << " pos.y: " << std::fixed << std::setprecision(2) << scene.camera.pos.y
+            << " pos.z: " << std::fixed << std::setprecision(2) << scene.camera.pos.z
             << " frames/s: " << std::fixed << std::setprecision(2) << 1000/smoothedMs;
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        

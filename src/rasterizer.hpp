@@ -20,7 +20,8 @@ template<class Effect>
 class Rasterizer {
     public:
         Rasterizer() :  fullTransformMat(smath::identity()), 
-                        normalTransformMat(smath::identity())
+                        normalTransformMat(smath::identity()),
+                        viewMatrix(smath::identity())
           {}
 
         void drawRenderable(Solid& solid, Scene& scn) {
@@ -39,6 +40,7 @@ class Rasterizer {
         Scene* scene; // Pointer to the Scene
         slib::mat4 fullTransformMat;
         slib::mat4 normalTransformMat;
+        slib::mat4 viewMatrix;
         Effect effect;    
         
         void setRenderable(Solid* solidPtr) {
@@ -51,6 +53,9 @@ class Rasterizer {
             slib::mat4 rotate = smath::rotation(slib::vec3({solid->position.xAngle, solid->position.yAngle, solid->position.zAngle}));
             slib::mat4 translate = smath::translation(slib::vec3({solid->position.x, solid->position.y, solid->position.z}));
             slib::mat4 scale = smath::scale(slib::vec3({solid->position.zoom, solid->position.zoom, solid->position.zoom}));
+            //slib::mat4 viewMatrix = smath::view(scene->camera.eye, scene->camera.target, scene->camera.up);
+            viewMatrix = smath::fpsview(scene->camera.pos, scene->camera.pitch, scene->camera.yaw);
+
             fullTransformMat = translate * rotate * scale;
             normalTransformMat = rotate;
         }
@@ -64,7 +69,7 @@ class Rasterizer {
                 solid->vertexData.end(),
                 projectedPoints.begin(),
                 [&](const auto& vData) {
-                    return effect.vs(vData, fullTransformMat, normalTransformMat, *scene);
+                    return effect.vs(vData, fullTransformMat, viewMatrix, normalTransformMat, *scene);
                 }
             );
         }
@@ -143,9 +148,10 @@ class Rasterizer {
                 if (currInside != prevInside) {
                     float alpha = ComputeAlpha(prev, curr, plane);
                     vertex interpolated = prev + (curr - prev) * alpha;
-                    interpolated.p_x = (int32_t) ceil((interpolated.ndc.x / interpolated.ndc.w + 1.0f) * (scene->screen.width / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                    interpolated.p_y = (int32_t) ceil((interpolated.ndc.y / interpolated.ndc.w + 1.0f) * (scene->screen.height / 2.0f) - 0.5f); // Convert from NDC to screen coordinates
-                    interpolated.p_z = interpolated.ndc.z / interpolated.ndc.w; // Store the depth value in the z-buffer
+                    float oneOverW = 1.0f / interpolated.ndc.w;
+                    interpolated.p_x = (int32_t) ((interpolated.ndc.x * oneOverW + 1.0f) * (scene->screen.width / 2.0f)); // Convert from NDC to screen coordinates
+                    interpolated.p_y = (int32_t) ((interpolated.ndc.y * oneOverW + 1.0f) * (scene->screen.height / 2.0f)); // Convert from NDC to screen coordinates
+                    interpolated.p_z = interpolated.ndc.z * oneOverW; // Store the depth value in the z-buffer
                     output.push_back(interpolated);
                 }
         
@@ -255,7 +261,8 @@ class Rasterizer {
 
             int dy = p2.p_y - p1.p_y;
             if (dy > 0) {
-                return (p2 - p1) / dy;
+                float oneOverDy = 1.0f / dy;
+                return (p2 - p1) * oneOverDy;
             } else {
                 return p2.p_x - p1.p_x > 0 ? vertex(INT32_MAX) : vertex(INT32_MIN);
             }
@@ -266,10 +273,11 @@ class Rasterizer {
             auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
         
             for(int hy=(top * scene->screen.width); hy<(bottom * scene->screen.width); hy+=scene->screen.width) {
-                int16_t dx = (right.p_x - left.p_x) >> 16;
+                int dx = (right.p_x - left.p_x) >> 16;
 
                 if (dx != 0) {
-                    vertex vRaster = left, vDx = (right - left) / dx;
+                    float oneOverDx = 1.0f / dx;
+                    vertex vRaster = left, vDx = (right - left) * oneOverDx;
                     for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
                         if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
                             pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
