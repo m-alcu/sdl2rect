@@ -29,7 +29,8 @@
                 "-lSDL2main",
                 "-lSDL2",
                 "-mwindows",
-                "-fopenmp"
+                "-fopenmp",
+                "-std=c++20"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

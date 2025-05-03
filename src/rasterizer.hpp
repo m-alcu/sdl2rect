@@ -131,7 +131,14 @@ class Rasterizer {
             // Triangulate fan-style and draw
             for (size_t i = 1; i + 1 < polygon.size(); ++i) {
                 Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
-                draw(tri);
+                draw(tri,
+                    [&](const vertex from, const vertex to, int num_steps)
+                    {
+                        // Retrieve X coordinates for begin and end.
+                        // Number of steps = number of scanlines
+                        return Slope( from, to, num_steps );
+                    } 
+                );
             }
         }
 
@@ -202,95 +209,86 @@ class Rasterizer {
         }
         
         /*
-        Drawing a triangle with edges 12, 13 and 23.
-        The triangle is divided into two halves, one for each edge.
-        The left edge is the one with the smallest x coordinate, and the right edge is the one with the largest x coordinate.
-        The left edge is drawn first, and then the right edge is drawn.
-
-            edge13.p_x > edge12.p_x    edge13.p_x < edge12.p_x
-                    p1                     p1
-                    /|                      |\
-                   / |                      | \
-          edge12  /  |                      |  \  edge12
-                 /   |                      |   \
-                /    |  edge13     edge13   |    \
-               /     |                      |     \
-            p2/______|                      |______\ p2 <--- here we update middle vertex
-              \      |                      |      /
-               \     |                      |     /
-                \    |                      |    /
-                 \   |                      |   /
-                  \  |                      |  /
-          edge23   \ |                      | /  edge23
-                    \|                      |/
-                    p3                    p3
+        Drawing a triangle with scanline rasterization.
+        The algorithm works by iterating through each scanline of the triangle and determining the left and right edges of the triangle at that scanline.
+        For each scanline, the algorithm calculates the x-coordinates of the left and right edges of the triangle and fills in the pixels between them.
+        The algorithm uses a slope to determine the x-coordinates of the left and right edges of the triangle at each scanline.
         */
 
-        void draw(Triangle<vertex>& tri) {
+        class Slope
+        {
+            vertex begin, step;
+        public:
+            Slope() {}
+            Slope(vertex from, vertex to, int num_steps)
+            {
+                float inv_step = 1.f / num_steps;
+                begin = from;                   // Begin here
+                step  = (to - from) * inv_step; // Stepsize = (end-begin) / num_steps
+            }
+            vertex get() const { return begin; }
+            void advance()    { begin += step; }
+        };
+
+        void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
             effect.gs(tri, *solid, *scene, normalTransformMat);
 
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
+            bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
             tri.p2.p_x = tri.p2.p_x << 16; // shift to 16.16 space
             tri.p3.p_x = tri.p3.p_x << 16; // shift to 16.16 space
-            tri.edge12 = gradientDy(tri.p1, tri.p2);
-            tri.edge23 = gradientDy(tri.p2, tri.p3);
-            tri.edge13 = gradientDy(tri.p1, tri.p3);
 
-            vertex left = tri.p1, right = tri.p1;
-            if(tri.edge13.p_x < tri.edge12.p_x) {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge13, tri.edge12, solid->faceData[tri.i].face, tri.flatColor);
-                right = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge13, tri.edge23, solid->faceData[tri.i].face, tri.flatColor);
-            } else {
-                drawTriHalf(tri.p1.p_y, tri.p2.p_y, left, right, tri.edge12, tri.edge13, solid->faceData[tri.i].face, tri.flatColor);
-                left = tri.p2;
-                drawTriHalf(tri.p2.p_y, tri.p3.p_y, left, right, tri.edge23, tri.edge13, solid->faceData[tri.i].face, tri.flatColor);
+            if(tri.p1.p_y == tri.p3.p_y) return;
+
+            std::invoke_result_t<decltype(MakeSlope), vertex, vertex,int> sides[2];
+
+            sides[!shortside] = MakeSlope(tri.p1,tri.p3, tri.p3.p_y - tri.p1.p_y);
+
+            for(auto y = tri.p1.p_y, endy = tri.p1.p_y, hy = y * scene->screen.width; ; ++y)
+            {
+                if(y >= endy)
+                {
+                    // If y of p2 is reached, the triangle is complete.
+                    if(y >= tri.p3.p_y) break;
+                    // Recalculate slope for short side. The number of lines cannot be zero.
+                    sides[shortside] = std::apply(MakeSlope, (y < tri.p2.p_y) ? std::tuple(tri.p1, tri.p2, (endy=tri.p2.p_y) - tri.p1.p_y)
+                                                                              : std::tuple(tri.p2, tri.p3, (endy=tri.p3.p_y) - tri.p2.p_y) );
+                }
+                // On a single scanline, we go from the left X coordinate to the right X coordinate.
+                DrawScanline(hy, sides[0], sides[1], solid->faceData[tri.i].face, tri.flatColor);
             }
+
         };
-
+ 
         inline void orderVertices(vertex *p1, vertex *p2, vertex *p3) {
-
             if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
             if (p2->p_y > p3->p_y) std::swap(*p2,*p3);
             if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
         };
-
-        inline vertex gradientDy(vertex p1, vertex p2) {
-
-            int dy = p2.p_y - p1.p_y;
-            if (dy > 0) {
-                float oneOverDy = 1.0f / dy;
-                return (p2 - p1) * oneOverDy;
-            } else {
-                return p2.p_x - p1.p_x > 0 ? vertex(INT32_MAX) : vertex(INT32_MIN);
-            }
-        };
-
-        inline void drawTriHalf(int32_t top, int32_t bottom, vertex& left, vertex& right, vertex leftDy, vertex rightDy, const Face& face, uint32_t flatColor) {
+        
+        inline void DrawScanline(int& hy, Slope& left, Slope& right, const Face& face, uint32_t flatColor) {
 
             auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
-        
-            for(int hy=(top * scene->screen.width); hy<(bottom * scene->screen.width); hy+=scene->screen.width) {
-                int dx = (right.p_x - left.p_x) >> 16;
+            int dx = (right.get().p_x - left.get().p_x) >> 16;
 
-                if (dx != 0) {
-                    float oneOverDx = 1.0f / dx;
-                    vertex vRaster = left, vDx = (right - left) * oneOverDx;
-                    for(int hx = left.p_x >> 16; hx < right.p_x >> 16; hx++) {
-                        if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
-                            pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
-                        }
-                        vRaster += vDx;
+            if (dx != 0) {
+                float oneOverDx = 1.0f / dx;
+                vertex vRaster = left.get(), vDx = (right.get() - left.get()) * oneOverDx;
+                for(int hx = left.get().p_x >> 16; hx < right.get().p_x >> 16; hx++) {
+                    if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
+                        pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
                     }
+                    vRaster += vDx;
                 }
-
-                left += leftDy;
-                right += rightDy;
             }
-        };
-        
+
+            left.advance();
+            right.advance();
+            hy += scene->screen.width; 
+        };        
+
     };
     
 
