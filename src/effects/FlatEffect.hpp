@@ -27,10 +27,6 @@ public:
         return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, ndc * rhs);
     }
 
-    Vertex operator/(const float &rhs) const {
-        return Vertex(p_x / rhs, p_y / rhs, p_z / rhs, ndc / rhs);
-    }
-
     Vertex(int32_t px) :
     p_x(px) {}
     

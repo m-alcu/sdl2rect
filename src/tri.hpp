@@ -6,7 +6,6 @@ class Triangle
 {
 public:
     V p1, p2, p3;
-    V edge12, edge23, edge13;
     int16_t i;
     uint32_t flatColor;
     Triangle(const Triangle& _t) : p1(_t.p1), p2(_t.p2), p3(_t.p3), i(_t.i) {};
