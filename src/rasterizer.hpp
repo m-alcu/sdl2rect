@@ -227,6 +227,7 @@ class Rasterizer {
                 step  = (to - from) * inv_step; // Stepsize = (end-begin) / num_steps
             }
             vertex get() const { return begin; }
+            int getx() const { return begin.p_x >> 16; }
             void advance()    { begin += step; }
         };
 
@@ -271,12 +272,12 @@ class Rasterizer {
         inline void DrawScanline(int& hy, Slope& left, Slope& right, const Face& face, uint32_t flatColor) {
 
             auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
-            int dx = (right.get().p_x - left.get().p_x) >> 16;
+            int dx = right.getx() - left.getx();
 
             if (dx != 0) {
                 float oneOverDx = 1.0f / dx;
                 vertex vRaster = left.get(), vDx = (right.get() - left.get()) * oneOverDx;
-                for(int hx = left.get().p_x >> 16; hx < right.get().p_x >> 16; hx++) {
+                for(int hx = left.getx(); hx < right.getx(); hx++) {
                     if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
                         pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
                     }
