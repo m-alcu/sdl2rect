@@ -1,46 +1,31 @@
 #pragma once
 #include <cstdint>
+#include "slib.hpp"
 
-class Color {
-    public:
-        float blue;
-        float green;
-        float red;
+class Color : public slib::vec3 {
+public:
+    // Default constructor: black (0, 0, 0)
+    Color() : slib::vec3(0.0f, 0.0f, 0.0f) {}
 
-        Color() : blue(0), green(0), red(0) {} // Default constructor initializes to black (0x00000000)
-    
-        // Optionally, you can add constructors or member functions if needed.
-        Color(float b, float g, float r) {
-            blue = b;
-            green = g;
-            red = r;
-        }
+    // Constructor with blue, green, red components
+    Color(float b, float g, float r) : slib::vec3(b, g, r) {}
 
-        uint32_t toBgra() {
-            return 0xff000000 | ((int) red) << 16 | ((int) green) << 8 | ((int) blue); // BGRA format
-        }
+    // Constructor from glm::vec3 directly
+    Color(const slib::vec3& v) : slib::vec3(v) {}
 
-        Color operator+(const Color &c) const {
-            return Color(blue + c.blue, green + c.green, red + c.red);
-        }
-    
-        Color operator-(const Color &c) const {
-            return Color(blue - c.blue, green - c.green, red - c.red);
-        }
-    
-        Color operator*(const float &rhs) const {
-            return Color(blue * rhs, green * rhs, red * rhs);
-        }
-    
-        Color operator/(const float &rhs) const {
-            return Color(blue / rhs, green / rhs, red / rhs);
-        }
+    // Convert to BGRA (assumes 0–255 range)
+    uint32_t toBgra() const {
+        return 0xff000000 |
+               (static_cast<int>(x) << 16) |
+               (static_cast<int>(y) << 8) |
+               (static_cast<int>(z));
+    }
 
-        Color& operator+=(const Color &c) {
-            red += c.red;
-            green += c.green;
-            blue += c.blue;
-            return *this;
-        }
+    float& blue()  { return x; }
+    float& green() { return y; }
+    float& red()   { return z; }
 
-    };
+    const float& blue()  const { return x; }
+    const float& green() const { return y; }
+    const float& red()   const { return z; }
+};

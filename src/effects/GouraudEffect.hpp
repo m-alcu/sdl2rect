@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include "../slib.hpp"
 #include "../color.hpp"
 
@@ -76,17 +77,14 @@ public:
     
         void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
         {
-            const auto& Ka = tri.face.material.Ka;
-            const auto& Kd = tri.face.material.Kd;
-            const auto& light = scene.lux;
+            const auto& Ka = tri.face.material.Ka; // vec3
+            const auto& Kd = tri.face.material.Kd; // vec3
+            const auto& light = scene.lux;         // vec3
         
             auto computeColor = [&](const slib::vec3& normal) -> Color {
-                float ds = std::max(0.0f, smath::dot(normal, light));
-                return Color(
-                    std::min(Ka[2] + Kd[2] * ds, 255.0f),
-                    std::min(Ka[1] + Kd[1] * ds, 255.0f),
-                    std::min(Ka[0] + Kd[0] * ds, 255.0f)
-                );
+                float ds = std::max(0.0f, smath::dot(normal, light)); // diffuse scalar
+                slib::vec3 color = Ka + Kd * ds;
+                return Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
             };
         
             tri.p1.color = computeColor(tri.p1.normal);

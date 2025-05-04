@@ -71,13 +71,16 @@ public:
     
         void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
 		{
+
+            const auto& Ka = tri.face.material.Ka; // vec3
+            const auto& Kd = tri.face.material.Kd; // vec3
+            const auto& light = scene.lux;         // vec3
+
             slib::vec3 rotatedFacenormal;
             rotatedFacenormal = normalTransformMat * slib::vec4(tri.faceNormal, 0);
-            float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
-            tri.flatColor = Color(
-                std::min(tri.face.material.Ka[2] + tri.face.material.Kd[2] * diff, 255.0f),
-                std::min(tri.face.material.Ka[1] + tri.face.material.Kd[1] * diff, 255.0f),
-                std::min(tri.face.material.Ka[0] + tri.face.material.Kd[0] * diff, 255.0f)).toBgra();
+            float diff = std::max(0.0f, smath::dot(rotatedFacenormal,light));
+            slib::vec3 color = Ka + Kd * diff;
+            tri.flatColor = Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 

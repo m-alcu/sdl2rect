@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "slib.hpp"
 
 namespace slib
 {
@@ -19,21 +20,6 @@ namespace slib
         int w, h;
         std::vector<unsigned char> data;
         unsigned int bpp;
-    };
-
-    struct material
-    {
-        float Ns{};
-        std::array<float, 3> Ka{};
-        std::array<float, 3> Kd{};
-        std::array<float, 3> Ks{};
-        std::array<float, 3> Ke{};
-        float Ni{};
-        float d{};
-        int illum{};
-        texture map_Kd;
-        texture map_Ks;
-        texture map_Ns;
     };
 
     struct zvec2
@@ -117,5 +103,20 @@ namespace slib
         mat4& operator*=(const mat4& rhs);
         mat4 operator*(const mat4& rhs) const;
         vec4 operator*(const vec4& rhs) const;
+    };
+
+    struct material
+    {
+        float Ns{};
+        vec3 Ka{};
+        vec3 Kd{};
+        vec3 Ks{};
+        vec3 Ke{};
+        float Ni{};
+        float d{};
+        int illum{};
+        texture map_Kd;
+        texture map_Ks;
+        texture map_Ns;
     };
 } // namespace slib
