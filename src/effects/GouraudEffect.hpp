@@ -75,7 +75,7 @@ public:
 	{
 	public:
     
-        void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
+        void operator()(Triangle<Vertex>& tri, const Scene& scene) const
         {
             const auto& Ka = tri.face.material.Ka; // vec3
             const auto& Kd = tri.face.material.Kd; // vec3

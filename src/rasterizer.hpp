@@ -80,13 +80,15 @@ class Rasterizer {
             for (int i = 0; i < static_cast<int>(solid->faceData.size()); ++i) {
                 const auto& faceDataEntry = solid->faceData[i];
                 const auto& face = faceDataEntry.face;
+                slib::vec3 rotatedFaceNormal;
+                rotatedFaceNormal = normalTransformMat * slib::vec4(faceDataEntry.faceNormal, 0);
             
                 Triangle<vertex> tri(
                     *projectedPoints[face.vertex1],
                     *projectedPoints[face.vertex2],
                     *projectedPoints[face.vertex3],
                     face,
-                    faceDataEntry.faceNormal
+                    rotatedFaceNormal
                 );
             
                 if (Visible(tri)) {
@@ -110,7 +112,12 @@ class Rasterizer {
 
         bool Visible(const Triangle<vertex>& triangle) {
 
-            return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
+            slib::vec3 viewDir = scene->camera.eye - triangle.p1.point;
+            float dotResult = smath::dot(triangle.faceNormal, viewDir);
+            // Return whether the triangle is facing the camera
+            return dotResult > 0.0f;
+
+            //return (triangle.p3.p_x-triangle.p2.p_x)*(triangle.p2.p_y-triangle.p1.p_y) - (triangle.p2.p_x-triangle.p1.p_x)*(triangle.p3.p_y-triangle.p2.p_y) < 0;
         };
 
         /*
@@ -240,7 +247,7 @@ class Rasterizer {
             if(tri.p1.p_y == tri.p3.p_y) return;
             bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
 
-            effect.gs(tri, *scene, normalTransformMat);
+            effect.gs(tri, *scene);
 
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
             tri.p2.p_x = tri.p2.p_x << 16; // shift to 16.16 space
