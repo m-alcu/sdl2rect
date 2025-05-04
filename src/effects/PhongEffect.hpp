@@ -103,7 +103,7 @@ public:
             }
         
             slib::vec3 color = Ka + Kd * diff + Ks * spec;
-            return Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+            return Color(color).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 public:

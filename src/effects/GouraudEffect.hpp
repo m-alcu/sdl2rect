@@ -84,7 +84,7 @@ public:
             auto computeColor = [&](const slib::vec3& normal) -> Color {
                 float ds = std::max(0.0f, smath::dot(normal, light)); // diffuse scalar
                 slib::vec3 color = Ka + Kd * ds;
-                return Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                return Color(color); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
             };
         
             tri.p1.color = computeColor(tri.p1.normal);

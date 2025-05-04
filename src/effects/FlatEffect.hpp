@@ -80,7 +80,7 @@ public:
             rotatedFacenormal = normalTransformMat * slib::vec4(tri.faceNormal, 0);
             float diff = std::max(0.0f, smath::dot(rotatedFacenormal,light));
             slib::vec3 color = Ka + Kd * diff;
-            tri.flatColor = Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+            tri.flatColor = Color(color).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 

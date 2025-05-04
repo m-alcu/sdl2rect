@@ -8,7 +8,7 @@ public:
     Color() : slib::vec3(0.0f, 0.0f, 0.0f) {}
 
     // Constructor with blue, green, red components
-    Color(float b, float g, float r) : slib::vec3(b, g, r) {}
+    Color(float b, float g, float r) : slib::vec3(std::min(b, 255.0f), std::min(g, 255.0f), std::min(r, 255.0f)) {}
 
     // Constructor from glm::vec3 directly
     Color(const slib::vec3& v) : slib::vec3(v) {}

@@ -108,7 +108,7 @@ public:
             }
                 
             slib::vec3 color = Ka + Kd * diff + Ks * spec;
-            return Color(std::min(color.x, 255.0f), std::min(color.y, 255.0f), std::min(color.z, 255.0f)).toBgra();
+            return Color(color).toBgra();
         }
 	};
 public:
