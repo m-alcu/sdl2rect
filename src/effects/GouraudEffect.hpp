@@ -63,10 +63,6 @@ public:
             screenPoint.point = viewMatrix * fullTransformMat * slib::vec4(vData.vertex, 1);
             screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
-            float oneOverW = 1.0f / screenPoint.ndc.w;
-            screenPoint.p_x = (int32_t) ((screenPoint.ndc.x * oneOverW + 1.0f) * (scene.screen.width / 2.0f));
-            screenPoint.p_y = (int32_t) ((screenPoint.ndc.y * oneOverW + 1.0f) * (scene.screen.height / 2.0f));
-            screenPoint.p_z = screenPoint.ndc.z * oneOverW;
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};
