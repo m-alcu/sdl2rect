@@ -77,18 +77,20 @@ class Rasterizer {
         void DrawFaces() {
 
             #pragma omp parallel for
-            for (int i=0; i<solid->numFaces; i++) {
-        
+            for (int i = 0; i < static_cast<int>(solid->faceData.size()); ++i) {
+                const auto& faceDataEntry = solid->faceData[i];
+                const auto& face = faceDataEntry.face;
+            
                 Triangle<vertex> tri(
-                    *projectedPoints[solid->faceData[i].face.vertex1],
-                    *projectedPoints[solid->faceData[i].face.vertex2],
-                    *projectedPoints[solid->faceData[i].face.vertex3],
-                    solid->faceData[i].face,
-                    solid->faceData[i].faceNormal
+                    *projectedPoints[face.vertex1],
+                    *projectedPoints[face.vertex2],
+                    *projectedPoints[face.vertex3],
+                    face,
+                    faceDataEntry.faceNormal
                 );
-        
+            
                 if (Visible(tri)) {
-                    ClipCullDrawTriangleSutherlandHodgman(tri);
+                    ClipCullDrawTriangleSutherlandHodgman(tri); // Must be thread-safe!
                 }
             }
         
@@ -235,7 +237,7 @@ class Rasterizer {
         void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
-            if(tri.p1.p_y == tri.p3.p_y) return;
+            if([[unlikely]] tri.p1.p_y == tri.p3.p_y) return;
             bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
 
             effect.gs(tri, *scene, normalTransformMat);
