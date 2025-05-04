@@ -75,23 +75,24 @@ public:
 	public:
     
         void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
-		{
-            float ds = std::max(0.0f, smath::dot(tri.p1.normal, scene.lux));
-            tri.p1.color = Color(
-                std::min(tri.face.material.Ka[2] + tri.face.material.Kd[2] * ds, 255.0f),
-                std::min(tri.face.material.Ka[1] + tri.face.material.Kd[1] * ds, 255.0f),
-                std::min(tri.face.material.Ka[0] + tri.face.material.Kd[0] * ds, 255.0f));
-            ds = std::max(0.0f, smath::dot(tri.p2.normal, scene.lux));
-            tri.p2.color = Color(
-                std::min(tri.face.material.Ka[2] + tri.face.material.Kd[2] * ds, 255.0f),
-                std::min(tri.face.material.Ka[1] + tri.face.material.Kd[1] * ds, 255.0f),
-                std::min(tri.face.material.Ka[0] + tri.face.material.Kd[0] * ds, 255.0f));
-            ds = std::max(0.0f, smath::dot(tri.p3.normal, scene.lux));
-            tri.p3.color = Color(
-                std::min(tri.face.material.Ka[2] + tri.face.material.Kd[2] * ds, 255.0f),
-                std::min(tri.face.material.Ka[1] + tri.face.material.Kd[1] * ds, 255.0f),
-                std::min(tri.face.material.Ka[0] + tri.face.material.Kd[0] * ds, 255.0f));
-		}
+        {
+            const auto& Ka = tri.face.material.Ka;
+            const auto& Kd = tri.face.material.Kd;
+            const auto& light = scene.lux;
+        
+            auto computeColor = [&](const slib::vec3& normal) -> Color {
+                float ds = std::max(0.0f, smath::dot(normal, light));
+                return Color(
+                    std::min(Ka[2] + Kd[2] * ds, 255.0f),
+                    std::min(Ka[1] + Kd[1] * ds, 255.0f),
+                    std::min(Ka[0] + Kd[0] * ds, 255.0f)
+                );
+            };
+        
+            tri.p1.color = computeColor(tri.p1.normal);
+            tri.p2.color = computeColor(tri.p2.normal);
+            tri.p3.color = computeColor(tri.p3.normal);
+        }
 	};    
 
 	class PixelShader
