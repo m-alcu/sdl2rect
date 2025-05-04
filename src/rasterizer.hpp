@@ -83,7 +83,8 @@ class Rasterizer {
                     *projectedPoints[solid->faceData[i].face.vertex1],
                     *projectedPoints[solid->faceData[i].face.vertex2],
                     *projectedPoints[solid->faceData[i].face.vertex3],
-                    i
+                    solid->faceData[i].face,
+                    solid->faceData[i].faceNormal
                 );
         
                 if (Visible(tri)) {
@@ -130,7 +131,7 @@ class Rasterizer {
 
             // Triangulate fan-style and draw
             for (size_t i = 1; i + 1 < polygon.size(); ++i) {
-                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.i);
+                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.face, t.faceNormal);
                 draw(tri,
                     [&](const vertex from, const vertex to, int num_steps)
                     {
@@ -237,7 +238,7 @@ class Rasterizer {
             if(tri.p1.p_y == tri.p3.p_y) return;
             bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
 
-            effect.gs(tri, *solid, *scene, normalTransformMat);
+            effect.gs(tri, *scene, normalTransformMat);
 
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
             tri.p2.p_x = tri.p2.p_x << 16; // shift to 16.16 space
@@ -258,7 +259,7 @@ class Rasterizer {
                                                                               : std::tuple(tri.p2, tri.p3, (endy=tri.p3.p_y) - tri.p2.p_y) );
                 }
                 // On a single scanline, we go from the left X coordinate to the right X coordinate.
-                DrawScanline(hy, sides[0], sides[1], solid->faceData[tri.i].face, tri.flatColor);
+                DrawScanline(hy, sides[0], sides[1], tri.face, tri.flatColor);
                 hy += scene->screen.width; 
             }
 

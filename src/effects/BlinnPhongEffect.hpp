@@ -74,7 +74,7 @@ public:
 	{
 	public:
     
-        void operator()(Triangle<Vertex>& tri, const Solid& solid, const Scene& scene, const slib::mat4& normalTransformMat) const
+        void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
 		{
 		}
 	};      

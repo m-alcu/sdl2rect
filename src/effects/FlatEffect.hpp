@@ -71,15 +71,15 @@ public:
 	{
 	public:
     
-        void operator()(Triangle<Vertex>& tri, const Solid& solid, const Scene& scene, const slib::mat4& normalTransformMat) const
+        void operator()(Triangle<Vertex>& tri, const Scene& scene, const slib::mat4& normalTransformMat) const
 		{
             slib::vec3 rotatedFacenormal;
-            rotatedFacenormal = normalTransformMat * slib::vec4(solid.faceData[tri.i].faceNormal, 0);
+            rotatedFacenormal = normalTransformMat * slib::vec4(tri.faceNormal, 0);
             float diff = std::max(0.0f, smath::dot(rotatedFacenormal,scene.lux));
             tri.flatColor = Color(
-                std::min(solid.faceData[tri.i].face.material.Ka[2] + solid.faceData[tri.i].face.material.Kd[2] * diff, 255.0f),
-                std::min(solid.faceData[tri.i].face.material.Ka[1] + solid.faceData[tri.i].face.material.Kd[1] * diff, 255.0f),
-                std::min(solid.faceData[tri.i].face.material.Ka[0] + solid.faceData[tri.i].face.material.Kd[0] * diff, 255.0f)).toBgra();
+                std::min(tri.face.material.Ka[2] + tri.face.material.Kd[2] * diff, 255.0f),
+                std::min(tri.face.material.Ka[1] + tri.face.material.Kd[1] * diff, 255.0f),
+                std::min(tri.face.material.Ka[0] + tri.face.material.Kd[0] * diff, 255.0f)).toBgra();
 		}
 	};
 
