@@ -233,15 +233,15 @@ class Rasterizer {
 
         void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
+            orderVertices(&tri.p1, &tri.p2, &tri.p3);
+            if(tri.p1.p_y == tri.p3.p_y) return;
+            bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
+
             effect.gs(tri, *solid, *scene, normalTransformMat);
 
-            orderVertices(&tri.p1, &tri.p2, &tri.p3);
-            bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
             tri.p1.p_x = tri.p1.p_x << 16; // shift to 16.16 space
             tri.p2.p_x = tri.p2.p_x << 16; // shift to 16.16 space
             tri.p3.p_x = tri.p3.p_x << 16; // shift to 16.16 space
-
-            if(tri.p1.p_y == tri.p3.p_y) return;
 
             std::invoke_result_t<decltype(MakeSlope), vertex, vertex,int> sides[2];
 
@@ -259,6 +259,7 @@ class Rasterizer {
                 }
                 // On a single scanline, we go from the left X coordinate to the right X coordinate.
                 DrawScanline(hy, sides[0], sides[1], solid->faceData[tri.i].face, tri.flatColor);
+                hy += scene->screen.width; 
             }
 
         };
@@ -269,26 +270,29 @@ class Rasterizer {
             if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
         };
         
-        inline void DrawScanline(int& hy, Slope& left, Slope& right, const Face& face, uint32_t flatColor) {
-
+        inline void DrawScanline(const int& y, Slope& left, Slope& right, const Face& face, const uint32_t flatColor) {
             auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
-            int dx = right.getx() - left.getx();
-
+            int xStart = left.getx();
+            int xEnd = right.getx();
+            int dx = xEnd - xStart;
+        
             if (dx != 0) {
-                float oneOverDx = 1.0f / dx;
-                vertex vRaster = left.get(), vDx = (right.get() - left.get()) * oneOverDx;
-                for(int hx = left.getx(); hx < right.getx(); hx++) {
-                    if (scene->zBuffer->TestAndSet(hy + hx, vRaster.p_z)) {
-                        pixels[hy + hx] = effect.ps(vRaster, *scene, face, flatColor);
+                float invDx = 1.0f / dx;
+                vertex vStart = left.get();
+                vertex vStep = (right.get() - vStart) * invDx;
+        
+                for (int x = xStart; x < xEnd; ++x) {
+                    int index = y + x;
+                    if (scene->zBuffer->TestAndSet(index, vStart.p_z)) {
+                        pixels[index] = effect.ps(vStart, *scene, face, flatColor);
                     }
-                    vRaster += vDx;
+                    vStart += vStep;
                 }
             }
-
+        
             left.advance();
             right.advance();
-            hy += scene->screen.width; 
-        };        
+        }
 
     };
     
