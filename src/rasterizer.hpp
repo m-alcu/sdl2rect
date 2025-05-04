@@ -237,7 +237,7 @@ class Rasterizer {
         void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
-            if([[unlikely]] tri.p1.p_y == tri.p3.p_y) return;
+            if(tri.p1.p_y == tri.p3.p_y) return;
             bool shortside = (tri.p2.p_y - tri.p1.p_y) * (tri.p3.p_x - tri.p1.p_x) < (tri.p2.p_x - tri.p1.p_x) * (tri.p3.p_y - tri.p1.p_y); // false=left side, true=right side
 
             effect.gs(tri, *scene, normalTransformMat);

@@ -44,7 +44,6 @@ public:
         int32_t p_y;
         float p_z; 
         slib::vec3 point;
-        slib::vec3 normal;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
         Color color;
@@ -57,7 +56,6 @@ public:
 		{
             Vertex screenPoint;
             screenPoint.point = viewMatrix * fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
             float oneOverW = 1.0f / screenPoint.ndc.w;
             screenPoint.p_x = (int32_t) ((screenPoint.ndc.x * oneOverW + 1.0f) * (scene.screen.width / 2.0f));
