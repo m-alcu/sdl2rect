@@ -47,7 +47,6 @@ public:
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
         Color color;
-        bool projected = false;
 	};
 
 	class VertexShader
