@@ -237,6 +237,7 @@ class Rasterizer {
 
         void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
+            auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
             viewProjection(tri.p1);
             viewProjection(tri.p2);
             viewProjection(tri.p3);
@@ -266,7 +267,7 @@ class Rasterizer {
                                                                               : std::tuple(tri.p2, tri.p3, (endy=tri.p3.p_y) - tri.p2.p_y) );
                 }
                 // On a single scanline, we go from the left X coordinate to the right X coordinate.
-                DrawScanline(hy, sides[0], sides[1], tri.face, tri.flatColor);
+                DrawScanline(hy, sides[0], sides[1], tri.face, tri.flatColor, pixels);
                 hy += scene->screen.width; 
             }
 
@@ -285,8 +286,8 @@ class Rasterizer {
             if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
         };
         
-        inline void DrawScanline(const int& y, Slope& left, Slope& right, const Face& face, const uint32_t flatColor) {
-            auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
+        inline void DrawScanline(const int& y, Slope& left, Slope& right, const Face& face, const uint32_t flatColor, uint32_t* pixels) {
+            
             int xStart = left.getx();
             int xEnd = right.getx();
             int dx = xEnd - xStart;
