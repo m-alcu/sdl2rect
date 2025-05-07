@@ -47,6 +47,7 @@ public:
         int32_t p_x;
         int32_t p_y;
         float p_z; 
+        slib::vec3 world;
         slib::vec3 point;
         slib::vec3 normal;
         slib::vec4 ndc;
@@ -60,7 +61,8 @@ public:
         std::unique_ptr<Vertex> operator()(const VertexData& vData, const slib::mat4& fullTransformMat, const slib::mat4& viewMatrix, const slib::mat4& normalTransformMat, const Scene& scene) const
 		{
             Vertex screenPoint;
-            screenPoint.point = viewMatrix * fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
             screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
             return std::make_unique<Vertex>(screenPoint);
@@ -79,8 +81,7 @@ public:
         
             auto computeColor = [&](const slib::vec3& normal) -> Color {
                 float ds = std::max(0.0f, smath::dot(normal, light)); // diffuse scalar
-                slib::vec3 color = Ka + Kd * ds;
-                return Color(color); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                return Color(Ka + Kd * ds); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
             };
         
             tri.p1.color = computeColor(tri.p1.normal);

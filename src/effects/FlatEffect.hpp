@@ -43,6 +43,7 @@ public:
         int32_t p_x;
         int32_t p_y;
         float p_z; 
+        slib::vec3 world;
         slib::vec3 point;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
@@ -55,7 +56,8 @@ public:
         std::unique_ptr<Vertex> operator()(const VertexData& vData, const slib::mat4& fullTransformMat, const slib::mat4& viewMatrix, const slib::mat4& normalTransformMat, const Scene& scene) const
 		{
             Vertex screenPoint;
-            screenPoint.point = viewMatrix * fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
+            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
             return std::make_unique<Vertex>(screenPoint);
 		}
