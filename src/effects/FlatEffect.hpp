@@ -57,7 +57,7 @@ public:
 		{
             Vertex screenPoint;
             screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
+            screenPoint.point =  slib::vec4(screenPoint.world, 1) * viewMatrix;
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
             return std::make_unique<Vertex>(screenPoint);
 		}

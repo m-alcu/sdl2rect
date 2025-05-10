@@ -6,6 +6,7 @@
 #include "objects/tetrakis.hpp"
 #include "objects/torus.hpp"
 #include "objects/test.hpp"
+#include "objects/floor.hpp"
 #include "objects/ascLoader.hpp"
 #include "objects/objLoader.hpp"
 #include "scene.hpp"
@@ -112,7 +113,7 @@ class Rasterizer {
 
         bool Visible(const Triangle<vertex>& triangle) {
 
-            slib::vec3 viewDir = scene->camera.eye - triangle.p1.world;
+            slib::vec3 viewDir = scene->camera.pos - triangle.p1.world;
             float dotResult = smath::dot(triangle.faceNormal, viewDir);
             // Return whether the triangle is facing the camera
             return dotResult > 0.0f;
