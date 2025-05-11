@@ -11,6 +11,16 @@ enum class Shading {
     Phong
 };
 
+inline std::string shadingToString(Shading s) {
+    switch (s) {
+        case Shading::Flat:  return "<Flat>";
+        case Shading::Gouraud: return "<Gouraud>";
+        case Shading::BlinnPhong: return "<BlinnPhong>";
+        case Shading::Phong: return "<Phong>";
+        default: return "Unknown";
+    }
+}
+
 struct VertexData {
     slib::vec3 vertex;
     slib::vec3 normal;

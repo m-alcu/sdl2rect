@@ -44,6 +44,9 @@ int main(int argc, char** argv)
     Scene scene({height, width});
     scene.lux = smath::normalize(slib::vec3{0, 1, 1});;
     scene.eye = {0, 0, 1};
+    scene.camera.pos = {0, 0, 0};
+    scene.camera.pitch = 0;
+    scene.camera.yaw = 0;
     scene.setup();
 
     float zNear = 100.0f; // Near plane distance
@@ -100,6 +103,8 @@ int main(int argc, char** argv)
             }
         }
 
+
+
         from = SDL_GetTicks();
         renderer.drawScene(scene, zNear, zFar, viewAngle, back);
         to = SDL_GetTicks();
@@ -108,9 +113,10 @@ int main(int argc, char** argv)
         double smoothedMs = frameTimeAvg.update(durationMs);
 
         std::ostringstream oss;
-        oss << "pos.x: " << std::fixed << std::setprecision(2) << scene.camera.pos.x
-            << " pos.y: " << std::fixed << std::setprecision(2) << scene.camera.pos.y
-            << " pos.z: " << std::fixed << std::setprecision(2) << scene.camera.pos.z
+        oss << "pos: (" << std::fixed << std::setprecision(2) << scene.camera.pos.x
+            << "," << std::fixed << std::setprecision(2) << scene.camera.pos.y
+            << "," << std::fixed << std::setprecision(2) << scene.camera.pos.z
+            << ") " << shadingToString(scene.solids[0]->shading)
             << " frames/s: " << std::fixed << std::setprecision(2) << 1000/smoothedMs;
         std::string title = oss.str();
         SDL_SetWindowTitle(window, title.c_str());        
