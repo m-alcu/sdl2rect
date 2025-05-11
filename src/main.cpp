@@ -73,25 +73,17 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                 isRunning = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_LEFT) {
-                scene.camera.yaw = scene.camera.yaw - 1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RIGHT) {
                 scene.camera.yaw = scene.camera.yaw + 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RIGHT) {
+                scene.camera.yaw = scene.camera.yaw - 1;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP) {
-                scene.camera.pitch = scene.camera.pitch + 1;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN) {
                 scene.camera.pitch = scene.camera.pitch - 1;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN) {
+                scene.camera.pitch = scene.camera.pitch + 1;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
-                scene.camera.pos.y = scene.camera.pos.y + 100;
+                scene.camera.pos = scene.camera.pos - scene.camera.forward * cameraSpeed; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
-                scene.camera.pos.y = scene.camera.pos.y - 100;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o) {
-                scene.camera.pos.x = scene.camera.pos.x + 100;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                scene.camera.pos.x = scene.camera.pos.x - 100; 
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_w) {
-                scene.camera.pos.z = scene.camera.pos.z - 100;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s) {
-                scene.camera.pos.z = scene.camera.pos.z + 100;                                         
+                scene.camera.pos = scene.camera.pos + scene.camera.forward * cameraSpeed; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.solids[0]->shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {

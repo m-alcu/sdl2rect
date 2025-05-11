@@ -20,6 +20,7 @@ struct Camera
     slib::vec3 up;
     float pitch;
     float yaw;
+    slib::vec3 forward;
 };
 
 typedef struct Screen
