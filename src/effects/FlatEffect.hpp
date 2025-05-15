@@ -88,17 +88,18 @@ public:
 	class PixelShader
 	{
 	public:
-		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
+		uint32_t operator()(Vertex& vRaster, const Scene& scene, Triangle<Vertex>& tri) const
 		{
 
             float w = 1 / vRaster.tex.w;
-            auto tx = static_cast<int>(vRaster.tex.x * w * (face.material.map_Kd.w - 1));
-            auto ty = static_cast<int>(vRaster.tex.y * w * (face.material.map_Kd.h - 1));
-            int index = ( tx + ty * face.material.map_Kd.w ) * face.material.map_Kd.bpp;
-            auto r = face.material.map_Kd.data[index];
-            auto g = face.material.map_Kd.data[index + 1];
-            auto b = face.material.map_Kd.data[index + 2];
-			return Color(r,g,b).toBgra();
+            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.face.material.map_Kd.w - 1));
+            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.face.material.map_Kd.h - 1));
+            int index = ( tx + ty * tri.face.material.map_Kd.w ) * tri.face.material.map_Kd.bpp;
+
+            return Color(
+                tri.face.material.map_Kd.data[index] * tri.flatDiffuse,
+                tri.face.material.map_Kd.data[index + 1] * tri.flatDiffuse,
+                tri.face.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 public:
