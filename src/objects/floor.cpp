@@ -8,10 +8,24 @@ void Floor::loadVertices() {
     const float half = 10.f;
 
     std::vector<VertexData> vertices;
-    vertices.push_back({   half,  half,  0 });
-    vertices.push_back({  -half,  half,  0 });
-    vertices.push_back({  -half, -half,  0 });
-    vertices.push_back({   half, -half,  0 });
+
+    VertexData vertexData;
+    vertexData.vertex = {  half,  half,  0 };
+    vertexData.texCoord = { 0, 0 };
+
+    vertices.push_back(vertexData);
+
+    vertexData.vertex = { -half,  half,  0 };
+    vertexData.texCoord = { 1, 0 };
+    vertices.push_back(vertexData);
+
+    vertexData.vertex = { -half, -half,  0 };
+    vertexData.texCoord = { 1, 1 };
+    vertices.push_back(vertexData);
+
+    vertexData.vertex = {  half, -half,  0 };
+    vertexData.texCoord = { 0, 1 };
+    vertices.push_back(vertexData);
 
     this->vertexData = vertices;
     this->numVertices = vertices.size();
@@ -23,27 +37,27 @@ void Floor::loadFaces() {
 
     std::vector<FaceData> faces;
 
-    FaceData face;
+    std::string materialKey = "floorTexture";
+    std::string mtlPath = "checker-map_tho.png";
 
-    face.face.vertex1 = 0;
-    face.face.vertex2 = 1;
-    face.face.vertex3 = 2;
-    face.face.material.Ka = { properties.k_a * 0x22, properties.k_a * 0x22, properties.k_a * 0x22 };
-    face.face.material.Kd = { properties.k_d * 0x22, properties.k_d * 0x22, properties.k_d * 0x22 }; 
-    face.face.material.Ks = { properties.k_s * 0x22, properties.k_s * 0x22, properties.k_s * 0x22 };
-    face.face.material.Ns = properties.shininess;
-    faces.push_back(face);
+    // Create the material
+    slib::material material{};
+    material.map_Kd = DecodePng(std::string(RES_PATH + mtlPath).c_str());
+    materials.insert({materialKey, material});
 
-    face.face.vertex1 = 0;
-    face.face.vertex2 = 2;
-    face.face.vertex3 = 3;
-    face.face.material.Ka = { properties.k_a * 0x22, properties.k_a * 0x22, properties.k_a * 0x22 };
-    face.face.material.Kd = { properties.k_d * 0x22, properties.k_d * 0x22, properties.k_d * 0x22 };
-    face.face.material.Ks = { properties.k_s * 0x22, properties.k_s * 0x22, properties.k_s * 0x22 };
-    face.face.material.Ns = properties.shininess;
-    faces.push_back(face);
 
-    this->faceData = faces;
+    FaceData face1 {
+        .face = {0, 1, 2, materials.at(materialKey), materialKey},
+        .faceNormal = {0, 0, 1}
+    };
+
+    FaceData face2 {
+        .face = {0, 2, 3, materials.at(materialKey), materialKey},
+        .faceNormal = {0, 0, 1}
+    };
+
+    this->faceData.push_back(face1);
+    this->faceData.push_back(face2);
     this->numFaces = faces.size();
 
 }

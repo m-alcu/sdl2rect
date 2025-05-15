@@ -7,7 +7,7 @@ void Scene::setup() {
     halfwayVector = smath::normalize(lux + eye);
 
 
-    
+    /*
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -21,20 +21,20 @@ void Scene::setup() {
     torus->shading = Shading::Flat;
     
     addSolid(std::move(torus));
-    
-    /*    
+    */
+        
     auto floor = std::make_unique<Floor>();
     floor->setup();
     floor->position.z = -500;
     floor->position.x = 0;
     floor->position.y = 0;
-    floor->position.zoom = 10;
+    floor->position.zoom = 20;
     floor->position.xAngle = 0.0f;
     floor->position.yAngle = 0.0f;
     floor->position.zAngle = 0.0f;
     floor->shading = Shading::Flat;
     addSolid(std::move(floor));
-    */
+    
 
     /*
     auto ascLoader = std::make_unique<AscLoader>();

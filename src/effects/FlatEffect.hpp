@@ -12,19 +12,19 @@ public:
 	public:
     Vertex() {}
 
-    Vertex(int32_t px, int32_t py, float pz, slib::vec4 vp) :
-    p_x(px), p_y(py), p_z(pz), ndc(vp) {}
+    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, slib::zvec2 _tex, Color _color) :
+    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), tex(_tex), color(_color) {}
 
     Vertex operator+(const Vertex &v) const {
-        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, ndc + v.ndc);
+        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, tex + v.tex, color + v.color);
     }
 
     Vertex operator-(const Vertex &v) const {
-        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, ndc - v.ndc);
+        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, tex - v.tex, color - v.color);
     }
 
     Vertex operator*(const float &rhs) const {
-        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, ndc * rhs);
+        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs, color * rhs);
     }
 
     Vertex(int32_t px) :
@@ -35,7 +35,10 @@ public:
         p_x += v.p_x;
         p_y += v.p_y;
         p_z += v.p_z;
+        normal += v.normal;
         ndc += v.ndc;
+        tex += v.tex;
+        color += v.color;
         return *this;
     }
         
@@ -45,6 +48,7 @@ public:
         float p_z; 
         slib::vec3 world;
         slib::vec3 point;
+        slib::vec3 normal;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
         Color color;
@@ -59,6 +63,7 @@ public:
             screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
             screenPoint.point =  slib::vec4(screenPoint.world, 1) * viewMatrix;
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+            screenPoint.tex = slib::zvec2(vData.texCoord.x, vData.texCoord.y, 1);
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};
@@ -74,8 +79,8 @@ public:
             const auto& Kd = tri.face.material.Kd; // vec3
             const auto& light = scene.lux;         // vec3
 
-            float diff = std::max(0.0f, smath::dot(tri.faceNormal,light));
-            slib::vec3 color = Ka + Kd * diff;
+            tri.flatDiffuse = std::max(0.0f, smath::dot(tri.faceNormal,light));
+            slib::vec3 color = Ka + Kd * tri.flatDiffuse;
             tri.flatColor = Color(color).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
@@ -85,7 +90,15 @@ public:
 	public:
 		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
 		{
-			return flatColor;
+
+            float w = 1 / vRaster.tex.w;
+            auto tx = static_cast<int>(vRaster.tex.x * w * (face.material.map_Kd.w - 1));
+            auto ty = static_cast<int>(vRaster.tex.y * w * (face.material.map_Kd.h - 1));
+            int index = ( tx + ty * face.material.map_Kd.w ) * face.material.map_Kd.bpp;
+            auto r = face.material.map_Kd.data[index];
+            auto g = face.material.map_Kd.data[index + 1];
+            auto b = face.material.map_Kd.data[index + 2];
+			return Color(r,g,b).toBgra();
 		}
 	};
 public:

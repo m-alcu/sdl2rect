@@ -290,6 +290,9 @@ class Rasterizer {
             p.p_x = static_cast<int>((p.ndc.x * oneOverW + 1.0f) * (scene->screen.width / 2.0f)); // Convert from NDC to screen coordinates
             p.p_y = static_cast<int>((p.ndc.y * oneOverW + 1.0f) * (scene->screen.height / 2.0f)); // Convert from NDC to screen coordinates
             p.p_z = p.ndc.z * oneOverW; // Store the depth value in the z-buffer
+            p.tex.x = p.tex.x * oneOverW;
+            p.tex.y = p.tex.y * oneOverW;
+            p.tex.w = oneOverW;   
         }
  
         inline void orderVertices(vertex *p1, vertex *p2, vertex *p3) {
