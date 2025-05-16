@@ -36,6 +36,21 @@ void Tetrakis::loadFaces() {
 
     std::vector<FaceData> faces;
 
+    MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
+    // Create and store the material
+    slib::material material{};
+    material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
+    material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+    material.Ns = properties.shininess;
+    materials.insert({"blue", material});
+
+    material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
+    material.Ns = properties.shininess;
+    materials.insert({"white", material});    
+
     // Define the quadrilaterals (outer vertices) and centers for each face group.
     const uint16_t quads[6][4] = {
         {2, 0, 1, 3},  // group 0, center 8
@@ -59,18 +74,10 @@ void Tetrakis::loadFaces() {
             face.face.vertex2 = quads[i][j];
             face.face.vertex3 = centers[i];
 
-            MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
-
             if (j % 2 == 0) {
-                face.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-                face.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-                face.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-                face.face.material.Ns = properties.shininess;
+                face.face.materialKey = "blue";
             } else {
-                face.face.material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
-                face.face.material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
-                face.face.material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
-                face.face.material.Ns = properties.shininess;
+                face.face.materialKey = "white";
             }
 
             faces.push_back(face);

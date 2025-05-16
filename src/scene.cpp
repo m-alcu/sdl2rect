@@ -37,6 +37,7 @@ void Scene::setup() {
     addSolid(std::move(cube));
     */
 
+    /*
     auto test = std::make_unique<Test>();
     test->setup();
     test->position.z = -500;
@@ -48,7 +49,7 @@ void Scene::setup() {
     test->position.zAngle = 0.0f;
     test->shading = Shading::Flat;
     addSolid(std::move(test));
-
+    */
 
     /*
     auto ascLoader = std::make_unique<AscLoader>();
@@ -81,7 +82,7 @@ void Scene::setup() {
     addSolid(std::move(obj));
     */
 
-    /*
+    
     auto tetrakis = std::make_unique<Tetrakis>();
     tetrakis->setup();
 
@@ -94,7 +95,7 @@ void Scene::setup() {
     tetrakis->position.zAngle = 0.0f;
     
     addSolid(std::move(tetrakis));
-    */
+    
 
     /*
     auto torus = std::make_unique<Test>(8, 4);
