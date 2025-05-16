@@ -30,9 +30,9 @@ struct VertexData {
 
 typedef struct Face
 {
-    int16_t vertex1;
-    int16_t vertex2;
-    int16_t vertex3;
+    int vertex1;
+    int vertex2;
+    int vertex3;
     std::string textureName;
 } Face;
 
