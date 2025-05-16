@@ -99,7 +99,8 @@ class Rasterizer {
                     *projectedPoints[face.vertex2],
                     *projectedPoints[face.vertex3],
                     face,
-                    rotatedFaceNormal
+                    rotatedFaceNormal,
+                    solid->materials.at(face.textureName)
                 );
             
                 if (Visible(tri)) {
@@ -151,7 +152,7 @@ class Rasterizer {
 
             // Triangulate fan-style and draw
             for (size_t i = 1; i + 1 < polygon.size(); ++i) {
-                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.face, t.faceNormal);
+                Triangle<vertex> tri(polygon[0], polygon[i], polygon[i + 1], t.face, t.faceNormal, t.material);
                 draw(tri,
                     [&](const vertex from, const vertex to, int num_steps)
                     {

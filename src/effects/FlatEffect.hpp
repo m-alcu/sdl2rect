@@ -75,8 +75,8 @@ public:
         void operator()(Triangle<Vertex>& tri, const Scene& scene) const
 		{
 
-            const auto& Ka = tri.face.material.Ka; // vec3
-            const auto& Kd = tri.face.material.Kd; // vec3
+            const auto& Ka = tri.material.Ka; // vec3
+            const auto& Kd = tri.material.Kd; // vec3
             const auto& light = scene.lux;         // vec3
 
             tri.flatDiffuse = std::max(0.0f, smath::dot(tri.faceNormal,light));
@@ -92,14 +92,14 @@ public:
 		{
 
             float w = 1 / vRaster.tex.w;
-            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.face.material.map_Kd.w - 1));
-            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.face.material.map_Kd.h - 1));
-            int index = ( tx + ty * tri.face.material.map_Kd.w ) * tri.face.material.map_Kd.bpp;
+            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
+            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));
+            int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
 
             return Color(
-                tri.face.material.map_Kd.data[index] * tri.flatDiffuse,
-                tri.face.material.map_Kd.data[index + 1] * tri.flatDiffuse,
-                tri.face.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                tri.material.map_Kd.data[index] * tri.flatDiffuse,
+                tri.material.map_Kd.data[index + 1] * tri.flatDiffuse,
+                tri.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 public:

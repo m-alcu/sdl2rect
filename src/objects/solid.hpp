@@ -33,7 +33,6 @@ typedef struct Face
     int16_t vertex1;
     int16_t vertex2;
     int16_t vertex3;
-    slib::material& material;
     std::string textureName;
 } Face;
 

@@ -88,7 +88,6 @@ void Cube::loadFaces() {
                 static_cast<int16_t>(baseIndex + 0),
                 static_cast<int16_t>(baseIndex + 1),
                 static_cast<int16_t>(baseIndex + 2),
-                materials.at(materialKey),
                 materialKey
             }
         };
@@ -98,7 +97,6 @@ void Cube::loadFaces() {
                 static_cast<int16_t>(baseIndex + 3),
                 static_cast<int16_t>(baseIndex + 4),
                 static_cast<int16_t>(baseIndex + 5),
-                materials.at(materialKey),
                 materialKey
             }
         };
