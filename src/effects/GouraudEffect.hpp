@@ -62,9 +62,9 @@ public:
 		{
             Vertex screenPoint;
             screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
-            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.point =  slib::vec4(screenPoint.world, 1) * viewMatrix;
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};
@@ -75,8 +75,8 @@ public:
     
         void operator()(Triangle<Vertex>& tri, const Scene& scene) const
         {
-            const auto& Ka = tri.face.material.Ka; // vec3
-            const auto& Kd = tri.face.material.Kd; // vec3
+            const auto& Ka = tri.material.Ka; // vec3
+            const auto& Kd = tri.material.Kd; // vec3
             const auto& light = scene.lux;         // vec3
         
             auto computeColor = [&](const slib::vec3& normal) -> Color {
@@ -93,7 +93,7 @@ public:
 	class PixelShader
 	{
 	public:
-		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
+		uint32_t operator()(Vertex& vRaster, const Scene& scene, Triangle<Vertex>& tri) const
 		{
 			return vRaster.color.toBgra();
 		}

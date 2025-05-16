@@ -5,6 +5,9 @@
 #include "objects/solid.hpp"
 #include "rasterizer.hpp"
 #include "effects/flatEffect.hpp"
+#include "effects/GouraudEffect.hpp"
+#include "effects/BlinnPhongEffect.hpp"
+#include "effects/PhongEffect.hpp"
 
 class Renderer {
 
@@ -48,9 +51,9 @@ class Renderer {
         }
         
         Rasterizer<FlatEffect> flatRasterizer;
-        Rasterizer<FlatEffect> gouraudRasterizer;
-        Rasterizer<FlatEffect> phongRasterizer;
-        Rasterizer<FlatEffect> blinnPhongRasterizer;
+        Rasterizer<GouraudEffect> gouraudRasterizer;
+        Rasterizer<PhongEffect> phongRasterizer;
+        Rasterizer<BlinnPhongEffect> blinnPhongRasterizer;
 };
 
 

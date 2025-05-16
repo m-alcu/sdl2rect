@@ -62,9 +62,9 @@ public:
 		{
             Vertex screenPoint;
             screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
-            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.point =  slib::vec4(screenPoint.world, 1) * viewMatrix;
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};
@@ -81,12 +81,12 @@ public:
 	class PixelShader
 	{
 	public:
-		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
+		uint32_t operator()(Vertex& vRaster, const Scene& scene, Triangle<Vertex>& tri) const
 		{
 
-            const auto& Ka = face.material.Ka; // vec3
-            const auto& Kd = face.material.Kd; // vec3
-            const auto& Ks = face.material.Ks; // vec3
+            const auto& Ka = tri.material.Ka; // vec3
+            const auto& Kd = tri.material.Kd; // vec3
+            const auto& Ks = tri.material.Ks; // vec3
             const auto& light = scene.lux;         // vec3
 
             slib::vec3 normal = smath::normalize(vRaster.normal);
@@ -94,7 +94,7 @@ public:
         
             slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
             float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
-            float spec = std::pow(specAngle, face.material.Ns);
+            float spec = std::pow(specAngle, tri.material.Ns);
         
             if (spec > 0.95) { 
                 return 0xffffffff; // White point if the light is too close to the normal

@@ -61,9 +61,9 @@ public:
 		{
             Vertex screenPoint;
             screenPoint.world = fullTransformMat * slib::vec4(vData.vertex, 1);
-            screenPoint.point = viewMatrix * slib::vec4(screenPoint.world, 1);
-            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
+            screenPoint.point =  slib::vec4(screenPoint.world, 1) * viewMatrix;
             screenPoint.ndc = slib::vec4(screenPoint.point, 1) * scene.projectionMatrix;
+            screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             return std::make_unique<Vertex>(screenPoint);
 		}
 	};
@@ -80,12 +80,12 @@ public:
 	class PixelShader
 	{
 	public:
-		uint32_t operator()(Vertex& vRaster, const Scene& scene, const Face& face, uint32_t flatColor) const
+		uint32_t operator()(Vertex& vRaster, const Scene& scene, Triangle<Vertex>& tri) const
 		{
 
-            const auto& Ka = face.material.Ka; // vec3
-            const auto& Kd = face.material.Kd; // vec3
-            const auto& Ks = face.material.Ks; // vec3
+            const auto& Ka = tri.material.Ka; // vec3
+            const auto& Kd = tri.material.Kd; // vec3
+            const auto& Ks = tri.material.Ks; // vec3
             // Normalize vectors
             slib::vec3 N = smath::normalize(vRaster.normal); // Normal at the fragment
             slib::vec3 L = scene.lux; // Light direction
@@ -99,7 +99,7 @@ public:
         
             // Specular component: spec = (N · H)^shininess
             float specAngle = std::max(0.0f, smath::dot(N,scene.halfwayVector)); // viewer
-            float spec = std::pow(specAngle, face.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
+            float spec = std::pow(specAngle, tri.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
         
             if (spec > 0.95) { 
                 return 0xffffffff; // White point if the light is too close to the normal
