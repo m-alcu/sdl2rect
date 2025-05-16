@@ -12,7 +12,7 @@
                 "src\\backgrounds\\desert.cpp",
                 "src\\backgrounds\\imagepng.cpp",
                 "src\\objects\\solid.cpp",
-                "src\\objects\\floor.cpp",  
+                "src\\objects\\cube.cpp",  
                 "src\\slib.cpp",
                 "src\\smath.cpp",
                 "src\\scene.cpp",

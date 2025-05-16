@@ -23,17 +23,17 @@ void Scene::setup() {
     addSolid(std::move(torus));
     */
         
-    auto floor = std::make_unique<Floor>();
-    floor->setup();
-    floor->position.z = -500;
-    floor->position.x = 0;
-    floor->position.y = 0;
-    floor->position.zoom = 20;
-    floor->position.xAngle = 0.0f;
-    floor->position.yAngle = 0.0f;
-    floor->position.zAngle = 0.0f;
-    floor->shading = Shading::Flat;
-    addSolid(std::move(floor));
+    auto cube = std::make_unique<Cube>();
+    cube->setup();
+    cube->position.z = -500;
+    cube->position.x = 0;
+    cube->position.y = 0;
+    cube->position.zoom = 20;
+    cube->position.xAngle = 0.0f;
+    cube->position.yAngle = 0.0f;
+    cube->position.zAngle = 0.0f;
+    cube->shading = Shading::Flat;
+    addSolid(std::move(cube));
     
 
     /*

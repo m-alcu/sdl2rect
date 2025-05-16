@@ -6,7 +6,7 @@
 #include "objects/tetrakis.hpp"
 #include "objects/torus.hpp"
 #include "objects/test.hpp"
-#include "objects/floor.hpp"
+#include "objects/cube.hpp"
 #include "objects/ascLoader.hpp"
 #include "objects/objLoader.hpp"
 #include "scene.hpp"
