@@ -11,58 +11,58 @@ void Cube::loadVertices() {
     VertexData v;
 
     // Front face (z = +half)
-    v.vertex = { -half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
     
-    v.vertex = { -half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { -half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     // Back face (z = -half)
-    v.vertex = { +half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { -half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { -half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { +half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { -half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { -half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
 
-    v.vertex = { +half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { -half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { +half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { +half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { -half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { +half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     // Left face (x = -half)
-    v.vertex = { -half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { -half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { -half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { -half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { -half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
 
-    v.vertex = { -half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { -half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { -half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { -half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     // Right face (x = +half)
-    v.vertex = { +half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { +half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
 
-    v.vertex = { +half, -half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { +half, +half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { +half, -half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { +half, +half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     // Top face (y = +half)
-    v.vertex = { -half, +half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { -half, +half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
 
-    v.vertex = { -half, +half, +half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { -half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, +half, +half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, +half, -half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, +half, -half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     // Bottom face (y = -half)
-    v.vertex = { -half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
-    v.vertex = { +half, -half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
+    v.vertex = { +half, -half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
 
-    v.vertex = { -half, -half, -half }; v.texCoord = { 0, 1 }; vertices.push_back(v);
-    v.vertex = { +half, -half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
-    v.vertex = { -half, -half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, -half }; v.texCoord = { 1, 1 }; vertices.push_back(v);
+    v.vertex = { +half, -half, +half }; v.texCoord = { 0, 0 }; vertices.push_back(v);
+    v.vertex = { -half, -half, +half }; v.texCoord = { 1, 0 }; vertices.push_back(v);
 
     this->vertexData = vertices;
     this->numVertices = vertices.size();
