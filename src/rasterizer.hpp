@@ -100,7 +100,7 @@ class Rasterizer {
                     *projectedPoints[face.vertex3],
                     face,
                     rotatedFaceNormal,
-                    solid->materials.at(face.textureName)
+                    solid->materials.at(face.materialKey)
                 );
             
                 if (Visible(tri)) {

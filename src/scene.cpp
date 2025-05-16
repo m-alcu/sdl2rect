@@ -23,6 +23,7 @@ void Scene::setup() {
     addSolid(std::move(torus));
     */
         
+    /*
     auto cube = std::make_unique<Cube>();
     cube->setup();
     cube->position.z = -500;
@@ -34,7 +35,20 @@ void Scene::setup() {
     cube->position.zAngle = 0.0f;
     cube->shading = Shading::Flat;
     addSolid(std::move(cube));
-    
+    */
+
+    auto test = std::make_unique<Test>();
+    test->setup();
+    test->position.z = -500;
+    test->position.x = 0;
+    test->position.y = 0;
+    test->position.zoom = 20;
+    test->position.xAngle = 0.0f;
+    test->position.yAngle = 0.0f;
+    test->position.zAngle = 0.0f;
+    test->shading = Shading::Flat;
+    addSolid(std::move(test));
+
 
     /*
     auto ascLoader = std::make_unique<AscLoader>();

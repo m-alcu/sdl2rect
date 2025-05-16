@@ -91,6 +91,11 @@ public:
 		uint32_t operator()(Vertex& vRaster, const Scene& scene, Triangle<Vertex>& tri) const
 		{
 
+            if (tri.material.map_Kd.data.empty())
+            {
+                return tri.flatColor;
+            }
+
             float w = 1 / vRaster.tex.w;
             auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
             auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));

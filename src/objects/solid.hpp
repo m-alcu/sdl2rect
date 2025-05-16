@@ -33,7 +33,7 @@ typedef struct Face
     int vertex1;
     int vertex2;
     int vertex3;
-    std::string textureName;
+    std::string materialKey;
 } Face;
 
 struct FaceData {
