@@ -33,6 +33,19 @@ void ObjLoader::loadVertices(const std::string& filename) {
 
     MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
+    slib::material material{};
+    material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
+    material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
+    material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
+    material.Ns = properties.shininess;
+    materials.insert({"blue", material});
+
+    material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
+    material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
+    material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
+    material.Ns = properties.shininess;
+    materials.insert({"white", material});  
+
     while (std::getline(file, line)) {
         // Remove leading/trailing spaces
         line.erase(0, line.find_first_not_of(" \t\r\n"));
@@ -68,11 +81,7 @@ void ObjLoader::loadVertices(const std::string& filename) {
                 faceData.face.vertex1 = std::stoi(match[3])-1;
                 faceData.face.vertex2 = std::stoi(match[2])-1;
                 faceData.face.vertex3 = std::stoi(match[1])-1;
-                faceData.face.material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
-                faceData.face.material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc };
-                faceData.face.material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
-                faceData.face.material.Ns = properties.shininess;
-
+                faceData.face.materialKey = "blue"; // Default material key
                 faces.push_back(faceData);
             }
         }
