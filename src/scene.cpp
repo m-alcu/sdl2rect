@@ -7,7 +7,7 @@ void Scene::setup() {
     halfwayVector = smath::normalize(lux + eye);
 
 
-    /*
+    
     auto torus = std::make_unique<Torus>();
     torus->setup(20, 10, 500, 250);
 
@@ -21,7 +21,7 @@ void Scene::setup() {
     torus->shading = Shading::Flat;
     
     addSolid(std::move(torus));
-    */
+    
         
     /*
     auto cube = std::make_unique<Cube>();
@@ -82,7 +82,7 @@ void Scene::setup() {
     addSolid(std::move(obj));
     */
 
-    
+    /*
     auto tetrakis = std::make_unique<Tetrakis>();
     tetrakis->setup();
 
@@ -95,7 +95,7 @@ void Scene::setup() {
     tetrakis->position.zAngle = 0.0f;
     
     addSolid(std::move(tetrakis));
-    
+    */
 
     /*
     auto torus = std::make_unique<Test>(8, 4);
