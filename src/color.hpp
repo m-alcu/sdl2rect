@@ -14,11 +14,20 @@ public:
     Color(const slib::vec3& v) : slib::vec3(v) {}
 
     // Convert to BGRA (assumes 0–255 range)
-    uint32_t toBgra() const {
+    uint32_t toBgra() {
+
+        float maxComponent = std::max({x, y, z});
+        if (maxComponent > 255.0f) {
+            float scale = 255.0f / maxComponent;
+            x *= scale;
+            y *= scale;
+            z *= scale;
+        }
+
         return 0xff000000 |
-               ((static_cast<int>(x) & 0xFF) << 16) |
-               ((static_cast<int>(y) & 0xFF) << 8) |
-               ((static_cast<int>(z) & 0xFF));
+               ((static_cast<int>(x)) << 16) |
+               ((static_cast<int>(y)) << 8) |
+               ((static_cast<int>(z)));
     }
 
     float& blue()  { return x; }

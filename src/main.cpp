@@ -93,7 +93,9 @@ int main(int argc, char** argv)
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
                 scene.solids[0]->shading = Shading::BlinnPhong;                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
-                scene.solids[0]->shading = Shading::Phong;                                 
+                scene.solids[0]->shading = Shading::Phong;   
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_u) {
+                scene.solids[0]->shading = Shading::TexturedPhong;                                                 
             }
         }
 

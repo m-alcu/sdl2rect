@@ -10,7 +10,8 @@ enum class Shading {
     Gouraud,
     TexturedGouraud,
     BlinnPhong,
-    Phong
+    Phong,
+    TexturedPhong
 };
 
 inline std::string shadingToString(Shading s) {
@@ -20,6 +21,7 @@ inline std::string shadingToString(Shading s) {
         case Shading::BlinnPhong: return "<BlinnPhong>";
         case Shading::TexturedGouraud: return "<TexturedGouraud>";
         case Shading::Phong: return "<Phong>";
+        case Shading::TexturedPhong: return "<TexturedPhong>";
         default: return "Unknown";
     }
 }
