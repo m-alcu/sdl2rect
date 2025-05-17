@@ -86,6 +86,8 @@ int main(int argc, char** argv)
                 scene.camera.pos = scene.camera.pos + scene.camera.forward * cameraSpeed; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
                 scene.solids[0]->shading = Shading::Flat;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_r) {
+                scene.solids[0]->shading = Shading::TexturedFlat;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.solids[0]->shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_t) {

@@ -8,6 +8,7 @@
 #include "effects/GouraudEffect.hpp"
 #include "effects/BlinnPhongEffect.hpp"
 #include "effects/PhongEffect.hpp"
+#include "effects/TexturedFlatEffect.hpp"
 #include "effects/TexturedGouraudEffect.hpp"
 #include "effects/TexturedPhongEffect.hpp"
 #include "effects/TexturedBlinnPhongEffect.hpp"
@@ -23,7 +24,10 @@ class Renderer {
                 switch (solidPtr->shading) {
                     case Shading::Flat: 
                         flatRasterizer.drawRenderable(*solidPtr, scene);
-                        break;      
+                        break;   
+                    case Shading::TexturedFlat: 
+                        texturedFlatRasterizer.drawRenderable(*solidPtr, scene);
+                        break;                             
                     case Shading::Gouraud: 
                         gouraudRasterizer.drawRenderable(*solidPtr, scene);
                         break;
@@ -66,6 +70,7 @@ class Renderer {
         Rasterizer<GouraudEffect> gouraudRasterizer;
         Rasterizer<PhongEffect> phongRasterizer;
         Rasterizer<BlinnPhongEffect> blinnPhongRasterizer;
+        Rasterizer<TexturedFlatEffect> texturedFlatRasterizer;
         Rasterizer<TexturedGouraudEffect> texturedGouraudRasterizer;
         Rasterizer<TexturedPhongEffect> texturedPhongRasterizer;
         Rasterizer<TexturedBlinnPhongEffect> texturedBlinnPhongRasterizer;
