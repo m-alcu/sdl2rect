@@ -251,9 +251,9 @@ class Rasterizer {
         void draw(Triangle<vertex>& tri, auto&& MakeSlope) {
 
             auto* pixels = static_cast<uint32_t*>(scene->sdlSurface->pixels);
-            viewProjection(tri.p1);
-            viewProjection(tri.p2);
-            viewProjection(tri.p3);
+            effect.vs.viewProjection(*scene, tri.p1);
+            effect.vs.viewProjection(*scene, tri.p2);
+            effect.vs.viewProjection(*scene, tri.p3);
             orderVertices(&tri.p1, &tri.p2, &tri.p3);
             if(tri.p1.p_y == tri.p3.p_y) return;
 
@@ -286,16 +286,6 @@ class Rasterizer {
 
         };
 
-        inline void viewProjection(vertex& p) {
-            float oneOverW = 1.0f / p.ndc.w;
-            p.p_x = static_cast<int>((p.ndc.x * oneOverW + 1.0f) * (scene->screen.width / 2.0f)); // Convert from NDC to screen coordinates
-            p.p_y = static_cast<int>((p.ndc.y * oneOverW + 1.0f) * (scene->screen.height / 2.0f)); // Convert from NDC to screen coordinates
-            p.p_z = p.ndc.z * oneOverW; // Store the depth value in the z-buffer
-            p.tex.x = p.tex.x * oneOverW;
-            p.tex.y = p.tex.y * oneOverW;
-            p.tex.w = oneOverW;   
-        }
- 
         inline void orderVertices(vertex *p1, vertex *p2, vertex *p3) {
             if (p1->p_y > p2->p_y) std::swap(*p1,*p2);
             if (p2->p_y > p3->p_y) std::swap(*p2,*p3);

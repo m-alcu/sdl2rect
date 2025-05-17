@@ -13,23 +13,20 @@ public:
 	public:
     Vertex() {}
 
-    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, slib::zvec2 _tex, Color _color) :
-    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), tex(_tex), color(_color) {}
+    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp) :
+    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp) {}
 
     Vertex operator+(const Vertex &v) const {
-        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, tex + v.tex, color + v.color);
+        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc);
     }
 
     Vertex operator-(const Vertex &v) const {
-        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, tex - v.tex, color - v.color);
+        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc);
     }
 
     Vertex operator*(const float &rhs) const {
-        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs, color * rhs);
+        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs);
     }
-
-    Vertex(int32_t px) :
-    p_x(px) {}
 
     Vertex& operator+=(const Vertex &v) {
         p_x += v.p_x;
@@ -37,8 +34,6 @@ public:
         p_z += v.p_z;
         normal += v.normal;
         ndc += v.ndc;
-        tex += v.tex;
-        color += v.color;
         return *this;
     }
         
@@ -50,8 +45,6 @@ public:
         slib::vec3 point;
         slib::vec3 normal;
         slib::vec4 ndc;
-        slib::zvec2 tex; // Texture coordinates
-        Color color;
 	};
     
 	class VertexShader
@@ -66,6 +59,13 @@ public:
             screenPoint.normal = normalTransformMat * slib::vec4(vData.normal, 0);
             return std::make_unique<Vertex>(screenPoint);
 		}
+
+        void viewProjection(const Scene& scene, Vertex& p) {
+            float oneOverW = 1.0f / p.ndc.w;
+            p.p_x = static_cast<int>((p.ndc.x * oneOverW + 1.0f) * (scene.screen.width / 2.0f)); // Convert from NDC to screen coordinates
+            p.p_y = static_cast<int>((p.ndc.y * oneOverW + 1.0f) * (scene.screen.height / 2.0f)); // Convert from NDC to screen coordinates
+            p.p_z = p.ndc.z * oneOverW; // Store the depth value in the z-buffer
+        }
 	};
 
     class GeometryShader
