@@ -29,34 +29,6 @@ public:
                (static_cast<int>(z));
     }
 
-    uint32_t toBgraToneMapping() {
-
-    constexpr float inv255 = 1.0f / 255.0f;
-    constexpr float invGamma = 1.0f / 2.2f;
-
-    // Normalize to 0..1 before tone mapping
-    float r = z * inv255;
-    float g = y * inv255;
-    float b = x * inv255;
-
-    // Apply Reinhard tone mapping: color = color / (color + 1)
-    r = r / (1.0f + r);
-    g = g / (1.0f + g);
-    b = b / (1.0f + b);
-
-    // Apply gamma correction (sRGB gamma ≈ 2.2)
-    r = powf(r, invGamma);
-    g = powf(g, invGamma);
-    b = powf(b, invGamma);
-
-    // Scale to [0, 255] and pack as BGRA
-    return 0xff000000 |
-           (static_cast<int>(r * 255.0f) << 16) |
-           (static_cast<int>(g * 255.0f) << 8) |
-           (static_cast<int>(b * 255.0f));
-
-    }
-
     float& blue()  { return x; }
     float& green() { return y; }
     float& red()   { return z; }

@@ -13,24 +13,21 @@ public:
 	public:
     Vertex() {}
 
-    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, slib::zvec2 _tex, Color _color) :
-    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), tex(_tex), color(_color) {}
+    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp, slib::zvec2 _tex) :
+    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp), tex(_tex) {}
 
     Vertex operator+(const Vertex &v) const {
-        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, tex + v.tex, color + v.color);
+        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc, tex + v.tex);
     }
 
     Vertex operator-(const Vertex &v) const {
-        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, tex - v.tex, color - v.color);
+        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc, tex - v.tex);
     }
 
     Vertex operator*(const float &rhs) const {
-        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs, color * rhs);
+        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs);
     }
 
-    Vertex(int32_t px) :
-    p_x(px) {}
-    
 
     Vertex& operator+=(const Vertex &v) {
         p_x += v.p_x;
@@ -39,7 +36,6 @@ public:
         normal += v.normal;
         ndc += v.ndc;
         tex += v.tex;
-        color += v.color;
         return *this;
     }
         
@@ -52,7 +48,6 @@ public:
         slib::vec3 normal;
         slib::vec4 ndc;
         slib::zvec2 tex; // Texture coordinates
-        Color color;
 	};
     
 	class VertexShader
@@ -115,7 +110,7 @@ public:
             return Color(
                 tri.material.map_Kd.data[index] * diff + Ks.x * spec,
                 tri.material.map_Kd.data[index + 1] * diff + Ks.y * spec,  
-                tri.material.map_Kd.data[index + 2] * diff + Ks.z * spec).toBgraToneMapping(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                tri.material.map_Kd.data[index + 2] * diff + Ks.z * spec).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 
         }
 	};
