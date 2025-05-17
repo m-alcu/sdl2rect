@@ -28,10 +28,6 @@ public:
         return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs, tex * rhs, diffuse * rhs);
     }
 
-    Vertex(int32_t px) :
-    p_x(px) {}
-    
-
     Vertex& operator+=(const Vertex &v) {
         p_x += v.p_x;
         p_y += v.p_y;
