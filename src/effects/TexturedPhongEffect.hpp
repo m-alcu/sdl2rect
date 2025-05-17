@@ -109,7 +109,7 @@ public:
             return Color(
                 tri.material.map_Kd.data[index] * diff + Ks.x * spec,
                 tri.material.map_Kd.data[index + 1] * diff + Ks.y * spec,  
-                tri.material.map_Kd.data[index + 2] * diff + Ks.z * spec).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                tri.material.map_Kd.data[index + 2] * diff + Ks.z * spec).toBgraToneMapping(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 
 		}
 	};

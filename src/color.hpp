@@ -10,24 +10,48 @@ public:
     // Constructor with blue, green, red components
     Color(float b, float g, float r) : slib::vec3(b, g, r) {}
 
-    // Constructor from glm::vec3 directly
+    // Constructor from slib::vec3 directly
     Color(const slib::vec3& v) : slib::vec3(v) {}
 
-    // Convert to BGRA (assumes 0–255 range)
     uint32_t toBgra() {
 
         float maxComponent = std::max({x, y, z});
         if (maxComponent > 255.0f) {
             float scale = 255.0f / maxComponent;
-            x *= scale;
-            y *= scale;
-            z *= scale;
+            return 0xff000000 | (static_cast<int>(x * scale)) << 16 |
+                                (static_cast<int>(y * scale)) << 8 |
+                                (static_cast<int>(z * scale));   
         }
 
         return 0xff000000 |
-               ((static_cast<int>(x)) << 16) |
-               ((static_cast<int>(y)) << 8) |
-               ((static_cast<int>(z)));
+               (static_cast<int>(x)) << 16 |
+               (static_cast<int>(y)) << 8 |
+               (static_cast<int>(z));
+    }
+
+    uint32_t toBgraToneMapping() {
+
+    // Normalize to 0..1 before tone mapping
+    float r = z / 255.0f;
+    float g = y / 255.0f;
+    float b = x / 255.0f;
+
+    // Apply Reinhard tone mapping: color = color / (color + 1)
+    r = r / (1.0f + r);
+    g = g / (1.0f + g);
+    b = b / (1.0f + b);
+
+    // Apply gamma correction (sRGB gamma ≈ 2.2)
+    r = powf(r, 1.0f / 2.2f);
+    g = powf(g, 1.0f / 2.2f);
+    b = powf(b, 1.0f / 2.2f);
+
+    // Scale to [0, 255] and pack as BGRA
+    return 0xff000000 |
+           (static_cast<int>(r * 255.0f) << 16) |
+           (static_cast<int>(g * 255.0f) << 8) |
+           (static_cast<int>(b * 255.0f));
+
     }
 
     float& blue()  { return x; }

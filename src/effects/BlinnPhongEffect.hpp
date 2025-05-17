@@ -99,7 +99,7 @@ public:
         
             // Specular component: spec = (N · H)^shininess
             float specAngle = std::max(0.0f, smath::dot(N,scene.halfwayVector)); // viewer
-            float spec = std::pow(specAngle, tri.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
+            float spec = std::powf(specAngle, tri.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
         
             if (spec > 0.95) { 
                 return 0xffffffff; // White point if the light is too close to the normal

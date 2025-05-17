@@ -94,7 +94,7 @@ public:
         
             slib::vec3 R = smath::normalize(normal * 2.0f * smath::dot(normal,scene.lux) - scene.lux);
             float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
-            float spec = std::pow(specAngle, tri.material.Ns);
+            float spec = std::powf(specAngle, tri.material.Ns);
         
             if (spec > 0.95) { 
                 return 0xffffffff; // White point if the light is too close to the normal
