@@ -8,6 +8,7 @@
 enum class Shading {
     Flat,
     Gouraud,
+    TexturedGouraud,
     BlinnPhong,
     Phong
 };

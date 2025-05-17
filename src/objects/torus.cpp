@@ -35,6 +35,8 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
             float y = (R + r * cosV) * sinU;
             float z = r * sinV;
             Torus::vertexData[i * vSteps + j].vertex = { x, y, z };
+            Torus::vertexData[i * vSteps + j].texCoord = { x, y };
+        
         }
     }
 
