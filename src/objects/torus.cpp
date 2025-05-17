@@ -35,7 +35,7 @@ void Torus::loadVertices(int uSteps, int vSteps, float R, float r) {
             float y = (R + r * cosV) * sinU;
             float z = r * sinV;
             Torus::vertexData[i * vSteps + j].vertex = { x, y, z };
-            Torus::vertexData[i * vSteps + j].texCoord = { x, y };
+            Torus::vertexData[i * vSteps + j].texCoord = { (x/(R+r)+1)/2, (y/(R+r)+1)/2 };
         
         }
     }
@@ -51,17 +51,21 @@ void Torus::loadFaces(int uSteps, int vSteps) {
 
     MaterialProperties properties = getMaterialProperties(MaterialType::Metal);
 
+    std::string mtlPath = "checker-map_tho.png";
+
     slib::material material{};
     material.Ka = { properties.k_a * 0x00, properties.k_a * 0x58, properties.k_a * 0xfc };
     material.Kd = { properties.k_d * 0x00, properties.k_d * 0x58, properties.k_d * 0xfc }; 
     material.Ks = { properties.k_s * 0x00, properties.k_s * 0x58, properties.k_s * 0xfc };
     material.Ns = properties.shininess;
+    material.map_Kd = DecodePng(std::string(RES_PATH + mtlPath).c_str());
     materials.insert({"blue", material});
 
     material.Ka = { properties.k_a * 0xff, properties.k_a * 0xff, properties.k_a * 0xff };
     material.Kd = { properties.k_d * 0xff, properties.k_d * 0xff, properties.k_d * 0xff };
     material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
     material.Ns = properties.shininess;
+    material.map_Kd = DecodePng(std::string(RES_PATH + mtlPath).c_str());
     materials.insert({"white", material});  
 
     int faceIndex = 0;

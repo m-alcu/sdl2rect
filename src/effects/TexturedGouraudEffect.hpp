@@ -94,9 +94,9 @@ public:
             int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
 
             return Color(
-                tri.material.Ka.x + tri.material.map_Kd.data[index] * vRaster.diffuse,
-                tri.material.Ka.y + tri.material.map_Kd.data[index + 1] * vRaster.diffuse,  
-                tri.material.Ka.z + tri.material.map_Kd.data[index + 2] * vRaster.diffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+                tri.material.map_Kd.data[index] * vRaster.diffuse,
+                tri.material.map_Kd.data[index + 1] * vRaster.diffuse,  
+                tri.material.map_Kd.data[index + 2] * vRaster.diffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 public:
