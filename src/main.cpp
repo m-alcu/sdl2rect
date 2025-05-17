@@ -84,14 +84,16 @@ int main(int argc, char** argv)
                 scene.camera.pos = scene.camera.pos - scene.camera.forward * cameraSpeed; 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_a) {
                 scene.camera.pos = scene.camera.pos + scene.camera.forward * cameraSpeed; 
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
+                scene.solids[0]->shading = Shading::Flat;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_g) {
                 scene.solids[0]->shading = Shading::Gouraud;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_t) {
                 scene.solids[0]->shading = Shading::TexturedGouraud;
-            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_f) {
-                scene.solids[0]->shading = Shading::Flat;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_h) {
-                scene.solids[0]->shading = Shading::BlinnPhong;                 
+                scene.solids[0]->shading = Shading::BlinnPhong; 
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_y) {
+                scene.solids[0]->shading = Shading::TexturedBlinnPhong;                                 
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_j) {
                 scene.solids[0]->shading = Shading::Phong;   
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_u) {
