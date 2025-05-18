@@ -12,19 +12,19 @@ public:
 	public:
     Vertex() {}
 
-    Vertex(int32_t px, int32_t py, float pz, slib::vec3 n, slib::vec4 vp) :
-    p_x(px), p_y(py), p_z(pz), normal(n), ndc(vp) {}
+    Vertex(int32_t px, int32_t py, float pz, slib::vec4 vp) :
+    p_x(px), p_y(py), p_z(pz), ndc(vp) {}
 
     Vertex operator+(const Vertex &v) const {
-        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, normal + v.normal, ndc + v.ndc);
+        return Vertex(p_x + v.p_x, p_y + v.p_y, p_z + v.p_z, ndc + v.ndc);
     }
 
     Vertex operator-(const Vertex &v) const {
-        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, normal - v.normal, ndc - v.ndc);
+        return Vertex(p_x - v.p_x, p_y - v.p_y, p_z - v.p_z, ndc - v.ndc);
     }
 
     Vertex operator*(const float &rhs) const {
-        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, normal * rhs, ndc * rhs);
+        return Vertex(p_x * rhs, p_y * rhs, p_z * rhs, ndc * rhs);
     }
 
 
@@ -32,7 +32,6 @@ public:
         p_x += v.p_x;
         p_y += v.p_y;
         p_z += v.p_z;
-        normal += v.normal;
         ndc += v.ndc;
         return *this;
     }
@@ -43,7 +42,6 @@ public:
         float p_z; 
         slib::vec3 world;
         slib::vec3 point;
-        slib::vec3 normal;
         slib::vec4 ndc;
 	};
 
