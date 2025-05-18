@@ -108,17 +108,17 @@ public:
                     tri.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
             }  else {
 
-                float tx = vRaster.tex.x * w * tri.material.map_Kd.w;
-                float ty = vRaster.tex.y * w * tri.material.map_Kd.w;
+                float tx = vRaster.tex.x * w * tri.material.map_Kd.w - 0.5f;
+                float ty = vRaster.tex.y * w * tri.material.map_Kd.w - 0.5f;
 
-                int left = std::clamp(static_cast<int>(tx - 0.5f), 0, tri.material.map_Kd.w - 2);
-                int top = std::clamp(static_cast<int>(ty - 0.5f), 0, tri.material.map_Kd.h - 2);
+                int left = std::clamp(static_cast<int>(tx), 0, tri.material.map_Kd.w - 2);
+                int top = std::clamp(static_cast<int>(ty), 0, tri.material.map_Kd.h - 2);
                 int right = left + 1;
                 int bottom = top + 1;
 
                 // Get the mantissa of the u/v
-                float fracU = tx - 0.5 - static_cast<float>(left);
-                float fracV = ty - 0.5 - static_cast<float>(top);
+                float fracU = tx - static_cast<float>(left);
+                float fracV = ty - static_cast<float>(top);
 
                 // Calculate the distance (weight) for each corner
                 float ul = (1.0f - fracU) * (1.0f - fracV);
