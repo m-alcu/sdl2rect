@@ -5,6 +5,7 @@
 #include "smath.hpp"
 #include "constants.hpp"
 #include <cmath>
+#include <algorithm>
 
 namespace smath
 {
@@ -142,6 +143,49 @@ namespace smath
     slib::mat4 identity()
     {
         return slib::mat4({{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}});
+    }
+
+    void sampleNearest(const slib::texture& tex, float u, float v, int& r, int& g, int& b)
+    {
+        int tx = static_cast<int>(u * (tex.w - 1));
+        int ty = static_cast<int>(v * (tex.h - 1));
+        int index = (ty * tex.w + tx) * tex.bpp;
+
+        r = tex.data[index];
+        g = tex.data[index + 1];
+        b = tex.data[index + 2];
+    }
+
+    void sampleBilinear(const slib::texture& tex, float u, float v, float& r, float& g, float& b)
+    {
+        float tx = u * tex.w - 0.5f;
+        float ty = v * tex.h - 0.5f;
+
+        int left = std::clamp(static_cast<int>(tx), 0, tex.w - 2);
+        int top = std::clamp(static_cast<int>(ty), 0, tex.h - 2);
+        int right = left + 1;
+        int bottom = top + 1;
+
+        float fracU = tx - left;
+        float fracV = ty - top;
+
+        float ul = (1.0f - fracU) * (1.0f - fracV);
+        float ll = (1.0f - fracU) * fracV;
+        float ur = fracU * (1.0f - fracV);
+        float lr = fracU * fracV;
+
+        auto idx = [&](int x, int y) {
+            return (y * tex.w + x) * tex.bpp;
+        };
+
+        auto tL = idx(left, top);
+        auto tR = idx(right, top);
+        auto bL = idx(left, bottom);
+        auto bR = idx(right, bottom);
+
+        r = ul * tex.data[tL] + ll * tex.data[bL] + ur * tex.data[tR] + lr * tex.data[bR];
+        g = ul * tex.data[tL + 1] + ll * tex.data[bL + 1] + ur * tex.data[tR + 1] + lr * tex.data[bR + 1];
+        b = ul * tex.data[tL + 2] + ll * tex.data[bL + 2] + ur * tex.data[tR + 2] + lr * tex.data[bR + 2];
     }
 
 } // namespace smath

@@ -102,18 +102,31 @@ public:
             float spec = std::pow(specAngle, tri.material.Ns);
 
             float w = 1 / vRaster.tex.w;
-            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
-            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));
-            int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
-        
-            if (spec > 0.95) { 
-                return 0xffffffff; // White point if the light is too close to the normal
+            if (tri.material.map_Kd.textureFilter == slib::TextureFilter::BILINEAR) {
+                float r, g, b;
+                smath::sampleBilinear(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
+
+                if (spec > 0.95) { 
+                    return 0xffffffff; // White point if the light is too close to the normal
+                }
+
+                return Color(
+                    r * diff + Ks.x * spec,
+                    g * diff + Ks.y * spec,
+                    b * diff + Ks.z * spec).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]     
+            }  else {
+                int r, g, b;
+                smath::sampleNearest(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
+
+                if (spec > 0.95) { 
+                    return 0xffffffff; // White point if the light is too close to the normal
+                }
+
+                return Color(
+                    r * diff + Ks.x * spec,
+                    g * diff + Ks.y * spec,
+                    b * diff + Ks.z * spec).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
             }
-        
-            return Color(
-                tri.material.map_Kd.data[index] * diff + Ks.x * spec,
-                tri.material.map_Kd.data[index + 1] * diff + Ks.y * spec,  
-                tri.material.map_Kd.data[index + 2] * diff + Ks.z * spec).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 
 		}
 	};

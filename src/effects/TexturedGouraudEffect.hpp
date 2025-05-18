@@ -95,14 +95,22 @@ public:
 		{
 
             float w = 1 / vRaster.tex.w;
-            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
-            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));
-            int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
+            if (tri.material.map_Kd.textureFilter == slib::TextureFilter::BILINEAR) {
+                float r, g, b;
+                smath::sampleBilinear(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
+                return Color(
+                    r * vRaster.diffuse,
+                    g * vRaster.diffuse,
+                    b * vRaster.diffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]     
+            }  else {
+                int r, g, b;
+                smath::sampleNearest(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
+                return Color(
+                    r * vRaster.diffuse,
+                    g * vRaster.diffuse,
+                    b * vRaster.diffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+            }
 
-            return Color(
-                tri.material.map_Kd.data[index] * vRaster.diffuse,
-                tri.material.map_Kd.data[index + 1] * vRaster.diffuse,  
-                tri.material.map_Kd.data[index + 2] * vRaster.diffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
 	};
 public:

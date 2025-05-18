@@ -21,4 +21,6 @@ namespace smath
     slib::mat4 translation(const slib::vec3& translation);
     slib::mat4 identity();
     slib::mat4 fpsview(const slib::vec3& eye, float pitch, float yaw);
+    void sampleNearest(const slib::texture& tex, float u, float v, int& r, int& g, int& b);
+    void sampleBilinear(const slib::texture& tex, float u, float v, float& r, float& g, float& b);
 }; // namespace smath
