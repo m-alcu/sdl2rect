@@ -101,10 +101,6 @@ public:
             float specAngle = std::max(0.0f, smath::dot(N,scene.halfwayVector)); // viewer
             float spec = std::powf(specAngle, tri.material.Ns); // Blinn Phong shininess needs *4 to be like Phong
         
-            if (spec > 0.95) { 
-                return 0xffffffff; // White point if the light is too close to the normal
-            }
-                
             slib::vec3 color = Ka + Kd * diff + Ks * spec;
             return Color(color).toBgra();
         }

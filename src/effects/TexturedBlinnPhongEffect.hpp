@@ -113,10 +113,6 @@ public:
                 float r, g, b;
                 smath::sampleBilinear(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
 
-                if (spec > 0.95) { 
-                    return 0xffffffff; // White point if the light is too close to the normal
-                }
-
                 return Color(
                     r * diff + Ks.x * spec,
                     g * diff + Ks.y * spec,
@@ -124,10 +120,6 @@ public:
             }  else {
                 int r, g, b;
                 smath::sampleNearest(tri.material.map_Kd, vRaster.tex.x * w, vRaster.tex.y * w, r, g, b);
-
-                if (spec > 0.95) { 
-                    return 0xffffffff; // White point if the light is too close to the normal
-                }
 
                 return Color(
                     r * diff + Ks.x * spec,

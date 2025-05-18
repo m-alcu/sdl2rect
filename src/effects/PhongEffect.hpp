@@ -96,10 +96,6 @@ public:
             float specAngle = std::max(0.0f, smath::dot(R,scene.eye)); // viewer
             float spec = std::powf(specAngle, tri.material.Ns);
         
-            if (spec > 0.95) { 
-                return 0xffffffff; // White point if the light is too close to the normal
-            }
-        
             slib::vec3 color = Ka + Kd * diff + Ks * spec;
             return Color(color).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
 		}
