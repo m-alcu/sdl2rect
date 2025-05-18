@@ -15,11 +15,18 @@ namespace slib
 
     struct material;
 
+    enum class TextureFilter
+    {
+        NEIGHBOUR,
+        BILINEAR
+    };
+
     struct texture
     {
         int w, h;
         std::vector<unsigned char> data;
         unsigned int bpp;
+        TextureFilter textureFilter;
     };
 
     struct zvec2

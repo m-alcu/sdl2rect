@@ -96,14 +96,62 @@ public:
 		{
 
             float w = 1 / vRaster.tex.w;
-            auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
-            auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));
-            int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
 
-            return Color(
-                tri.material.map_Kd.data[index] * tri.flatDiffuse,
-                tri.material.map_Kd.data[index + 1] * tri.flatDiffuse,
-                tri.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+            if (tri.material.map_Kd.textureFilter != slib::TextureFilter::BILINEAR) {
+
+                auto tx = static_cast<int>(vRaster.tex.x * w * (tri.material.map_Kd.w - 1));
+                auto ty = static_cast<int>(vRaster.tex.y * w * (tri.material.map_Kd.h - 1));
+                int index = ( tx + ty * tri.material.map_Kd.w ) * tri.material.map_Kd.bpp;
+                return Color(
+                    tri.material.map_Kd.data[index] * tri.flatDiffuse,
+                    tri.material.map_Kd.data[index + 1] * tri.flatDiffuse,
+                    tri.material.map_Kd.data[index + 2] * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]
+            }  else {
+
+                float tx = vRaster.tex.x * w * tri.material.map_Kd.w;
+                float ty = vRaster.tex.y * w * tri.material.map_Kd.w;
+
+                int left = std::clamp(static_cast<int>(tx - 0.5f), 0, tri.material.map_Kd.w - 2);
+                int top = std::clamp(static_cast<int>(ty - 0.5f), 0, tri.material.map_Kd.h - 2);
+                int right = left + 1;
+                int bottom = top + 1;
+
+                // Get the mantissa of the u/v
+                float fracU = tx - 0.5 - static_cast<float>(left);
+                float fracV = ty - 0.5 - static_cast<float>(top);
+
+                // Calculate the distance (weight) for each corner
+                float ul = (1.0f - fracU) * (1.0f - fracV);
+                float ll = (1.0f - fracU) * fracV;
+                float ur = fracU * (1.0f - fracV);
+                float lr = fracU * fracV;
+
+                // Texture index of above pixel samples
+                auto topLeft = (top * tri.material.map_Kd.w + left) * tri.material.map_Kd.bpp;
+                auto topRight = (top * tri.material.map_Kd.w + right) * tri.material.map_Kd.bpp;
+                auto bottomLeft = (bottom * tri.material.map_Kd.w + left) * tri.material.map_Kd.bpp;
+                auto bottomRight = (bottom * tri.material.map_Kd.w + right) * tri.material.map_Kd.bpp; 
+                
+                float red = ul * tri.material.map_Kd.data[topLeft] + 
+                            ll * tri.material.map_Kd.data[bottomLeft] + 
+                            ur * tri.material.map_Kd.data[topRight] +
+                            lr * tri.material.map_Kd.data[bottomRight];
+                float green = ul * tri.material.map_Kd.data[topLeft + 1] + 
+                            ll * tri.material.map_Kd.data[bottomLeft + 1] +
+                            ur * tri.material.map_Kd.data[topRight + 1] + 
+                            lr * tri.material.map_Kd.data[bottomRight + 1];
+                float blue = ul * tri.material.map_Kd.data[topLeft + 2] + 
+                            ll * tri.material.map_Kd.data[bottomLeft + 2] +
+                            ur * tri.material.map_Kd.data[topRight + 2] + 
+                            lr * tri.material.map_Kd.data[bottomRight + 2];
+
+                return Color(
+                    red * tri.flatDiffuse,
+                    green * tri.flatDiffuse,
+                    blue * tri.flatDiffuse).toBgra(); // assumes vec3 uses .r/g/b or [0]/[1]/[2]     
+
+            }
+
 		}
 	};
 public:

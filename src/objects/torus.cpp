@@ -59,6 +59,7 @@ void Torus::loadFaces(int uSteps, int vSteps) {
     material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
     material.Ns = properties.shininess;
     material.map_Kd = DecodePng(std::string(RES_PATH + mtlPath).c_str());
+    material.map_Kd.textureFilter = slib::TextureFilter::BILINEAR;
     materials.insert({"blue", material});
 
     material.Ka = { properties.k_a * 0x00, properties.k_a * 0x00, properties.k_a * 0x00 };
@@ -66,6 +67,7 @@ void Torus::loadFaces(int uSteps, int vSteps) {
     material.Ks = { properties.k_s * 0xff, properties.k_s * 0xff, properties.k_s * 0xff };
     material.Ns = properties.shininess;
     material.map_Kd = DecodePng(std::string(RES_PATH + mtlPath).c_str());
+    material.map_Kd.textureFilter = slib::TextureFilter::BILINEAR;
     materials.insert({"white", material});  
 
     int faceIndex = 0;
